@@ -2,15 +2,16 @@ using System.Collections.Generic;
 using System;
 using System.Collections;
 using System.Linq;
+using LaYumba.Functional;
 
 public sealed class Cell : IComparable, IEqualityComparer
 {
-    public Cell(UInt16 value, UInt16 row, UInt16 col)
+    public Cell(Option<UInt16> value, UInt16 row, UInt16 col)
     {
         Row = row;
         Column = col;
         Value = value;
-        if (Value > 9)
+        if (Value.IsSome() && Value.value > 9)
         {
             throw new ArgumentOutOfRangeException("value", $"Value: {value} is out of range");
         }
@@ -23,19 +24,21 @@ public sealed class Cell : IComparable, IEqualityComparer
             throw new ArgumentOutOfRangeException("col", $"Column: {col} out of range");
         }
     }
-    public readonly UInt16 Value;
+    public readonly Option<UInt16> Value;
     public readonly UInt16 Row;
     public readonly UInt16 Column;
 
     public bool PositionEquals(Cell other) =>
-        this.Column == other.Column && this.Row == other.Row;
+        Column == other.Column && Row == other.Row;
 
     public int CompareTo(object obj) =>
-        obj == null 
+        obj == null
             ? int.MinValue
             : obj.GetType() != typeof(Cell)
                 ? int.MinValue
-                : this.Value - (obj as Cell).Value;
+                : Value.HasValue == false || (obj as Cell).Value.HasValue == false
+                    ? int.MinValue
+                    : Value.Value - (obj as Cell).Value;
 
     public new bool Equals(object x, object y)
     {
