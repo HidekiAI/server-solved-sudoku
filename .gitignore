@@ -43,6 +43,8 @@ dlldata.c
 
 # Rust build results
 target/
+**/*.rs.bk
+Cargo.lock
 
 # DNX
 project.lock.json
@@ -252,6 +254,7 @@ paket-files/
 
 # FAKE - F# Make
 .fake/
+.ionide/
 
 # JetBrains Rider
 .idea/
@@ -263,16 +266,3 @@ paket-files/
 # Python Tools for Visual Studio (PTVS)
 __pycache__/
 *.pyc
-
-# RUST
-Cargo.lock
-
-
-
-
-#Added by cargo
-#
-#already existing elements are commented out
-
-/target
-**/*.rs.bk
