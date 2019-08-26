@@ -9,17 +9,30 @@ struct Cell
 
 impl Cell {
  fn Set(&self) {
-   println!(“baf!”);
+     Row = self.Row;
+     Col = self.Col;
+     match self.Value ->
+        | > 9 -> fail;
+        | v -> Value() = self.Value;
  }
 }
 
-fn greet() -> String {
-    "Hello, world!".to_string()
+fn Row() -> u8 {
+    self.Row;
+}
+
+fn Col() -> u8 {
+    self.Col;
+}
+
+fn Value() -> u8 {
+    self.Value;
 }
 
 #[cfg(test)] // Only compiles when running tests
 mod tests {
     use super::greet; // Import root greet function
+    x
 
     #[test]
     fn test_greet() {
