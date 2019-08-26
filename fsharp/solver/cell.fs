@@ -1,17 +1,21 @@
 module Cell
+
 open System.Runtime.CompilerServices    // IsReadOnly
 
-type Value = uint16 option
-type Column = uint16
-type Row = uint16
+// Intirinsic and optional extensions
+// type typename with
+//		member self-identifier.member-name =
+//          body
+type Row with
     member FromInt: int -> uint16 // can do this since both int and uint are actually functions
     static member Create: int -> Row
+type Value = uint16 option
+type Column = uint16
 
 let xformValue =
     (fun (x) -> Some (uint16 x) )
 let VMin: Value = xformValue 1
 let VMax: Value = xformValue 9
-
 
 let xform2 = fun x -> Row: Row = xformRow x
 let RMax: Row = xformRow 2
