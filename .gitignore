@@ -267,4 +267,8 @@ paket-files/
 __pycache__/
 *.pyc
 
+# other crufts
 *.bak
+*.tmp
+*.swp
+*.sw?

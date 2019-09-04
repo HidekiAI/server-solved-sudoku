@@ -1,32 +1,34 @@
-mod models {
-    pub struct cell
-    {
-        Value: u8,
-        Row: u8,
-        Col: u8,
-    }
+pub mod sudoku {
+    pub mod models {
+        pub struct cell
+        {
+            Value: u8,
+            Row: u8,
+            Col: u8,
+        }
 
-    impl Cell {
-        fn Set(&self) {
-            Row = self.Row;
-            Col = self.Col;
-            match self.Value {
-                1|2|3|3|4|5|6|7|8|9 => fail,
-                _ => Value() = self.Value,
+        impl Cell {
+            fn Set(&self) {
+                Row = self.Row;
+                Col = self.Col;
+                match self.Value {
+                    1|2|3|3|4|5|6|7|8|9 => fail,
+                    _ => Value() = self.Value,
+                }
             }
         }
-    }
 
-    fn Row() -> u8 {
-        self.Row;
-    }
+        fn Row() -> u8 {
+            self.Row;
+        }
 
-    fn Col() -> u8 {
-        self.Col;
-    }
+        fn Col() -> u8 {
+            self.Col;
+        }
 
-    fn Value() -> u8 {
-        self.Value;
+        fn Value() -> u8 {
+            self.Value;
+        }
     }
 }
 
