@@ -5,4 +5,3 @@ authors = ["Hideki A. Ikeda <hidekiai@CodeMonkeyNinja.com>"]
 edition = "2018"
 
 [dependencies]
-models = { path = "models" }

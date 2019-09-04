@@ -1,38 +1,38 @@
-mod cell;
+mod models {
+    pub struct cell
+    {
+        Value: u8,
+        Row: u8,
+        Col: u8,
+    }
 
-struct Cell
-{
-    u8 Value;
-    u8 Row;
-    u8 Col;
-}
+    impl Cell {
+        fn Set(&self) {
+            Row = self.Row;
+            Col = self.Col;
+            match self.Value {
+                1|2|3|3|4|5|6|7|8|9 => fail,
+                _ => Value() = self.Value,
+            }
+        }
+    }
 
-impl Cell {
- fn Set(&self) {
-     Row = self.Row;
-     Col = self.Col;
-     match self.Value ->
-        | > 9 -> fail;
-        | v -> Value() = self.Value;
- }
-}
+    fn Row() -> u8 {
+        self.Row;
+    }
 
-fn Row() -> u8 {
-    self.Row;
-}
+    fn Col() -> u8 {
+        self.Col;
+    }
 
-fn Col() -> u8 {
-    self.Col;
-}
-
-fn Value() -> u8 {
-    self.Value;
+    fn Value() -> u8 {
+        self.Value;
+    }
 }
 
 #[cfg(test)] // Only compiles when running tests
 mod tests {
     use super::greet; // Import root greet function
-    x
 
     #[test]
     fn test_greet() {
