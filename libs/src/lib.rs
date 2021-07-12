@@ -1,11 +1,11 @@
-use std::io::ErrorKind;
+pub mod sudoku {
+    #[path="models/cell.rs"]
 
-mod sudoku {
-    fn check_cell (cell_value: models::cell) -> Result<bool, Err> {
+    fn check_cell(cell_value: cell) -> Result<bool, string> {
         if cell_value.Value > 9 {
             Err("Call.Value cannot exceed value of 9 on a 3x3");
         }
-        true;
+        Ok(true);
     }
 }
 
@@ -16,3 +16,4 @@ mod tests {
         assert_eq!(2 + 2, 4);
     }
 }
+
