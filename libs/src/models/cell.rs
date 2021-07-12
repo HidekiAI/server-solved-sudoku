@@ -24,25 +24,15 @@ pub mod sudoku {
 
         impl Cell {
             fn Set(&self) {
+                // Row and Col are assumed to be checed/tested at Block level
                 Row = self.Row;
                 Col = self.Col;
+                // validate the value in Cell is in range between 1..9
                 match self.Value {
                     1|2|3|3|4|5|6|7|8|9 => Value() = self.Value,
                     _ => fail,
                 }
             }
-        }
-
-        fn Row() -> u8 {
-            self.Row;
-        }
-
-        fn Col() -> u8 {
-            self.Col;
-        }
-
-        fn Value() -> u8 {
-            self.Value;
         }
     }
 }
