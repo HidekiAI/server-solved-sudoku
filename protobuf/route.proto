@@ -1,0 +1,28 @@
+syntax = "proto3";
+package Router;
+
+message Cell {
+    // should be 1x1 in general and if so, width/height are optional
+    optional uint32 width_count = 1;
+    optional uint32 height_count = 2;
+    repeated int32 data = 3;        // PoD's are packed by default
+}
+message Row {
+    uint32 cell_count = 1;  // aka column_count
+    repeated Cell row = 2;
+}
+
+message Grid {
+    uint32 row_count = 1;
+    repeated Row rows = 2;
+}
+message Game {
+    uint32 width_count = 1;
+    uint32 height_count = 2;
+    repeated Grid game = 3;
+}
+service Route {
+    rpc WorkGrid(Grid) returns (Grid) {}
+    rpc WorkRow(Row) returns (Row) {}
+    rpc Work(Game) returns (Game) {}
+}
