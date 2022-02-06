@@ -268,9 +268,10 @@ __pycache__/
 *.pyc
 
 # other crufts
+**/generated
 *.bak
 *.tmp
 *.swp
 *.sw?
 .editorconfig
-**/generated
+tags
