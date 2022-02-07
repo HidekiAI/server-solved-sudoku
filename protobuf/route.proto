@@ -1,10 +1,18 @@
 syntax = "proto3";
+// This file relies on plugins to generate service code.
+option cc_generic_services = false;
+
 package Router;
 
+service Route {
+    rpc WorkGrid(Grid) returns (Grid) {}
+    rpc WorkRow(Row) returns (Row) {}
+    rpc Work(Game) returns (Game) {}
+}
 message Cell {
     // should be 1x1 in general and if so, width/height are optional
-    optional uint32 width_count = 1;
-    optional uint32 height_count = 2;
+    uint32 width_count = 1;
+    uint32 height_count = 2;
     repeated int32 data = 3;        // PoD's are packed by default
 }
 message Row {
@@ -20,9 +28,4 @@ message Game {
     uint32 width_count = 1;
     uint32 height_count = 2;
     repeated Grid game = 3;
-}
-service Route {
-    rpc WorkGrid(Grid) returns (Grid) {}
-    rpc WorkRow(Row) returns (Row) {}
-    rpc Work(Game) returns (Game) {}
 }

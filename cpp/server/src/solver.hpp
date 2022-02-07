@@ -1,6 +1,7 @@
 #include <iostream>
 #include <memory>
 #include <thread>
+#include <optional>
 
 // Debian libgrpc++-dev package version (source tracks back to from github.com/grpc homepage: grpc.io)
 #include <grpc/support/log.h>

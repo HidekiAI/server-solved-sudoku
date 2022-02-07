@@ -1,6 +1,7 @@
 #include <iostream>
 #include <thread>
 #include <vector>
+#include <optional>
 #include "../../protobuf/generated/route.pb.h"
 
 namespace Sudoku
@@ -41,6 +42,13 @@ namespace Sudoku
             {
                 cells = std::move(cells);
             }
+            Row(const Router::Row& row)
+            {
+                for(const auto& c : row.row())
+                {
+                    cells.add(Cell(c));
+                }
+            }
 
             private:
             std::vector<Cell<T>> cells;
@@ -53,6 +61,13 @@ namespace Sudoku
             Grid(const std::vector<Row<T>>& rows)
             {
                 rows = std::move(rows);
+            }
+            Grid(const Router::Grid& grid)
+            {
+                for(const auto& r : grid.rows())
+                {
+                    rows.add(Row(r));
+                }
             }
 
             private:
@@ -67,6 +82,14 @@ namespace Sudoku
             {
                 grids = std::move(grids);
             }
+            Game(const Router::Game& game)
+            {
+                for(const autu& g : game.game())
+                {
+                    grids.add(Grid(g));
+                }
+            }
+
             private:
             std::vector<Grid<T>> grids = grids;
         };

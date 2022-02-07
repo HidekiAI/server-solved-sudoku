@@ -3,4 +3,7 @@ if ! [ -e generated ]; then
     mkdir generated
 fi
 
-protoc --cpp_out=generated/ --experimental_allow_proto3_optional *.proto
+# build RPC service via plugins
+protoc  --grpc_out=generated/ -I .  --plugin=protoc-gen-grpc=`which grpc_cpp_plugin` *.proto
+# build messages
+protoc --cpp_out=generated/ -I .  *.proto
