@@ -18,12 +18,6 @@ proto_library(
     visibility = ["//visibility:public"]
 )
 
-proto_library(
-    name = "person_proto",
-    srcs = ["person.proto"],
-    deps = [":address_proto"],
-)
-
 load("@rules_proto_grpc//cpp:defs.bzl", "cpp_proto_library")
 #cpp_proto_library(
 #    name = "cpp_route_proto",

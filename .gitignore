@@ -275,8 +275,10 @@ __pycache__/
 *.tmp
 *.swp
 *.sw?
+**/.cache
 .editorconfig
 tags
 tags.lock
 external
 compile_commands.json
+.clangd
