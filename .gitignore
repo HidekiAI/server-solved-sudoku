@@ -278,3 +278,5 @@ __pycache__/
 .editorconfig
 tags
 tags.lock
+external
+compile_commands.json
