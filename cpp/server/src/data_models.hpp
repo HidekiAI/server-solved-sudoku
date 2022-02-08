@@ -2,7 +2,7 @@
 #include <thread>
 #include <vector>
 #include <optional>
-#include "../../protobuf/generated/route.pb.h"
+#include "protobuf/route.pb.h"
 
 namespace Sudoku
 {

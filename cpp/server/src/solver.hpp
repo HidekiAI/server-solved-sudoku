@@ -7,7 +7,8 @@
 #include <grpc/support/log.h>
 #include <grpcpp/grpcpp.h>
 
-#include "../../protobuf/generated/route.pb.h"
+#include "protobuf/route.grpc.pb.h"
+//#include "protobuf/generated/route.pb.h"
 #include "data_models.hpp"
 
 namespace Sudoku
