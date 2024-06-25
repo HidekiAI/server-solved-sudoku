@@ -1,0 +1,8 @@
+[package]
+name = "sudoku_resolver"
+version = "0.1.0"
+edition = "2021"
+authors = ["Hideki A. Ikeda <hidekiai@CodeMonkeyNinja.com>"]
+
+[dependencies]
+libs = { path = "../../libs" }

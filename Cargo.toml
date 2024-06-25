@@ -2,6 +2,8 @@
     resolver = "2"
     members = [
         "libs",
-        "server",
-        "client_tui", "client_ai",
+        "clients/client_tui", 
+        "clients/client_ai", 
+        "micro-services/generator", 
+        "micro-services/resolver", "micro-services/game", "micro-services/trainer",
     ]

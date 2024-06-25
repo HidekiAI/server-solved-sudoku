@@ -1,8 +1,8 @@
 [package]
-name = "server"
+name = "sudoku_game_service"
 version = "0.1.0"
+edition = "2021"
 authors = ["Hideki A. Ikeda <hidekiai@CodeMonkeyNinja.com>"]
-edition = "2018"
 
 [dependencies]
-libs = { path = "../libs" }
+libs = { path = "../../libs" }

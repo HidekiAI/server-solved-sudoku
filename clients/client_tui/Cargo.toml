@@ -1,0 +1,8 @@
+[package]
+name = "sudoku_client_tui"
+version = "0.1.0"
+authors = ["Hideki A. Ikeda <hidekiai@CodeMonkeyNinja.com>"]
+edition = "2018"
+
+[dependencies]
+libs = { path = "../../libs" }
