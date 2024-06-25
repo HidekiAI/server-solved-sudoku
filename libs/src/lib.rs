@@ -1,4 +1,8 @@
-pub mod sudoku {
+pub mod models;
+pub mod generators;
+pub mod solvers;
+
+pub mod libsudoku {
     #[path="models/cell.rs"]
 
     fn check_cell(cell_value: cell) -> Result<bool, string> {

@@ -1,6 +1,4 @@
-pub mod sudoku;
-
-pub mod sudoku {
+pub mod libsudoku {
     pub mod models {
         use std::collections::HashSet;
 

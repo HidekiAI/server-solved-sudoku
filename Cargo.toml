@@ -1,7 +1,7 @@
 [workspace]
-
-members = [
-    "server",
-    "client",
-    "libs",
-]
+    resolver = "2"
+    members = [
+        "libs",
+        "server",
+        "client_tui", "client_ai",
+    ]
