@@ -52,6 +52,8 @@ At the `serde` level, mainly at `into` traits, we'll make sure that if/when new 
 
 It is tempting to bypass all this and pass the raw Protobuf data (in the past, I confess I've done it and I am guilty of my laziness, but I'd argue that I was using C++ `placement-new` and implementing fast message-router and it was to avoid resource allocations and deep-copying data and pointing the memory as typeless/generic `void *`, so I claim not-guilty of laziness and only violated possible memory-leak, potential double-free, can have `NULL`-pointer, loosely-typed, bug-proned code-smell misdemeanor which all C++ programmers are immune to), but to assure separations of I/O-based data and stack-based data, there will be redundancies of defining the data-model twice, once in Protobuf and once in Rust.  This way, when unit-testing and mocking/faking/stubbing, it'll be decoupled and agnostic of the I/O-based data-model.  Not only that, but if Protobuf is no longer desired, there will be no need to touch any layer other than RPC layer.
 
+Lastly, Protobuf 3 has this interesting feature of validation, but it seems it can only be usef with `protoc` and for C/C++ and Go (I think).  I am using Rust `tonic`, hence validations such as whether the cell is in the range of 1..9 is not possible.  Note that Protobuf only supports `int32` so the value cal also be negative as well as way above to 2^31 range.  When deserializing (and serializing), I will have to make sure to validate the range of the value (unlike validation micro-service, I only test for range, no more than that).
+
 ## Servers
 
 There are libraries that are shared between servers-to-servers (S2S).

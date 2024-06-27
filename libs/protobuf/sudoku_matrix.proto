@@ -1,0 +1,44 @@
+syntax = "proto3";
+
+package LibSCSudoku; // Server-Client Sudoku (SCSudoku)
+
+// NOTE: Even though the Service is over-engineered, we'll keep the data model
+// simple. Sudoku data is based on digits 1..9 on a 9x9 matrix and there are no
+// rules of making the matrix dimensions other than 9x9. Hence, in general, a
+// data can even be int32[81] with stride 9, or we can make it just a tad bit
+// more complicated and do int32[9][9] which is what we'll do here. for Network
+// I/O data, we'll do int32[81] but when deserialized, it can (perhaps) be
+// in32[9][9].  At the time of the design, I've decided to at least use
+// `optional` for the cell_value to make it clear that it can be None or
+// Some[1..9], but I could have probably used 0 as a empty cell, mainly because
+// wehen calculating the sume (Rule45), I have to most likely transform None
+// into() 0 anyways (either that or I'd have to iter().flatten()).  I'm assuming
+// for languages that do not have Option<T>, `protoc` probably converts it as
+// NULL/nullptr/null...  If so, I figure using 0 instead for empty cell is
+// probably better?
+message SudokuCell {
+  // NOTE: Validators to check ranges (min:1, max:9) are for protoc and is only
+  // supported for C/C++ and Go, hence we MUST make sure to validate during
+  // serde! (it's different from duplicate digits, which will be on rpc
+  // Validate() call)
+  // NOTE: Maybe using `optional` is overkill sincw when calculating Rule45, we
+  // need to transform None to 0 anyways so that we can sum it up without
+  // testing and flattening the row/column/block.
+  optional int32 cell_value = 1; // Range: Some[1..9] or None
+}
+message SudokuMatrix {
+  // size should be 81 for 9x9 matrix, but could be useful for
+  // languages that needs to know the size of array because
+  // there is no MyArray.len() supporting function...
+  int32 size = 1;               // const 81
+  repeated SudokuCell data = 2; // must match size
+}
+
+message TrainingInput {
+  SudokuMatrix data = 1;
+  // NOTE: validations of ranges must be done during serde!
+  // index Range: 0..80 (actually, it has to be less-than
+  // SudokuMatrix.size to assure it's within the matrix)
+  int32 index = 2;      // Range: 0..80
+  SudokuCell digit = 3; // Range: Some[1..9] or None
+}

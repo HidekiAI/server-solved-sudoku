@@ -1,0 +1,8 @@
+import "libs/protobuf/sudoku_matrix.proto";
+
+package LibSCSudoku; // Server-Client Sudoku (SCSudoku)
+
+service SCSudoku {
+  rpc Train(TrainingInput) returns (LibSCSudoku.SudokuMatrix) {}
+}
+

@@ -1,0 +1,12 @@
+version: '3.8'
+
+services:
+  oauth_relay_service:
+    build: .
+    ports:
+      - "8080:8080" # For OAuth2 callback from Google
+      - "8081:8081" # For client connections and heartbeat
+    environment:
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+      - GOOGLE_REDIRECT_URI=${GOOGLE_REDIRECT_URI}
