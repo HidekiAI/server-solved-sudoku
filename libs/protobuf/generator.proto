@@ -1,8 +1,9 @@
-import "libs/protobuf/sudoku_matrix.proto";
+syntax = "proto3";
+
+import "sudoku_matrix.proto";
 
 package LibSCSudoku; // Server-Client Sudoku (SCSudoku)
 
-service SCSudoku {
-  rpc Generate(LibSCSudoku.SudokuMatrix) returns (LibSCSudoku.SudokuMatrix) {}
+service SCSudokuGenerator {
+  rpc Generate(SudokuMatrix) returns (SudokuMatrix) {}
 }
-

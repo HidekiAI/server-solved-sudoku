@@ -1,16 +1,10 @@
-pub mod models;
 pub mod generators;
+pub mod models;
 pub mod solvers;
 
 pub mod libsudoku {
-    #[path="models/cell.rs"]
+    use crate::models::cell::{self, libsudoku::models::Cell};
 
-    fn check_cell(cell_value: cell) -> Result<bool, string> {
-        if cell_value.Value > 9 {
-            Err("Call.Value cannot exceed value of 9 on a 3x3");
-        }
-        Ok(true);
-    }
 }
 
 #[cfg(test)]
@@ -20,4 +14,3 @@ mod tests {
         assert_eq!(2 + 2, 4);
     }
 }
-

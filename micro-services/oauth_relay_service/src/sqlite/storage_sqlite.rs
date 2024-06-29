@@ -1,5 +1,8 @@
+use super::data_sqlite::{AuthRequest, SharedTokens, TokenData, TokenResponse};
+use super::data_sqlite::TokenData;
 use rusqlite::{params, Connection, Result};
 use serde::{Deserialize, Serialize};
+use std::time::SystemTime;
 use std::time::{SystemTime, UNIX_EPOCH};
 
 const CREATE_TABLE: &str = r#"
@@ -11,15 +14,11 @@ CREATE TABLE IF NOT EXISTS tokens (
     expiry_time INTEGER NOT NULL
 )"#;
 
-#[derive(Clone, Debug)]
-pub struct TokenData {
-    pub access_token: String,
-    pub refresh_token: Option<String>,
-    pub expires_in: i64,
-    pub expiry_time: SystemTime,
-}
-
-fn store_token(conn: &Connection, client_id: &str, token_data: &TokenData) -> Result<()> {
+pub(crate) fn store_token(
+    conn: &Connection,
+    client_id: &str,
+    token_data: &TokenData,
+) -> Result<()> {
     conn.execute(
         "INSERT INTO tokens (client_id, access_token, refresh_token, expires_in, expiry_time) VALUES (?1, ?2, ?3, ?4, ?5)",
         params![
@@ -27,7 +26,7 @@ fn store_token(conn: &Connection, client_id: &str, token_data: &TokenData) -> Re
             token_data.access_token,
             token_data.refresh_token,
             token_data.expires_in,
-            token_data.expiry_time.duration_since(UNIX_EPOCH)?.as_secs() as i64,
+            token_data.expiry_time.duration_since(UNIX_EPOCH)?.as_secs() ,
         ],
     )?;
     Ok(())

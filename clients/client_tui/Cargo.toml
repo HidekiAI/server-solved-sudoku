@@ -5,4 +5,4 @@ authors = ["Hideki A. Ikeda <hidekiai@CodeMonkeyNinja.com>"]
 edition = "2018"
 
 [dependencies]
-libs = { path = "../../libs" }
+libscsudoku = { path = "../../libs" }

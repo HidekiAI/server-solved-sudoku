@@ -43,8 +43,8 @@ AUTH_CODE=$(zenity --entry --text="Enter the authorization code:" --title="OAuth
 TOKEN_URL="https://oauth2.googleapis.com/token"
 
 curl -X POST "${TOKEN_URL}" \
-     -d "client_id=${CLIENT_ID}" \
-     -d "client_secret=${CLIENT_SECRET}" \
-     -d "code=${AUTH_CODE}" \
-     -d "redirect_uri=${REDIRECT_URI}" \
-     -d "grant_type=authorization_code"
+    -d "client_id=${CLIENT_ID}" \
+    -d "client_secret=${CLIENT_SECRET}" \
+    -d "code=${AUTH_CODE}" \
+    -d "redirect_uri=${REDIRECT_URI}" \
+    -d "grant_type=authorization_code"
