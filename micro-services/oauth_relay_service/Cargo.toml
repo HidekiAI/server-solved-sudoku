@@ -6,12 +6,17 @@ authors = ["Hideki A. Ikeda <hidekiai@CodeMonkeyNinja.com>"]
 
 [dependencies]
 libscsudoku = { path = "../../libs" }
-actix-web = "4.8.0"
-reqwest = { version = "0.12.5", features = ["json"] }
-tokio = { version = "1.38.0", features = ["full", "macros", "time", "tokio-macros", "io-util", "io-std"] }
+actix-web = { version = "4.8.0", features = ["openssl"] }
+reqwest = { version = "^0.12.5", features = ["json", "gzip", "stream", "socks"] }
 serde = { version = "1.0.203", features = ["derive"] }
-serde_json = "1.0.118"
+serde_json = "1.0.120"
 dotenv = "0.15.0"
-rusqlite = "0.31.0"
-tokio-postgres = "0.7.10"
-redis = { version = "0.25.4", features = ["tokio-comp"] }
+tokio-rusqlite = "0.5.1"
+anyhow = "1.0.86"
+rand = "0.8.5"
+tokio = { version = "1.38.0", features = ["full", "macros", "tokio-macros", "io-std", "io-util"] }
+serde_urlencoded = "0.7.1"
+actix-rt = "2.10.0"
+actix-session = "0.9.0"
+oauth2 = { version = "4.4.2", features = ["reqwest"] }
+futures = "0.3.30"

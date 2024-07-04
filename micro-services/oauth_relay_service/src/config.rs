@@ -1,6 +1,7 @@
 use dotenv::dotenv;
 use std::env;
 
+#[derive(Clone)]
 pub struct Config {
     pub google_client_id: String,
     pub google_client_secret: String,

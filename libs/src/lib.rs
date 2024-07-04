@@ -3,8 +3,7 @@ pub mod models;
 pub mod solvers;
 
 pub mod libsudoku {
-    use crate::models::cell::{self, libsudoku::models::Cell};
-
+    // API for the libs
 }
 
 #[cfg(test)]
