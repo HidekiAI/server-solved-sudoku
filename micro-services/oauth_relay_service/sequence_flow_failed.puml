@@ -1,0 +1,6 @@
+@startuml
+client -> server : /login
+server -> google_oauth2: redirect client
+client -> google_oauth2: user entry
+google_oauth2 -> client : Auth Failed
+@enduml

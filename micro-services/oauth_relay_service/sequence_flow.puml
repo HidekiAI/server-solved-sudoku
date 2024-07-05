@@ -1,0 +1,57 @@
+@startuml
+'NOTE: nested box is not yet supported
+title Login Sequence
+
+actor client
+box "Micro Services" #lightgrey
+  participant NAT_host
+  database message_service as message
+  participant oauth_service
+  database persistent_storage as storage
+end box
+participant google_oauth2 as google_oauth2
+
+client -> NAT_host: 'https://server.extern.tld:443/login'
+NAT_host --> oauth_service : route/relay\n'https://oauth_service.internal:8080/login'
+activate NAT_host
+oauth_service -> google_oauth2: relay to authorizationEndpoint (HTTP GET)\nto acquire auth_code
+activate google_oauth2
+note right of oauth_service: relay to authorizationEndpoint (HTTP GET)\nto acquire auth_code (to be used for \ntokenEndpoint)\nredirect_uri=https://server.extern.tld:80/auth_callback\nNote that the callback URI is the NAT_host's address,\nBUT because it's to port 8080, it should route it back to\nthis oauth_service micro-service
+note right of oauth_service: oauth_service is the "client" (as in client_id)\nof Google Service\nGoogle will be informed (over HTTPS)\nthe client's info via HTTP header
+hnote over oauth_service: idle (do other \nstuffs while\nwaiting for \ncallback from \ngoogle_oauth2)
+
+note right of oauth_service: See "prompt=consent select_account"\nparameter on auth-code request
+google_oauth2 --> client: username, password, and consent
+note left of google_oauth2: From HTTP header we send to Google, \nit knows the IP:port to query for user \nauth and permissions directly \nbypassing our service \nFrom client's point of view, \nbecause it got message back on the \nestablished port, firewall says \n"it's all good and safe... go to sleep..."
+
+client --> google_oauth2: user entry (username, password, consent)
+note right of client: How the heck does the client know which \nenpoint to send username/password to?!?!? \nI need to sleep!
+... client consents ...
+
+google_oauth2 -> NAT_host: callback (HTTP GET)\nhttps://oauth_service.internal:8080/auth_callback?\n  code=4/P7q7W91a-oMsCeLvIaQm6bTrgtp7
+deactivate google_oauth2
+note right of NAT_host: Note that the callback host is the out/WAN facing IP, but because of the port 8080, it should route it to oauth_service
+NAT_host --> oauth_service: relay callback \nauth_code_callback?code=4/P7q7W91a-oMsCeLvIaQm6bTrgtp7\n(HTTP GET)
+oauth_service -> storage: save access token mapped to key SessionID
+storage --> oauth_service: OK
+
+oauth_service -> google_oauth2: HTTP POST: tokenEndpoint\nredirect_uri=https://server.extern.tld:80/auth_callback
+activate google_oauth2
+note left of google_oauth2: Note that this is an POST request with JSON data\nwhich just happens to have redirect_uri\nbut only for the purpose of\nvalidating that it's from the\nsame service that asked for the auth-code
+google_oauth2 -> oauth_service: HTTP POST Response
+deactivate google_oauth2
+oauth_service -> storage: update token, expiry for session_id
+storage --> oauth_service: OK
+
+oauth_service -> google_oauth2: gimme userinfo
+activate google_oauth2
+google_oauth2 -> oauth_service: HTTP GET Response: gmail
+deactivate google_oauth2
+oauth_service -> storage: update email addreess for session_id
+storage --> oauth_service: OK
+oauth_service -> message: pub/notify new login of session_id
+
+oauth_service -> client : login_succeeded, here's your session_id,\nfrom here on, use this Session_ID
+deactivate NAT_host
+@enduml
+

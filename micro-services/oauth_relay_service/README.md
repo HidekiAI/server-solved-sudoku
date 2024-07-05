@@ -22,24 +22,24 @@ In any case, the process is simple:
 
 Couple points to note on concerns here:
 
-- So why PostgresSQL? That's because in a large-scale cluster, this micro-service is probably the most chatty, and when clients disconnects and reconnects back, the load-balancer and/or routers will not garauntee the client to connect back to the same endpoint.
+-   So why PostgresSQL? That's because in a large-scale cluster, this micro-service is probably the most chatty, and when clients disconnects and reconnects back, the load-balancer and/or routers will not garauntee the client to connect back to the same endpoint.
 
-- Isn't it an issue to have auth-service also be the heartbeat service? Yes, probably is, especially because it's a lack of concerns for DoS mainly because nobody can log in if auth-service is busy wasting its processes on sockets that isn't really a valid/legit connection (this also means that auto-refresh would probably miss the refreshing window because it was busy on illegitimate connections).
+-   Isn't it an issue to have auth-service also be the heartbeat service? Yes, probably is, especially because it's a lack of concerns for DoS mainly because nobody can log in if auth-service is busy wasting its processes on sockets that isn't really a valid/legit connection (this also means that auto-refresh would probably miss the refreshing window because it was busy on illegitimate connections).
 
-- Which raises a new question, why not have a dedicated heartbeat service; It's mainly because I'm just lazy... This service and the game-service are the only services which exposes its host connections (not the IP address, since IP from client side is the same/single host to the routing/proxy service such as Google load-balancer) to the client - of course, client side doesn't know that since I rely on port-forwarding to route client's requests to different/either services - i.e. auth and keepalive to port 8080, and all the game request/response on port 8888. In a nutshell, I just wanted heartbeat/keepalive pulses to be HTTP based because I did not want to create another micro-service with another dedicated port (on this over-engineered cluster) just for heartbeats (note that whether this micro-service or the dedicated heartbeat service recognizes loss of pulse, we need to pub-notify message to Kafka that client is dead), and from client's point-of-view, it somewhat makes more sense to have the socket open and dedicated just for auth/heartbeat, and another socket open for game-service.
+-   Which raises a new question, why not have a dedicated heartbeat service; It's mainly because I'm just lazy... This service and the game-service are the only services which exposes its host connections (not the IP address, since IP from client side is the same/single host to the routing/proxy service such as Google load-balancer) to the client - of course, client side doesn't know that since I rely on port-forwarding to route client's requests to different/either services - i.e. auth and keepalive to port 8080, and all the game request/response on port 8888. In a nutshell, I just wanted heartbeat/keepalive pulses to be HTTP based because I did not want to create another micro-service with another dedicated port (on this over-engineered cluster) just for heartbeats (note that whether this micro-service or the dedicated heartbeat service recognizes loss of pulse, we need to pub-notify message to Kafka that client is dead), and from client's point-of-view, it somewhat makes more sense to have the socket open and dedicated just for auth/heartbeat, and another socket open for game-service.
 
-- That sucks that each clients has to dedicate 2 sockets to play sudoku! In the past experiences, I've noticed that if you provide just one single socket to handle everything, the client/frontend engineers would try to bend-over-backwards to try to fit keepalive messages in the same thread as the game messages. This seems logical, mainly because we both (front and back) can agree that as long as there is some messages, it's considered _not_ idle, so it counds as a keepalive, and only when the player is paused or something, we need keepalives. But here's a scenario they rarely realize, what if the main game request/response blocks the client from sending keepliave because the main thread that sends "messages" (including keepalives) are blocked? Common examples include things like in smartphone games, supposed you're asked to watch a movie/video by the sponsor, in which player is awarded free credits for game instead of paying $$$ from IAP.  But this video takes 120 seconds and the frontend engineer blocks the thread just to watch the video, and backend disconnects the client because it did not have pulse.  Another common case was that backend somehow took longer than X seconds to respond (maybe it had to query another 3rd parth host that tracks segmentations), and the response to the client took longer than Y seconds, and frontend dedicates its messaging thread to send/receive both regular and keepalives, it could not send keepalives.  In both cases, by forcing the frontend to allocate 2 sockets, the natural implementations and design on client-side will most likely attempt to create a separate thread for keepalive/heartbeats, and prevents me from telling this long-a$$ story of why heartbeats should be on separate thread for clients... :stuck_out_tongue_closed_eyes:
+-   That sucks that each clients has to dedicate 2 sockets to play sudoku! In the past experiences, I've noticed that if you provide just one single socket to handle everything, the client/frontend engineers would try to bend-over-backwards to try to fit keepalive messages in the same thread as the game messages. This seems logical, mainly because we both (front and back) can agree that as long as there is some messages, it's considered _not_ idle, so it counds as a keepalive, and only when the player is paused or something, we need keepalives. But here's a scenario they rarely realize, what if the main game request/response blocks the client from sending keepliave because the main thread that sends "messages" (including keepalives) are blocked? Common examples include things like in smartphone games, supposed you're asked to watch a movie/video by the sponsor, in which player is awarded free credits for game instead of paying $$$ from IAP.  But this video takes 120 seconds and the frontend engineer blocks the thread just to watch the video, and backend disconnects the client because it did not have pulse.  Another common case was that backend somehow took longer than X seconds to respond (maybe it had to query another 3rd parth host that tracks segmentations), and the response to the client took longer than Y seconds, and frontend dedicates its messaging thread to send/receive both regular and keepalives, it could not send keepalives.  In both cases, by forcing the frontend to allocate 2 sockets, the natural implementations and design on client-side will most likely attempt to create a separate thread for keepalive/heartbeats, and prevents me from telling this long-a$$ story of why heartbeats should be on separate thread for clients... :stuck_out_tongue_closed_eyes:
 
-- Then why not have the server side feed/send the pulse for each clients? Push versus pull... That's because the common practice is to always design backend in which when a work can be on the client side, make it so. Would you want to have the server manage heartbeat schedule for all the DoS endpoints? "Hi script-kiddy, we've noticed that you've been idle for 30 seconds on your connection #666, here's a check to see if you're alive, no need to respond, just a TCP/IP ack will tell us that you're still connected, wonderful!, we'll send you another pulse in 30 seconds, I have to notify connection #667 now..." :sarcasm:
+-   Then why not have the server side feed/send the pulse for each clients? Push versus pull... That's because the common practice is to always design backend in which when a work can be on the client side, make it so. Would you want to have the server manage heartbeat schedule for all the DoS endpoints? "Hi script-kiddy, we've noticed that you've been idle for 30 seconds on your connection #666, here's a check to see if you're alive, no need to respond, just a TCP/IP ack will tell us that you're still connected, wonderful!, we'll send you another pulse in 30 seconds, I have to notify connection #667 now..." :sarcasm:
 
 ## Points of intersts
 
-- The `TokenData` [struct](./src/data.rs) is used to represent the token information.
-- The `/login` route handles the OAuth2 authentication process.
-- The `/keepalive` route handles the keep-alive mechanism.
-- Tokens are stored in SQLite with `store_token` and retrieved with `get_token_by_session_id`.
-- The Dockerfile sets up the Rust environment and builds the application.
-- The `docker-compose.yml` file sets up the Docker container with port mapping and volume for the SQLite database.
+-   The `TokenData` [struct](./src/data.rs) is used to represent the token information.
+-   The `/login` route handles the OAuth2 authentication process.
+-   The `/keepalive` route handles the keep-alive mechanism.
+-   Tokens are stored in SQLite with `store_token` and retrieved with `get_token_by_session_id`.
+-   The Dockerfile sets up the Rust environment and builds the application.
+-   The `docker-compose.yml` file sets up the Docker container with port mapping and volume for the SQLite database.
 
 ## Project Structure
 
@@ -138,71 +138,14 @@ In any case, perhaps flow-diagram will help better explain... In case when auth 
 
 Few notes:
 
-- There are 2 WAN-facing enpoints, 1 for relay service, 1 for Google callbacks. NOTE: Google OAuth2 ONLY ACCEPTS HTTPS (HTTP connections are refused)
-- It is critical, all the way up to with or without the trailing "/", the `redirect_uri` matches EXACTLY as declared on the Google Console. If you enter as "<https://localhost/callback>" then in your code (for me, it's [here](../.env)) has to match exact!
-- The `redirect_uri` is used mainly as a callback to non-blocking request for Authentication Endpoint at Google. This is because Google needs to interact a bit with the client to ask for username+password and consent (allow/deny) to have the micro-service acquire user's email address from Google. But at the same time, that same `redirect_uri` is used as a signature associated to the authentication code to clarify that the auth-code we're using is specifically for this micro-services consentment, and not for other micro-services (they'll need to have their own callback uri as well as request auth-code for that purpose).
-- `NAT_host` is just the proxy server that is exposed with IP (or hostname with FQDN), listening on HTTPS port 443
-- `message_service` is another micro-service such as Kafka, RabbitMQ, etc for pub/sub/notif
-- `storage` is another micro-service such as SQLite3, MongoDB, PostgresSQL, or even File System, etc that can persist and outlive the lifetime of the service
+-   There are 2 WAN-facing enpoints, 1 for relay service, 1 for Google callbacks. NOTE: Google OAuth2 ONLY ACCEPTS HTTPS (HTTP connections are refused)
+-   It is critical, all the way up to with or without the trailing "/", the `redirect_uri` matches EXACTLY as declared on the Google Console. If you enter as "<https://localhost/callback>" then in your code (for me, it's [here](../.env)) has to match exact!
+-   The `redirect_uri` is used mainly as a callback to non-blocking request for Authentication Endpoint at Google. This is because Google needs to interact a bit with the client to ask for username+password and consent (allow/deny) to have the micro-service acquire user's email address from Google. But at the same time, that same `redirect_uri` is used as a signature associated to the authentication code to clarify that the auth-code we're using is specifically for this micro-services consentment, and not for other micro-services (they'll need to have their own callback uri as well as request auth-code for that purpose).
+-   `NAT_host` is just the proxy server that is exposed with IP (or hostname with FQDN), listening on HTTPS port 443
+-   `message_service` is another micro-service such as Kafka, RabbitMQ, etc for pub/sub/notif
+-   `storage` is another micro-service such as SQLite3, MongoDB, PostgresSQL, or even File System, etc that can persist and outlive the lifetime of the service
 
-```plantuml
-@startuml
-'NOTE: nested box is not yet supported
-title Login Sequence
-
-actor client
-box "Micro Services" #lightgrey
-  participant NAT_host
-  database message_service as message
-  participant oauth_service
-  database persistent_storage as storage
-end box
-participant google_oauth2 as google_oauth2
-
-client -> NAT_host: 'https://server.extern.tld:443/login'
-NAT_host --> oauth_service : route/relay\n'https://oauth_service.internal:8080/login'
-activate NAT_host
-oauth_service -> google_oauth2: relay to authorizationEndpoint (HTTP GET)\nto acquire auth_code
-activate google_oauth2
-note right of oauth_service: relay to authorizationEndpoint (HTTP GET)\nto acquire auth_code (to be used for \ntokenEndpoint)\nredirect_uri=https://server.extern.tld:80/auth_callback\nNote that the callback URI is the NAT_host's address,\nBUT because it's to port 8080, it should route it back to\nthis oauth_service micro-service
-note right of oauth_service: oauth_service is the "client" (as in client_id)\nof Google Service\nGoogle will be informed (over HTTPS)\nthe client's info via HTTP header
-hnote over oauth_service: idle (do other \nstuffs while\nwaiting for \ncallback from \ngoogle_oauth2)
-
-note right of oauth_service: See "prompt=consent select_account"\nparameter on auth-code request
-google_oauth2 --> client: username, password, and consent
-note left of google_oauth2: From HTTP header we send to Google, \nit knows the IP:port to query for user \nauth and permissions directly \nbypassing our service \nFrom client's point of view, \nbecause it got message back on the \nestablished port, firewall says \n"it's all good and safe... go to sleep..."
-
-client --> google_oauth2: user entry (username, password, consent)
-note right of client: How the heck does the client know which \nenpoint to send username/password to?!?!? \nI need to sleep!
-... client consents ...
-
-google_oauth2 -> NAT_host: callback (HTTP GET)\nhttps://oauth_service.internal:8080/auth_callback?\n  code=4/P7q7W91a-oMsCeLvIaQm6bTrgtp7
-deactivate google_oauth2
-note right of NAT_host: Note that the callback host is the out/WAN facing IP, but because of the port 8080, it should route it to oauth_service
-NAT_host --> oauth_service: relay callback \nauth_code_callback?code=4/P7q7W91a-oMsCeLvIaQm6bTrgtp7\n(HTTP GET)
-oauth_service -> storage: save access token mapped to key SessionID
-storage --> oauth_service: OK
-
-oauth_service -> google_oauth2: HTTP POST: tokenEndpoint\nredirect_uri=https://server.extern.tld:80/auth_callback
-activate google_oauth2
-note left of google_oauth2: Note that this is an POST request with JSON data\nwhich just happens to have redirect_uri\nbut only for the purpose of\nvalidating that it's from the\nsame service that asked for the auth-code
-google_oauth2 -> oauth_service: HTTP POST Response
-deactivate google_oauth2
-oauth_service -> storage: update token, expiry for session_id
-storage --> oauth_service: OK
-
-oauth_service -> google_oauth2: gimme userinfo
-activate google_oauth2
-google_oauth2 -> oauth_service: HTTP GET Response: gmail
-deactivate google_oauth2
-oauth_service -> storage: update email addreess for session_id
-storage --> oauth_service: OK
-oauth_service -> message: pub/notify new login of session_id
-
-oauth_service -> client : login_succeeded, here's your session_id,\nfrom here on, use this Session_ID
-deactivate NAT_host
-@enduml
-```
+![flow](sequence_flow.png)
 
 By the way, I'm exaggerating and making false speculations on those notes... I'm pretty sure it's not over the same socket/stream (or am I wrong?!? - please let me sleep!), so I'm unsure how Google gets away on the firewalled host where almost all outgoings are allowed, and only established incomming are valid, type of setup... But it seems to bypass that... Or am I wrong?!? aaaaaaaaaaaaah!
 
@@ -216,14 +159,7 @@ Though access token has expiration, it can be a security issue if the MitM actor
 
 Case where auth fails (i.e. invalid password)
 
-```plantuml
-@startuml
-client -> server : /login
-server -> google_oauth2: redirect client
-client -> google_oauth2: user entry
-google_oauth2 -> client : Auth Failed
-@enduml
-```
+![failed](./sequence_flow_failed.png)
 
 Little more complicated on this spaghetti, but the UML probably is the gist of how the endpoints are associated.
 
