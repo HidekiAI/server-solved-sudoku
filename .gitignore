@@ -296,3 +296,6 @@ tags.lock
 external
 compile_commands.json
 .clangd
+*.har
+*client*secret*.json
+

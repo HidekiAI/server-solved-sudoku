@@ -13,10 +13,10 @@ I like Google OAUTH2 because it's free, it's open source, it's easy to use, and 
 In any case, the process is simple:
 
 1. The micro-service will be a [Docker](./Dockerfile) container, in which will listen to [port 8080](../docker-compose.yml) with HTTP/REST protocol, for new connections.
-2. Client connects to port 8080 (HTTP/REST) of the Docker host with routing address to default routing-paths (`http://auth-host-name:8080/`), which will relay (port-foward) to this micro-service.
+2. Client connects to port 8080 (HTTP/REST) of the Docker host with routing address to default routing-paths (`https://auth-host-name:8080/`), which will relay (port-foward) to this micro-service.
 3. The micro-service is setup to relay the request to Google OAuth2 service, in which will query the player for GMail address and password, and then ask the user if it is alright to allow authorization against this sudoku service (actually, it's against just THIS micro-service, but the idea is, it's the gateway and once your knocking is heard and the door opens, the player has access to the whole cluster).
 4. Google with then send tokens and expiry time in which the micro-service will store into a persisted storage, in case of reconnection. At the time of this writing, I've prototyped for SQLite3, Redis, and PostgresSQL, but I'll be using SQLite3.
-5. The client will then be notified that it's now connected to the sudoku cluster, and the client will be able to send/receive messages to/from the sudoku cluster. But at the same time, it will have to send heartbeat pulses (keepalives) every X seconds to same IP:port (port 8080 of this micro-service) via HTTP/REST request to routing-paths `http://auth-host-name:8080/keepalive`.
+5. The client will then be notified that it's now connected to the sudoku cluster, and the client will be able to send/receive messages to/from the sudoku cluster. But at the same time, it will have to send heartbeat pulses (keepalives) every X seconds to same IP:port (port 8080 of this micro-service) via HTTP/REST request to routing-paths `https://auth-host-name:8080/keepalive`.
 6. If the client is disconnected and/or do not hear heartbeats on port `host:8080/keepalive` for a while, the player is now disallowed access to the whole cluster.
 7. If on the other hand, client is discliplined to keepalive, and the token expires, if the OAuth2 service provided a Refresh Token, it will request the OAuth2 service on behalf of the player, so that player do not require to be re-authenticated.
 
@@ -88,10 +88,17 @@ https://accounts.google.com/o/oauth2/v2/auth?
 ```
 
 ```http
- https://hostname.mydomain.tld/auth_code_callback?error=access_denied
+https://hostname.mydomain.tld:8080/auth_code_callback?error=access_denied
 
- https://hostname.mydomain.tld/auth_code_callback?code=4/P7q7W91a-oMsCeLvIaQm6bTrgtp7
+http://localhost:8080/auth_code_callback?code=4/P7q7W91a-oMsCeLvIaQm6bTrgtp7
+
+https://hostname.mydomain.tld:8080/code? state=security_token%3D138r5719ru3e1%26url%3Dhttps%3A%2F%2Foa2cb.example.com%2FmyHome &code=4/P7q7W91a-oMsCeLvIaQm6bTrgtp7 &scope=openid%20email%20https://www.googleapis.com/auth/userinfo.email
+
+# actual redirect captured (uri edited, but it's my static FQDN):
+https://hostname.mydomain.tld:8080/auth_callback?state=IyMVxN1PBW5nnOTwzaAzQtvyzqKqgX5tqY8ajIzZQ &code=4%2F0ATx3LY4JVvoiqD8jtxqPe9V6Vzm2gzs3x87eBfcYT90Eq0VQ5sVfVJtc0gquHiNuRA4V5A &scope=openid &authuser=2 &prompt=consent
 ```
+
+NOTE 1: `http://localhost` will ONLY WORK IF you have an HTTP (does not have to be TLS) service (such as IIS Express on Windows, etc) running on the same host you're testing WITHOUT DOCKER and/or NAT in your route.
 
 Once you got the authorization code, you need to request for permissions to token endpoint:
 
@@ -107,13 +114,13 @@ redirect_uri=https%3A//hostname.mydomain.tld/auth_code_callback&
 grant_type=authorization_code
 ```
 
-``` json
+```json
 {
-  "access_token": "1/fFAGRNJru1FTz70BzhT3Zg",
-  "expires_in": 3920,
-  "token_type": "Bearer",
-  "scope": "https://www.googleapis.com/auth/drive.metadata.readonly",
-  "refresh_token": "1//xEoDL4iW3cxlI7yDbSRFYNG01kVKM2C-259HOF2aQbI"
+    "access_token": "1/fFAGRNJru1FTz70BzhT3Zg",
+    "expires_in": 3920,
+    "token_type": "Bearer",
+    "scope": "https://www.googleapis.com/auth/drive.metadata.readonly",
+    "refresh_token": "1//xEoDL4iW3cxlI7yDbSRFYNG01kVKM2C-259HOF2aQbI"
 }
 ```
 
@@ -123,17 +130,17 @@ On the other hand, the token endpoint allows your app to obtain an access token 
 
 In summary, the authorization endpoint handles user authentication and consent, while the token endpoint provides the actual access token for subsequent API requests2.
 
-As for userInfoEndpoint, it's mainly because I wanted to make it just a tad fancy and associate GMail account that the user used to associate the AccessToken with.  Whatever element you need to expose, make sure to go to the Console and enable it (i.e. userinfo.email).
+As for userInfoEndpoint, it's mainly because I wanted to make it just a tad fancy and associate GMail account that the user used to associate the AccessToken with. Whatever element you need to expose, make sure to go to the Console and enable it (i.e. userinfo.email).
 
-Firstly, just to clarify, from Google OAuth2 service's point of view, the term "Client" is meant by this micro-service acting as a client to Google's service.  What probably makes it really confusing (well, at least I constantly get confused to a point where I lose sleep, OK maybe not) is that if your mime on your Desktop is setup in a way Google likes it, you'd see a dialog box appear in which it asks for username, password, and even a subsequent dialog box asking for your consent to grant permission for this micro-service to extract private data such as your email address, calendar schedules, etc.  In which you get this double-take of "I never wrote that code nor designed that beautiful UI on this app, where did that logic come from?"
+Firstly, just to clarify, from Google OAuth2 service's point of view, the term "Client" is meant by this micro-service acting as a client to Google's service. What probably makes it really confusing (well, at least I constantly get confused to a point where I lose sleep, OK maybe not) is that if your mime on your Desktop is setup in a way Google likes it, you'd see a dialog box appear in which it asks for username, password, and even a subsequent dialog box asking for your consent to grant permission for this micro-service to extract private data such as your email address, calendar schedules, etc. In which you get this double-take of "I never wrote that code nor designed that beautiful UI on this app, where did that logic come from?"
 
-In any case, perhaps flow-diagram will help better explain...  In case when auth succeeds (i.e. user enters the password correctly)
+In any case, perhaps flow-diagram will help better explain... In case when auth succeeds (i.e. user enters the password correctly)
 
 Few notes:
 
-- There are 2 WAN-facing enpoints, 1 for relay service, 1 for Google callbacks.
-- It is critical, all the way up to with or without the trailing "/", the `redirect_uri` matches EXACTLY as declared on the Google Console.  If you enter as "<http://localhost/callback>" then in your code (for me, it's [here](../.env)) has to match exact!
-- The `redirect_uri` is used mainly as a callback to non-blocking request for Authentication Endpoint at Google.  This is because Google needs to interact a bit with the client to ask for username+password and consent (allow/deny) to have the micro-service acquire user's email address from Google.  But at the same time, that same `redirect_uri` is used as a signature associated to the authentication code to clarify that the auth-code we're using is specifically for this micro-services consentment, and not for other micro-services (they'll need to have their own callback uri as well as request auth-code for that purpose).
+- There are 2 WAN-facing enpoints, 1 for relay service, 1 for Google callbacks. NOTE: Google OAuth2 ONLY ACCEPTS HTTPS (HTTP connections are refused)
+- It is critical, all the way up to with or without the trailing "/", the `redirect_uri` matches EXACTLY as declared on the Google Console. If you enter as "<https://localhost/callback>" then in your code (for me, it's [here](../.env)) has to match exact!
+- The `redirect_uri` is used mainly as a callback to non-blocking request for Authentication Endpoint at Google. This is because Google needs to interact a bit with the client to ask for username+password and consent (allow/deny) to have the micro-service acquire user's email address from Google. But at the same time, that same `redirect_uri` is used as a signature associated to the authentication code to clarify that the auth-code we're using is specifically for this micro-services consentment, and not for other micro-services (they'll need to have their own callback uri as well as request auth-code for that purpose).
 - `NAT_host` is just the proxy server that is exposed with IP (or hostname with FQDN), listening on HTTPS port 443
 - `message_service` is another micro-service such as Kafka, RabbitMQ, etc for pub/sub/notif
 - `storage` is another micro-service such as SQLite3, MongoDB, PostgresSQL, or even File System, etc that can persist and outlive the lifetime of the service
@@ -153,11 +160,11 @@ end box
 participant google_oauth2 as google_oauth2
 
 client -> NAT_host: 'https://server.extern.tld:443/login'
-NAT_host --> oauth_service : route/relay\n'http://oauth_service.internal:8080/login'
+NAT_host --> oauth_service : route/relay\n'https://oauth_service.internal:8080/login'
 activate NAT_host
-oauth_service -> google_oauth2: relay to authorizationEndpoint (HTTP GET)\nto acquire auth_code 
+oauth_service -> google_oauth2: relay to authorizationEndpoint (HTTP GET)\nto acquire auth_code
 activate google_oauth2
-note right of oauth_service: relay to authorizationEndpoint (HTTP GET)\nto acquire auth_code (to be used for \ntokenEndpoint)\nredirect_uri=http://server.extern.tld:80/auth_callback\nNote that the callback URI is the NAT_host's address,\nBUT because it's to port 8080, it should route it back to\nthis oauth_service micro-service
+note right of oauth_service: relay to authorizationEndpoint (HTTP GET)\nto acquire auth_code (to be used for \ntokenEndpoint)\nredirect_uri=https://server.extern.tld:80/auth_callback\nNote that the callback URI is the NAT_host's address,\nBUT because it's to port 8080, it should route it back to\nthis oauth_service micro-service
 note right of oauth_service: oauth_service is the "client" (as in client_id)\nof Google Service\nGoogle will be informed (over HTTPS)\nthe client's info via HTTP header
 hnote over oauth_service: idle (do other \nstuffs while\nwaiting for \ncallback from \ngoogle_oauth2)
 
@@ -169,14 +176,14 @@ client --> google_oauth2: user entry (username, password, consent)
 note right of client: How the heck does the client know which \nenpoint to send username/password to?!?!? \nI need to sleep!
 ... client consents ...
 
-google_oauth2 -> NAT_host: callback (HTTP GET)\nhttp://oauth_service.internal:8080/auth_callback?\n  code=4/P7q7W91a-oMsCeLvIaQm6bTrgtp7
+google_oauth2 -> NAT_host: callback (HTTP GET)\nhttps://oauth_service.internal:8080/auth_callback?\n  code=4/P7q7W91a-oMsCeLvIaQm6bTrgtp7
 deactivate google_oauth2
 note right of NAT_host: Note that the callback host is the out/WAN facing IP, but because of the port 8080, it should route it to oauth_service
 NAT_host --> oauth_service: relay callback \nauth_code_callback?code=4/P7q7W91a-oMsCeLvIaQm6bTrgtp7\n(HTTP GET)
-oauth_service -> storage: save access token mapped to key SessionID 
+oauth_service -> storage: save access token mapped to key SessionID
 storage --> oauth_service: OK
 
-oauth_service -> google_oauth2: HTTP POST: tokenEndpoint\nredirect_uri=http://server.extern.tld:80/auth_callback
+oauth_service -> google_oauth2: HTTP POST: tokenEndpoint\nredirect_uri=https://server.extern.tld:80/auth_callback
 activate google_oauth2
 note left of google_oauth2: Note that this is an POST request with JSON data\nwhich just happens to have redirect_uri\nbut only for the purpose of\nvalidating that it's from the\nsame service that asked for the auth-code
 google_oauth2 -> oauth_service: HTTP POST Response
@@ -186,7 +193,7 @@ storage --> oauth_service: OK
 
 oauth_service -> google_oauth2: gimme userinfo
 activate google_oauth2
-google_oauth2 -> oauth_service: HTTP GET Response: gmail 
+google_oauth2 -> oauth_service: HTTP GET Response: gmail
 deactivate google_oauth2
 oauth_service -> storage: update email addreess for session_id
 storage --> oauth_service: OK
@@ -197,13 +204,15 @@ deactivate NAT_host
 @enduml
 ```
 
-  By the way, I'm exaggerating and making false speculations on those notes...  I'm pretty sure it's not over the same socket/stream (or am I wrong?!? - please let me sleep!), so I'm unsure how Google gets away on the firewalled host where almost all outgoings are allowed, and only established incomming are valid, type of setup...  But it seems to bypass that...  Or am I wrong?!?  aaaaaaaaaaaaah!
+By the way, I'm exaggerating and making false speculations on those notes... I'm pretty sure it's not over the same socket/stream (or am I wrong?!? - please let me sleep!), so I'm unsure how Google gets away on the firewalled host where almost all outgoings are allowed, and only established incomming are valid, type of setup... But it seems to bypass that... Or am I wrong?!? aaaaaaaaaaaaah!
 
-Aside from my sacastic comments, I recall having to write a Javascript for Firefox once (and never again, do I want to) to have a pop-up dialog box appear to request for consents.  I'm using [zenity](https://github.com/GNOME/zenity) on this [BASH script](./test_client_auth.sh), see if that makes me sleep better...
+Aside from my sacastic comments, I recall having to write a Javascript for Firefox once (and never again, do I want to) to have a pop-up dialog box appear to request for consents. I'm using [zenity](https://github.com/GNOME/zenity) on this [BASH script](./test_client_auth.sh), see if that makes me sleep better...
+
+<img src="./screenshot-auth-consent.png" width="15%"/>
 
 In general we get back auth token and refresh token, as well as expiry time, but none of these should (in practice) be sent back to client (especially in raw-text), instead we'll send back a SessionID associated/mapped to that token data; and backend should monitor for refresh token if session is about to expire.
 
-Though access token has expiration, it can be a security issue if the MitM actor acquires the tokens before expirations.  As you can see from the UML example, I can inquire the email address of the client via this token.  Of course, the bad-actor also have to have my [Google Client Key](./src/config.rs) (also [here](../.env)), and also, I want to demonstrate bad practices, so I'm saving/persisting the access-token in RAW TEXT on SQLite3 :grimacing:  Which reminds me of a (true) story in which the company I used to work for many years ago encoded (not encrypted) SSN numbers of customers (for tax purposes) and stored it on SQL database... :innocent:  But then again, the same company also hard-coded passwords (in raw text) onto the source code (I've reported it to concerned group at that company more than once, but nothing was done)...
+Though access token has expiration, it can be a security issue if the MitM actor acquires the tokens before expirations. As you can see from the UML example, I can inquire the email address of the client via this token. Of course, the bad-actor also have to have my [Google Client Key](./src/config.rs) (also [here](../.env)), and also, I want to demonstrate bad practices, so I'm saving/persisting the access-token in RAW TEXT on SQLite3 :grimacing: Which reminds me of a (true) story in which the company I used to work for many years ago encoded (not encrypted) SSN numbers of customers (for tax purposes) and stored it on SQL database... :innocent: But then again, the same company also hard-coded passwords (in raw text) onto the source code (I've reported it to concerned group at that company more than once, but nothing was done)...  
 
 Case where auth fails (i.e. invalid password)
 
@@ -217,3 +226,21 @@ google_oauth2 -> client : Auth Failed
 ```
 
 Little more complicated on this spaghetti, but the UML probably is the gist of how the endpoints are associated.
+
+## localhost redirect_uri
+
+From [Google Identity](https://developers.google.com/identity/openid-connect/openid-connect?authuser=2#sendauthrequest) documentations:
+
+> `redirect_uri` should be the HTTP endpoint on your server that will receive the response from Google. The value must exactly match one of the authorized redirect URIs for the OAuth 2.0 client, which you configured in the API Console Credentials page. If this value doesn't match an authorized URI, the request will fail with a redirect_uri_mismatch error
+
+Strange that this statement says "HTTP" yet a paragraph above it mentions "...Note the use of HTTPS rather than HTTP in all the steps of this process; HTTP connections are refused..."
+
+Also note that in the [Credentials page](https://console.developers.google.com/apis/credentials?authuser=2), for `redirect_uri`, you can only enter domain names that ends in valid extension (`.com`, `.net`, etc) except when it is `http://localhost` as well as the fact that it allows entry of both `HTTP` and `HTTPS`.
+
+According to [this](https://www.nango.dev/blog/oauth-redirects-on-localhost-with-https) nice blog on [nango.dev](https://github.com/NangoHQ/nango), there are ways to overcome these issues (as well as what no longer works).
+
+And final conflicting notes from the [Cloud Console](https://console.cloud.gooogle.com):
+
+> Users will be redirected to this path after they have authenticated with Google. The path will be appended with the authorization code for access, and must have a protocol. It can’t contain URL fragments, relative paths, or wildcards, and can’t be a public IP address. ![screenshot-redirect-url](./screenshot-redirect_uri-help-text.png "can't be a public IP")
+
+I _THINK_ (though I'm still unsure to this day) it means the address (literally) cannot be a raw IPv4 and/or IPv6 address, and only allows FQDN... Though it's blacked out, that "public" (TLS/HTTPS) address is my HTTPS (static) endpoint, and it's in FQDN and points to port 8080 so port-forwarding can magically happen...

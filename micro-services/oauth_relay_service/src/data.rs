@@ -95,7 +95,7 @@ impl TokenData {
 // see: https://developers.google.com/identity/protocols/oauth2/web-server#creatingclient
 
 #[derive(Serialize)]
-pub struct AuthCodeRequest {
+pub struct OAuth2AuthCodeRequest {
     pub client_id: String, // from the API Console Credentials page
     // redirect_uri: The value must exactly match one of the authorized redirect URIs for the
     // OAuth 2.0 client, which you configured in your client's API Console Credentials page.
@@ -126,7 +126,7 @@ pub struct AuthCodeRequest {
 //   https://localhost:8080/authcode_callback?error=access_denied
 //   https://localhost:8080/authcode_callback?code=4/P7q7W91a-oMsCeLvIaQm6bTrgtp7
 #[derive(Deserialize)]
-pub struct AuthCodeResponse {
+pub struct OAuth2AuthCodeResponse {
     // can I serialize Union/enum types so I don't have to make both elements Option<>?
     pub code: Option<String>,  // None if access_denied and/or other errors
     pub error: Option<String>, // None if code is present
@@ -170,7 +170,7 @@ pub struct OAuth2UerInfoRequest {
     pub access_token: String,
 }
 
-#[derive(Serialize )]
+#[derive(Serialize)]
 pub struct OAuth2UserInfoResponse {
     pub email: String,
 }
