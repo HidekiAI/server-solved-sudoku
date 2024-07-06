@@ -22,24 +22,24 @@ In any case, the process is simple:
 
 Couple points to note on concerns here:
 
--   So why PostgresSQL? That's because in a large-scale cluster, this micro-service is probably the most chatty, and when clients disconnects and reconnects back, the load-balancer and/or routers will not garauntee the client to connect back to the same endpoint.
+- So why PostgresSQL? That's because in a large-scale cluster, this micro-service is probably the most chatty, and when clients disconnects and reconnects back, the load-balancer and/or routers will not garauntee the client to connect back to the same endpoint.
 
--   Isn't it an issue to have auth-service also be the heartbeat service? Yes, probably is, especially because it's a lack of concerns for DoS mainly because nobody can log in if auth-service is busy wasting its processes on sockets that isn't really a valid/legit connection (this also means that auto-refresh would probably miss the refreshing window because it was busy on illegitimate connections).
+- Isn't it an issue to have auth-service also be the heartbeat service? Yes, probably is, especially because it's a lack of concerns for DoS mainly because nobody can log in if auth-service is busy wasting its processes on sockets that isn't really a valid/legit connection (this also means that auto-refresh would probably miss the refreshing window because it was busy on illegitimate connections).
 
--   Which raises a new question, why not have a dedicated heartbeat service; It's mainly because I'm just lazy... This service and the game-service are the only services which exposes its host connections (not the IP address, since IP from client side is the same/single host to the routing/proxy service such as Google load-balancer) to the client - of course, client side doesn't know that since I rely on port-forwarding to route client's requests to different/either services - i.e. auth and keepalive to port 8080, and all the game request/response on port 8888. In a nutshell, I just wanted heartbeat/keepalive pulses to be HTTP based because I did not want to create another micro-service with another dedicated port (on this over-engineered cluster) just for heartbeats (note that whether this micro-service or the dedicated heartbeat service recognizes loss of pulse, we need to pub-notify message to Kafka that client is dead), and from client's point-of-view, it somewhat makes more sense to have the socket open and dedicated just for auth/heartbeat, and another socket open for game-service.
+- Which raises a new question, why not have a dedicated heartbeat service; It's mainly because I'm just lazy... This service and the game-service are the only services which exposes its host connections (not the IP address, since IP from client side is the same/single host to the routing/proxy service such as Google load-balancer) to the client - of course, client side doesn't know that since I rely on port-forwarding to route client's requests to different/either services - i.e. auth and keepalive to port 8080, and all the game request/response on port 8888. In a nutshell, I just wanted heartbeat/keepalive pulses to be HTTP based because I did not want to create another micro-service with another dedicated port (on this over-engineered cluster) just for heartbeats (note that whether this micro-service or the dedicated heartbeat service recognizes loss of pulse, we need to pub-notify message to Kafka that client is dead), and from client's point-of-view, it somewhat makes more sense to have the socket open and dedicated just for auth/heartbeat, and another socket open for game-service.
 
--   That sucks that each clients has to dedicate 2 sockets to play sudoku! In the past experiences, I've noticed that if you provide just one single socket to handle everything, the client/frontend engineers would try to bend-over-backwards to try to fit keepalive messages in the same thread as the game messages. This seems logical, mainly because we both (front and back) can agree that as long as there is some messages, it's considered _not_ idle, so it counds as a keepalive, and only when the player is paused or something, we need keepalives. But here's a scenario they rarely realize, what if the main game request/response blocks the client from sending keepliave because the main thread that sends "messages" (including keepalives) are blocked? Common examples include things like in smartphone games, supposed you're asked to watch a movie/video by the sponsor, in which player is awarded free credits for game instead of paying $$$ from IAP.  But this video takes 120 seconds and the frontend engineer blocks the thread just to watch the video, and backend disconnects the client because it did not have pulse.  Another common case was that backend somehow took longer than X seconds to respond (maybe it had to query another 3rd parth host that tracks segmentations), and the response to the client took longer than Y seconds, and frontend dedicates its messaging thread to send/receive both regular and keepalives, it could not send keepalives.  In both cases, by forcing the frontend to allocate 2 sockets, the natural implementations and design on client-side will most likely attempt to create a separate thread for keepalive/heartbeats, and prevents me from telling this long-a$$ story of why heartbeats should be on separate thread for clients... :stuck_out_tongue_closed_eyes:
+- That sucks that each clients has to dedicate 2 sockets to play sudoku! In the past experiences, I've noticed that if you provide just one single socket to handle everything, the client/frontend engineers would try to bend-over-backwards to try to fit keepalive messages in the same thread as the game messages. This seems logical, mainly because we both (front and back) can agree that as long as there is some messages, it's considered _not_ idle, so it counds as a keepalive, and only when the player is paused or something, we need keepalives. But here's a scenario they rarely realize, what if the main game request/response blocks the client from sending keepliave because the main thread that sends "messages" (including keepalives) are blocked? Common examples include things like in smartphone games, supposed you're asked to watch a movie/video by the sponsor, in which player is awarded free credits for game instead of paying $$$ from IAP.  But this video takes 120 seconds and the frontend engineer blocks the thread just to watch the video, and backend disconnects the client because it did not have pulse.  Another common case was that backend somehow took longer than X seconds to respond (maybe it had to query another 3rd parth host that tracks segmentations), and the response to the client took longer than Y seconds, and frontend dedicates its messaging thread to send/receive both regular and keepalives, it could not send keepalives.  In both cases, by forcing the frontend to allocate 2 sockets, the natural implementations and design on client-side will most likely attempt to create a separate thread for keepalive/heartbeats, and prevents me from telling this long-a$$ story of why heartbeats should be on separate thread for clients... :stuck_out_tongue_closed_eyes:
 
--   Then why not have the server side feed/send the pulse for each clients? Push versus pull... That's because the common practice is to always design backend in which when a work can be on the client side, make it so. Would you want to have the server manage heartbeat schedule for all the DoS endpoints? "Hi script-kiddy, we've noticed that you've been idle for 30 seconds on your connection #666, here's a check to see if you're alive, no need to respond, just a TCP/IP ack will tell us that you're still connected, wonderful!, we'll send you another pulse in 30 seconds, I have to notify connection #667 now..." :sarcasm:
+- Then why not have the server side feed/send the pulse for each clients? Push versus pull... That's because the common practice is to always design backend in which when a work can be on the client side, make it so. Would you want to have the server manage heartbeat schedule for all the DoS endpoints? "Hi script-kiddy, we've noticed that you've been idle for 30 seconds on your connection #666, here's a check to see if you're alive, no need to respond, just a TCP/IP ack will tell us that you're still connected, wonderful!, we'll send you another pulse in 30 seconds, I have to notify connection #667 now..." :sarcasm:
 
 ## Points of intersts
 
--   The `TokenData` [struct](./src/data.rs) is used to represent the token information.
--   The `/login` route handles the OAuth2 authentication process.
--   The `/keepalive` route handles the keep-alive mechanism.
--   Tokens are stored in SQLite with `store_token` and retrieved with `get_token_by_session_id`.
--   The Dockerfile sets up the Rust environment and builds the application.
--   The `docker-compose.yml` file sets up the Docker container with port mapping and volume for the SQLite database.
+- The `TokenData` [struct](./src/data.rs) is used to represent the token information.
+- The `/login` route handles the OAuth2 authentication process.
+- The `/keepalive` route handles the keep-alive mechanism.
+- Tokens are stored in SQLite with `store_token` and retrieved with `get_token_by_session_id`.
+- The Dockerfile sets up the Rust environment and builds the application.
+- The `docker-compose.yml` file sets up the Docker container with port mapping and volume for the SQLite database.
 
 ## Project Structure
 
@@ -138,12 +138,12 @@ In any case, perhaps flow-diagram will help better explain... In case when auth 
 
 Few notes:
 
--   There are 2 WAN-facing enpoints, 1 for relay service, 1 for Google callbacks. NOTE: Google OAuth2 ONLY ACCEPTS HTTPS (HTTP connections are refused)
--   It is critical, all the way up to with or without the trailing "/", the `redirect_uri` matches EXACTLY as declared on the Google Console. If you enter as "<https://localhost/callback>" then in your code (for me, it's [here](../.env)) has to match exact!
--   The `redirect_uri` is used mainly as a callback to non-blocking request for Authentication Endpoint at Google. This is because Google needs to interact a bit with the client to ask for username+password and consent (allow/deny) to have the micro-service acquire user's email address from Google. But at the same time, that same `redirect_uri` is used as a signature associated to the authentication code to clarify that the auth-code we're using is specifically for this micro-services consentment, and not for other micro-services (they'll need to have their own callback uri as well as request auth-code for that purpose).
--   `NAT_host` is just the proxy server that is exposed with IP (or hostname with FQDN), listening on HTTPS port 443
--   `message_service` is another micro-service such as Kafka, RabbitMQ, etc for pub/sub/notif
--   `storage` is another micro-service such as SQLite3, MongoDB, PostgresSQL, or even File System, etc that can persist and outlive the lifetime of the service
+- There are 2 WAN-facing enpoints, 1 for relay service, 1 for Google callbacks. NOTE: Google OAuth2 ONLY ACCEPTS HTTPS (HTTP connections are refused)
+- It is critical, all the way up to with or without the trailing "/", the `redirect_uri` matches EXACTLY as declared on the Google Console. If you enter as "<https://localhost/callback>" then in your code (for me, it's [here](../.env)) has to match exact!
+- The `redirect_uri` is used mainly as a callback to non-blocking request for Authentication Endpoint at Google. This is because Google needs to interact a bit with the client to ask for username+password and consent (allow/deny) to have the micro-service acquire user's email address from Google. But at the same time, that same `redirect_uri` is used as a signature associated to the authentication code to clarify that the auth-code we're using is specifically for this micro-services consentment, and not for other micro-services (they'll need to have their own callback uri as well as request auth-code for that purpose).
+- `NAT_host` is just the proxy server that is exposed with IP (or hostname with FQDN), listening on HTTPS port 443
+- `message_service` is another micro-service such as Kafka, RabbitMQ, etc for pub/sub/notif
+- `storage` is another micro-service such as SQLite3, MongoDB, PostgresSQL, or even File System, etc that can persist and outlive the lifetime of the service
 
 ![flow](sequence_flow.png)
 
@@ -171,7 +171,7 @@ From [Google Identity](https://developers.google.com/identity/openid-connect/ope
 
 Strange that this statement says "HTTP" yet a paragraph above it mentions "...Note the use of HTTPS rather than HTTP in all the steps of this process; HTTP connections are refused..."
 
-Also note that in the [Credentials page](https://console.developers.google.com/apis/credentials?authuser=2), for `redirect_uri`, you can only enter domain names that ends in valid extension (`.com`, `.net`, etc) except when it is `http://localhost` as well as the fact that it allows entry of both `HTTP` and `HTTPS`.
+Also note that in the [Credentials page](https://console.developers.google.com/apis/credentials?authuser=2), for `redirect_uri`, you can only enter domain names thaNango blog (few paragraphs above)t ends in valid extension (`.com`, `.net`, etc) except when it is `http://localhost` as well as the fact that it allows entry of both `HTTP` and `HTTPS`.
 
 According to [this](https://www.nango.dev/blog/oauth-redirects-on-localhost-with-https) nice blog on [nango.dev](https://github.com/NangoHQ/nango), there are ways to overcome these issues (as well as what no longer works).
 
@@ -179,4 +179,32 @@ And final conflicting notes from the [Cloud Console](https://console.cloud.gooog
 
 > Users will be redirected to this path after they have authenticated with Google. The path will be appended with the authorization code for access, and must have a protocol. It can’t contain URL fragments, relative paths, or wildcards, and can’t be a public IP address. ![screenshot-redirect-url](./screenshot-redirect_uri-help-text.png "can't be a public IP")
 
-I _THINK_ (though I'm still unsure to this day) it means the address (literally) cannot be a raw IPv4 and/or IPv6 address, and only allows FQDN... Though it's blacked out, that "public" (TLS/HTTPS) address is my HTTPS (static) endpoint, and it's in FQDN and points to port 8080 so port-forwarding can magically happen...
+To clarify the above screenshot, it literally means you CANNOT use IPv4 and/or IPv6 addresses, you MUST use named FQDN (with exception of "localhost").  Though it's blacked out, that "public" (TLS/HTTPS) address is my HTTPS (static) endpoint, and it's in FQDN and points to port 8080 so port-forwarding can magically happen...  But you can notice that I have 2 URIs, the one above my public static address is "<http://localhost:8080/auth_callback>" (note that it's non-TLS, but it can be HTTPS, it's just easier to `tcpdump` network traffic if it is raw traffic) and it's pointing to port 8080 as well (so that I can take advantages of port-forwarding characteristics).  Both works (as in, tested) for its purposes, one is in the case of normal development, the other is in case of when I use `cURL` and prefer to use loopback.
+
+Finally, on the note of HTTPS/TLS...  I've not tried it in long-while, but I have in the past, setup Docker-compose based setup in which I'd use nginx to relay HTTPS requests with self-signed certs to other Docker containers based on incoming URI.  I cannot remember but I think I've been able to even transform and relay HTTPS (on nginx) to HTTP (on Rust HTTP listner).  But the point is, Google will allow redirect to self-signed certificate based endpoint/hosts, so you can do both "<http://localhost:8080/auth_callback>" and "<https://localhost:8080/auth_callback>" (or one-or-the-other).  I saw a section on Nango blog (few paragraphs above) mentioned that it's hard to make it work but it's doable as well (the author recommends not to do it just for redirect_uri).
+
+As for security thingy, I'm not an expert but I don't really think it really matters whether your redirect_uri is HTTPS (TLS based) or HTTP (raw) because the authenticat-code is part of the URI parameters (i.e. the `code=...` in '<http://localhost:8080/auth_code_callback?code=4/P7q7W91a-oMsCeLvIaQm6bTrgtp7>').  When I get this callback, all I'm doing is checking for parameter [actix_web::request::HttpRequest::query_string()](https://docs.rs/actix-web/latest/actix_web/struct.HttpRequest.html#method.query_string) for parameter presence of `code` or `error` and I never care about the payloads.  In another words, the code is visible whether it's TLS-based or raw request when sniffing network traffic...
+
+```rust
+#[actix_web::get("/auth_callback")] // routing paths MUST match Config::google_redirect_uri! (actually it's GOOGLE_REDIRECT_URI in .env file)
+pub async fn auth_code_callback( client_http_request: HttpRequest,) -> impl Responder {
+    let query_string = client_http_request.query_string();
+    let query_params: HashMap<String, String> = serde_urlencoded::from_str(query_string).unwrap_or_else(|_| HashMap::new());
+    let auth_code_response = OAuth2AuthCodeResponse {
+        possible_error: query_params.get("error").map(|s| s.to_string()),
+        possible_code: query_params.get("code").map(|s| s.to_string()),
+    };
+
+    ...
+
+    match auth_code_response.possible_error {
+        Some(_) => {
+            // Error occurred, let's log it and return 500
+            println!( "AuthCodeCallback: Error={}", auth_code_response.possible_error.unwrap());
+            HttpResponse::InternalServerError().finish()
+        }
+        None => {
+            // First, if it is NOT an error, let's go ahead and request OAuth2Token from Google
+            let auth_code = auth_code_response.possible_code.unwrap(); // should panic if code is not present!
+            ...
+```

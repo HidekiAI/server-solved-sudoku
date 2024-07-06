@@ -22,7 +22,11 @@ use std::{
     sync::Arc,
     time::{Duration, SystemTime, UNIX_EPOCH},
 };
-use tokio::sync::{broadcast, futures, mpsc::{channel, Receiver, Sender}, Mutex};
+use tokio::sync::{
+    broadcast, futures,
+    mpsc::{channel, Receiver, Sender},
+    Mutex,
+};
 use tokio_rusqlite::{params, Connection};
 
 use crate::{
@@ -142,13 +146,17 @@ async fn request_auth_code(
 // sample CALLBACK response from request to AUTH_URL_GET
 //     https://hostname.mydomain.tld/auth_code_callback?error=access_denied
 //     https://hostname.mydomain.tld/auth_code_callback?code=4/P7q7W91a-oMsCeLvIaQm6bTrgtp7
-#[actix_web::get("/auth_callback")] // MUST match Config::google_redirect_uri! (actually it's GOOGLE_REDIRECT_URI in .env file)
+#[actix_web::get("/auth_callback")] // routing paths MUST match Config::google_redirect_uri! (actually it's GOOGLE_REDIRECT_URI in .env file)
 pub async fn auth_code_callback(
     client_http_request: HttpRequest, // unfortunately, for callback from external, we only get this and body (most likely empty)
 ) -> impl Responder {
     let query_string = client_http_request.query_string();
     let query_params: HashMap<String, String> =
         serde_urlencoded::from_str(query_string).unwrap_or_else(|_| HashMap::new());
+    let auth_code_response = OAuth2AuthCodeResponse {
+        error: query_params.get("error").map(|s| s.to_string()),
+        possible_code: query_params.get("code").map(|s| s.to_string()),
+    };
     // we don't really need IP of Google Service, but for debugging/logging purposes, we'll keep it
     // NOTE: Don't log query_params, for it contains auth code...
     let client_ip = client_http_request
@@ -164,10 +172,6 @@ pub async fn auth_code_callback(
         client_ip, client_port
     );
 
-    let auth_code_response = OAuth2AuthCodeResponse {
-        error: query_params.get("error").map(|s| s.to_string()),
-        code: query_params.get("code").map(|s| s.to_string()),
-    };
     match auth_code_response.error {
         Some(_) => {
             // Error occurred, let's log it and return 500
@@ -179,7 +183,7 @@ pub async fn auth_code_callback(
         }
         None => {
             // First, if it is NOT an error, let's go ahead and request OAuth2Token from Google
-            let auth_code = auth_code_response.code.unwrap(); // should panic if code is not present!
+            let auth_code = auth_code_response.possible_code.unwrap(); // should panic if code is not present!
             let token_response =
                 request_and_store_google_oauth2(config, http_client, conn_as_data).await;
 
@@ -248,7 +252,7 @@ async fn request_and_store_google_oauth2(
                 // Again, this field is only present in this response if
                 // you set the access_type parameter to offline in the
                 // initial request to Google's authorization server
-                oauth2_token_response.refresh_token,
+                oauth2_token_response.possible_refresh_token,
                 oauth2_token_response.expires_in, // The remaining lifetime of the access token in seconds.
                 expiry_time,
             );
@@ -316,9 +320,7 @@ pub async fn login(
     println!("Login: Client IP={} (port={})", client_ip, client_port);
 
     // I'd like to now block and wait for the signal that I've got a session_id...
-    loop {
-
-    }
+    loop {}
 
     HttpResponse::Ok().body(response_body)
 }

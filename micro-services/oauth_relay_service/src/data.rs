@@ -1,6 +1,5 @@
 use serde::{Deserialize, Serialize};
-use std::{collections::HashMap, sync::Arc, time::SystemTime};
-use tokio::sync::Mutex;
+use std::time::SystemTime;
 
 #[derive(Serialize, Deserialize, Clone)]
 pub enum SessionIDType {
@@ -17,10 +16,10 @@ pub struct TokenData {
 
     pub client_address: std::net::IpAddr, // either IPv4 or IPv6
     pub client_port: u16,
-    pub client_email: Option<String>, // optionally, client email address used to auth against
+    pub possible_client_email: Option<String>, // optionally, client email address used to auth against
 
     pub access_token: String,
-    pub refresh_token: Option<String>,
+    pub possible_refresh_token: Option<String>,
     pub expires_in: i64,
     pub expiry_time: SystemTime,
 }
@@ -29,10 +28,10 @@ impl PartialEq for TokenData {
     fn eq(&self, other: &Self) -> bool {
         let match_ip_port =
             self.client_address == other.client_address && self.client_port == other.client_port;
-        match self.client_email {
+        match self.possible_client_email {
             Some(ref email) => {
                 email
-                    == match other.client_email {
+                    == match other.possible_client_email {
                         Some(ref other_email) => other_email,
                         None => return false,
                     }
@@ -47,9 +46,9 @@ impl TokenData {
         session_id: SessionIDType,
         client_address: std::net::IpAddr,
         client_port: u16,
-        client_email: Option<String>,
+        possible_client_email: Option<String>,
         access_token: String,
-        refresh_token: Option<String>,
+        possible_refresh_token: Option<String>,
         expires_in: i64,
         expiry_time: SystemTime,
     ) -> Self {
@@ -57,12 +56,12 @@ impl TokenData {
             session_id,
             client_address,
             client_port,
-            client_email: match client_email {
+            possible_client_email: match possible_client_email {
                 None => None,
                 Some(email) => Self::validate_email(email.as_str()),
             },
             access_token,
-            refresh_token,
+            possible_refresh_token,
             expires_in,
             expiry_time,
         }
@@ -84,7 +83,7 @@ impl TokenData {
     }
 
     pub fn get_key(&self) -> String {
-        let email = match self.client_email {
+        let email = match self.possible_client_email {
             Some(ref email) => email.clone(),
             None => "".to_string(),
         };
@@ -112,14 +111,14 @@ pub struct OAuth2AuthCodeRequest {
     // access_type: Indicates whether your application can refresh access tokens when the user is not
     // present at the browser. Set the value to 'offline' to get a refresh token and an access token the
     // first time your application exchanges an authorization code for a user.
-    pub access_type: Option<String>, // valid parameter values are 'online', which is the default value, and 'offline'.
+    pub possible_access_type: Option<String>, // valid parameter values are 'online', which is the default value, and 'offline'.
     // state: Any string value that your application uses to maintain state between your
     // authorization request and the authorization server's response. The server returns the
     // exact value that you send as a name=value pair in URL query component ('?') of the
     // 'redirect_uri' after the user consents to or denies your application's access request.
-    pub state: Option<String>, // See the OpenID Connect documentation for an example of how to create and confirm a state token.
-    pub include_granted_scopes: Option<bool>, // Enables applications to use incremental authorization to request access to additional scopes in context. If you set this parameter's value to true and the authorization request is granted, then the new access token will also cover any scopes to which the user previously granted the application access
-    pub prompt: Option<String>, // A space-delimited, case-sensitive list of prompts to present the user. If you don't specify this parameter, the user will be prompted only the first time your app requests access. Possible values are 'none', 'consent', and 'select_account'.
+    pub possible_state: Option<String>, // See the OpenID Connect documentation for an example of how to create and confirm a state token.
+    pub possible_include_granted_scopes: Option<bool>, // Enables applications to use incremental authorization to request access to additional scopes in context. If you set this parameter's value to true and the authorization request is granted, then the new access token will also cover any scopes to which the user previously granted the application access
+    pub possible_prompt: Option<String>, // A space-delimited, case-sensitive list of prompts to present the user. If you don't specify this parameter, the user will be prompted only the first time your app requests access. Possible values are 'none', 'consent', and 'select_account'.
 }
 
 // Sample response (to the  redirect_uri via parameter):
@@ -128,8 +127,8 @@ pub struct OAuth2AuthCodeRequest {
 #[derive(Deserialize)]
 pub struct OAuth2AuthCodeResponse {
     // can I serialize Union/enum types so I don't have to make both elements Option<>?
-    pub code: Option<String>,  // None if access_denied and/or other errors
-    pub error: Option<String>, // None if code is present
+    pub possible_code: Option<String>, // None if access_denied and/or other errors
+    pub possible_error: Option<String>, // None if code is present
 }
 
 // See: https://developers.google.com/identity/protocols/oauth2/web-server#exchange-authorization-code
@@ -162,7 +161,7 @@ pub struct OAuth2TokenResponse {
     pub expires_in: i64,
     pub token_type: String,
     pub scope: String,
-    pub refresh_token: Option<String>,
+    pub possible_refresh_token: Option<String>,
 }
 
 #[derive(Deserialize)]

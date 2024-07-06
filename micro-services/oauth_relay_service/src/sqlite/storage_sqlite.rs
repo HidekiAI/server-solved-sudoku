@@ -54,7 +54,7 @@ pub(crate) async fn store_token(
             params![
                 token_data_no_session_id.client_address.to_string(), // 1
                 token_data_no_session_id.client_port,                // 2
-                token_data_no_session_id.client_email,               // 3
+                token_data_no_session_id.possible_client_email,      // 3
                 token_data_no_session_id.access_token,               // 4
                 token_data_no_session_id.refresh_token,              // 5
                 token_data_no_session_id.expires_in,                 // 6
