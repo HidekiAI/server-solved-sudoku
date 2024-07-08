@@ -1,8 +1,8 @@
 use super::storage_sqlite;
 use crate::{
     config::Config,
-    data::{AuthRequest, OAuth2TokenResponse, SessionIDType, TokenData},
-    sqlite::{new_connection, TConnection},
+    data::{OAuth2AuthCodeRequest, OAuth2TokenResponse, SessionIDType, TokenData},
+    sqlite::{open_db_connection, TDBConnection},
 };
 use actix_web::{get, http::ConnectionType, web, App, HttpResponse, HttpServer, Responder};
 use anyhow::Result as AnyResult;
@@ -14,11 +14,10 @@ const HTTP_LISTEN_ADDR: &str = "0.0.0.0:8080";
 
 #[actix_web::main]
 pub async fn sqlite_actix_main() -> AnyResult<(), String> {
-    let possible_db_connection_raw = Connection::open(DB_PATHS).await;
+    let possible_db_connection_raw = open_db_connection(DB_PATHS).await;
     match possible_db_connection_raw {
-        Ok(db_connection_raw) => {
+        Ok(db_connection) => {
             // create DB table in case it does not exist yet
-            let db_connection: TConnection = new_connection(db_connection_raw);
             storage_sqlite::create_table_token(db_connection.clone())
                 .await
                 .unwrap();

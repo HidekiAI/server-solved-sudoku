@@ -28,6 +28,7 @@ function check_env_var() {
 #        scope=openid%20email&
 #        redirect_uri=https%3A//oauth2.example.com/code&
 #        state=security_token%3D138r5719ru3e1%26url%3Dhttps%3A%2F%2Foauth2-login-demo.example.com%2FmyHome&
+#        prompt=consent%20select_account&
 #        login_hint=jsmith@example.com&
 #        nonce=0394852-3190485-2490358&
 #        hd=example.com
@@ -36,7 +37,8 @@ function get_auth_url() {
     local REDIRECT_URI="${2}"
     local SCOPE="${3}"
     local STATE="${4}"
-    echo "https://accounts.google.com/o/oauth2/v2/auth?response_type=code&client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&scope=${SCOPE}&state=${STATE}"
+    #echo "https://accounts.google.com/o/oauth2/v2/auth?response_type=code&client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&scope=${SCOPE}&state=${STATE}&prompt=consent%20select_account"
+    echo "https://accounts.google.com/o/oauth2/v2/auth?response_type=code&client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&scope=${SCOPE}&prompt=consent%20select_account"
 }
 
 function get_token_url() {
@@ -60,11 +62,40 @@ function request_auth_code() {
     echo "# Please start the HTTPS redirect_url server listening for callback at address ${REDIRECT_URI}"
     read -n 1 -s -r -p "Press any key to continue"
     echo
+    # use netcat to listen to http://localhost:8080/
+    nc -l -p 8080 > /tmp/auth_get_listener.log &
 
     # curl to get the auth code, returns either "code=AUTH_CODE" or "error=access_denied"
-    echo "# Connecting to ${AUTH_URL}"
     echo
-    curl -k -X GET "${AUTH_URL}"
+    echo "############################################################################################################"
+    echo "# Open to your browser to the following URL to authorize the application:"
+    echo
+    echo "${AUTH_URL}"
+    echo
+    echo "############################################################################################################"
+    echo
+    curl --verbose -k -X GET "${AUTH_URL}"
+
+    AUTH_URL_AMPER=$(echo "${AUTH_URL}" | sed 's/&/%26/g')
+    _TEXT="Please open your web browser and go to the following URL to authorize the application:\n\n${AUTH_URL_AMPER}\n\nNOTE: DO NOT copy this one, copy-paste from the one on Console output..."
+    echo $_TEXT
+    ${_ZENITY} --info --text="$_TEXT" --title="OAuth2 Authorization"
+}
+
+function build_token_request_body() {
+    local CLIENT_ID="${1}"
+    local CLIENT_SECRET="${2}"
+    local AUTH_CODE="${3}"
+    local REDIRECT_URI="${4}"
+    local GRANT_TYPE="${5}"
+    # JSON body
+    echo "{
+        \"client_id\": \"${CLIENT_ID}\",
+        \"client_secret\": \"${CLIENT_SECRET}\",
+        \"code\": \"${AUTH_CODE}\",
+        \"redirect_uri\": \"${REDIRECT_URI}\",
+        \"grant_type\": \"${GRANT_TYPE}\"
+    }"
 }
 
 # token request is HTTP POST
@@ -74,12 +105,23 @@ function exchange_auth_code() {
     local AUTH_CODE="${3}"
     local REDIRECT_URI="${4}"
     local TOKEN_URL=$(get_token_url)
-    curl -k -X POST "${TOKEN_URL}" \
-        -d "client_id=${CLIENT_ID}" \
-        -d "client_secret=${CLIENT_SECRET}" \
-        -d "code=${AUTH_CODE}" \
-        -d "redirect_uri=${REDIRECT_URI}" \
-        -d "grant_type=authorization_code"
+    local JSON_BODY=$(build_token_request_body "${CLIENT_ID}" "${CLIENT_SECRET}" "${AUTH_CODE}" "${REDIRECT_URI}" "authorization_code")
+
+    echo "# Requesting tokens from ${TOKEN_URL}" > /tmp/token_request.log
+    echo "# JSON body:" >> /tmp/token_request.log
+    echo "${JSON_BODY}" >> /tmp/token_request.log
+    echo >> /tmp/token_request.log
+
+    # Save response into a file
+    curl --verbose -k -X POST "${TOKEN_URL}" \
+        -H "Content-Type: application/json" \
+        -d "${JSON_BODY}" -o "token_response.json"
+    cat "token_response.json" >> /tmp/token_request.log
+
+    # Extract access token
+    ACCESS_TOKEN=$(jq -r '.access_token' "token_response.json")
+    echo "Access Token: ${ACCESS_TOKEN}" >> /tmp/token_request.log
+    echo ${ACCESS_TOKEN}
 }
 
 function make_state_token() {
@@ -140,12 +182,40 @@ check_env_var "REDIRECT_URI"
 SCOPE="openid profile email"
 
 # curl to get the auth code
-${_ZENITY} --info --text="Please open your web browser and go to the following URL to authorize the application:" --title="OAuth2 Authorization"
-
+echo "################################################## request_auth_code"
 # Prompt user to enter authorization code
 request_auth_code ${CLIENT_ID} ${REDIRECT_URI} ${SCOPE}
 AUTH_CODE=$(get_auth_code)
-check_env_var "AUTH_CODE"
 
+# if /tmp/auth_get_listener.log has captured the redirect to localhost:8080, parse it and extract AUTH_CODE
+# Sample capture:
+#       GET /auth_callback?state=kM8JHEwKJurORMeYvSgIPE3Dz9noXlSbNsAnj5ZE1L4&code=4%2F0ATx3LY5LWFieCmErwAb8YRacDSc33FMlY2JHYdU83VtJf02_NYt4WtRtuPk_ZIjrInMceA&scope=openid&authuser=2&prompt=consent HTTP/1.1
+#       Host: localhost:8080
+# Assume 2nd '&' on first line is "code=AUTH_CODE"
+_FIRST_LINE=$(head -n 1 /tmp/auth_get_listener.log)
+AUTH_CODE_PARAM1=$(echo "${_FIRST_LINE}" | cut -d'&' -f1 )
+AUTH_CODE_PARAM2=$(echo "${_FIRST_LINE}" | cut -d'&' -f2 )
+echo -e "# Found parameter /tmp/auth_get_listener.log:\n\t'${AUTH_CODE_PARAM1}'\n\t'${AUTH_CODE_PARAM2}"
+AUTH_CODE1=$(echo "${AUTH_CODE_PARAM1}" | grep "code=" | cut -d'=' -f2)
+AUTH_CODE2=$(echo "${AUTH_CODE_PARAM2}" | grep "code=" | cut -d'=' -f2)
+if ! [ -z "${AUTH_CODE1}" ]; then
+    AUTH_CODE="${AUTH_CODE1}"
+    echo "# Using AUTH_CODE from /tmp/auth_get_listener.log: '${AUTH_CODE}'"
+fi
+if ! [ -z "${AUTH_CODE2}" ]; then
+    AUTH_CODE="${AUTH_CODE2}"
+    echo "# Using AUTH_CODE from /tmp/auth_get_listener.log: '${AUTH_CODE}'"
+fi
+
+echo "################################################## exchange_auth_code"
+check_env_var "AUTH_CODE"
 # Exchange authorization code for tokens
-exchange_auth_code ${CLIENT_ID} ${CLIENT_SECRET} ${AUTH_CODE} ${REDIRECT_URI}
+ACCESS_TOKEN=$(exchange_auth_code ${CLIENT_ID} ${CLIENT_SECRET} ${AUTH_CODE} ${REDIRECT_URI})
+echo 
+cat /tmp/token_request.log
+echo
+
+echo "################################################## request UserInfo"
+# lastly, request UserInfo
+#ACCESS_TOKEN="%2F0ATx3LY60ftPnwh_O7BPdfu_T1ZGKKHWEgjYPuuRlu6rlswIDj43tZ3SNRvkVP3TkNEaOuQ"
+curl --verbose -X GET "https://www.googleapis.com/oauth2/v1/userinfo?alt=json" -H"Authorization: Bearer ${ACCESS_TOKEN}"
