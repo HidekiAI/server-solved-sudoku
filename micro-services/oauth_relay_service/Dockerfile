@@ -14,7 +14,9 @@ COPY src ./src
 COPY .env .env
 
 # Install apps dependant by 3rd party crates
-RUN apt-get update && apt-get install -y libsqlite3-dev
+RUN apt-get update \
+    && apt-get install -y --no-cache libsqlite3-dev ca-certificates tzdata \
+    && rm -rf /var/cache/apk/*
 
 # Build the Rust application
 RUN cargo build --release

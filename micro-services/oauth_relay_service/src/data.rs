@@ -142,8 +142,20 @@ pub struct OAuth2AuthCodeRequest {
 // See the OpenID Connect documentation for an example of how to create and confirm a state token.
 #[derive(Serialize, Deserialize)]
 pub struct OAuth2AuthCodeRequestState {
+    pub login_client_ip: std::net::IpAddr,
+    pub login_client_port: u16,
+
     pub session_id: SessionIDType,
     pub state_token: String,
+
+    pub db_type: String,    // SQLite or PostgresSQL
+    pub possible_db_address: Option<std::net::IpAddr>,  // for PostgresSQL
+    pub possible_db_port: Option<u16>, // for PostgresSQL
+    pub possible_db_path: Option<String>, // for SQLite
+
+    pub mq_type: String,    // None, Kafka, etc
+    pub possible_mq_address: Option<std::net::IpAddr>,  // for PostgresSQL
+    pub possible_mq_port: Option<u16>, // for PostgresSQL
 }
 pub fn encode_state_token(possible_state: Option<OAuth2AuthCodeRequestState>) -> Option<String> {
     match possible_state {
@@ -195,6 +207,7 @@ pub struct OAuth2AuthCodeResponse {
 //  - redirect_uri	One of the redirect URIs listed for your project in the API Console Credentials page for the given client_id.
 #[derive(Serialize)]
 pub struct OAuth2TokenRequest {
+    pub state_token: String,
     pub client_id: String,
     pub client_secret: String,
     pub code: String,

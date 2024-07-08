@@ -1,13 +1,63 @@
 version: '3.8'
 
+# Ports (from external hosts (including WAN)):
+# host -> container:port
+# 8080 -> oauth_relay_service:8080 : endpoints such as /login and /redirect_uri 
+# 9092 -> kafka:9092 
+
+networks:
+  app-tier:
+    driver: bridge
+
 services:
   oauth_relay_service:
     build: .
+    networks:
+    - app-tier
     ports:
-      - "8080:8080" # HTTP/REST
+      #- "8080:8080" # HTTP/REST
+      - "${REST_PORT}:${REST_PORT}" # HTTP/REST
     environment:
       - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
       - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
       - GOOGLE_REDIRECT_URI=${GOOGLE_REDIRECT_URI}
+      - REST_PORT=${REST_PORT}
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+      - DB_STORAGE_PATH=${DB_STORAGE}
+      - BROKER_HOST=${BROKER_HOST}
+      - BROKER_PORT=${BROKER_PORT}
     volumes:
-      - ./data:/usr/src/oauth_relay_service/tokens.sqlite.db
+      - ./data:/usr/src/oauth_relay_service/${DB_STORAGE_PATH}
+
+  # see: https://github.com/bitnami/containers/blob/main/bitnami/kafka/docker-compose.yml
+  kafka:
+    image: 
+      #docker.io/bitnami/kafka:3.7
+      'bitnami/kafka:latest'
+    networks:
+      - app-tier
+    ports:
+      # Make sure this matches BROKER_PORT in .env!
+      #- "9092:9092"
+      - "${BROKER_PORT}:${BROKER_PORT}"
+    volumes:
+      # see: https://hub.docker.com/r/bitnami/kafka
+      - "kafka_data:/bitnami"
+    environment:
+      - BROKER_HOST=${BROKER_HOST}
+      - BROKER_PORT=${BROKER_PORT}
+      # KRaft settings
+      - KAFKA_CFG_NODE_ID=0
+      - KAFKA_CFG_PROCESS_ROLES=controller,broker
+      - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=0@kafka:9093
+      # Listeners
+      - KAFKA_CFG_LISTENERS=PLAINTEXT://:${BROKER_PORT},CONTROLLER://:9093
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://:${BROKER_PORT}
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
+      - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=PLAINTEXT
+
+volumes:
+  kafka_data:
+    driver: local

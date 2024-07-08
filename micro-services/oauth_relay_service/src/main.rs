@@ -11,6 +11,7 @@ use tokio_rusqlite::Connection;
 mod config;
 mod data;
 mod sqlite;
+mod kafka;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
