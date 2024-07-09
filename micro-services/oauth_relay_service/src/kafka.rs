@@ -1,20 +1,17 @@
 //#include
-mod data_sqlite;
-mod handlers_sqlite;
-mod main_sqlite;
-mod storage_sqlite;
+mod data_kafka;
+mod main_kafka;
 
 use anyhow::Result as AnyResult;
 use std::sync::Arc;
 use tokio::sync::Mutex;
+use rdkafka::client::Client;
 
 use crate::config::*;
-use data_sqlite::*;
-use handlers_sqlite::*;
-use main_sqlite::*;
-use storage_sqlite::*;
+use data_kafka::*;
+use main_kafka::*;
 
-pub type TMQConnection = Arc<Mutex<kafka>>;
+pub type TMQConnection = Arc<Mutex<Client>>;
 
 fn open_mq_connection_from_config(config: Config) -> TMQConnection {
     match config.mq_connection {

@@ -148,14 +148,14 @@ pub struct OAuth2AuthCodeRequestState {
     pub session_id: SessionIDType,
     pub state_token: String,
 
-    pub db_type: String,    // SQLite or PostgresSQL
-    pub possible_db_address: Option<std::net::IpAddr>,  // for PostgresSQL
-    pub possible_db_port: Option<u16>, // for PostgresSQL
-    pub possible_db_path: Option<String>, // for SQLite
+    pub db_type: String,                               // SQLite or PostgresSQL
+    pub possible_db_address: Option<std::net::IpAddr>, // for PostgresSQL
+    pub possible_db_port: Option<u16>,                 // for PostgresSQL
+    pub possible_db_path: Option<String>,              // for SQLite
 
-    pub mq_type: String,    // None, Kafka, etc
-    pub possible_mq_address: Option<std::net::IpAddr>,  // for PostgresSQL
-    pub possible_mq_port: Option<u16>, // for PostgresSQL
+    pub mq_type: String,                               // None, Kafka, etc
+    pub possible_mq_address: Option<std::net::IpAddr>, // for PostgresSQL
+    pub possible_mq_port: Option<u16>,                 // for PostgresSQL
 }
 pub fn encode_state_token(possible_state: Option<OAuth2AuthCodeRequestState>) -> Option<String> {
     match possible_state {
@@ -241,6 +241,14 @@ pub struct OAuth2UerInfoRequest {
 #[derive(Serialize)]
 pub struct OAuth2UserInfoResponse {
     pub email: String,
+    pub id: String,          // User ID
+    pub name: String,        // Full name
+    pub given_name: String,  // First name
+    pub family_name: String, // Last name
+    pub link: String,        // Public profile URL
+    pub picture: String,     // Profile photo URL
+    pub gender: String,      // Gender
+    pub locale: String,      // Locale
 }
 
 #[derive(Deserialize)]

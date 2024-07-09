@@ -7,6 +7,7 @@ use crate::{
 use actix_web::{http, web, FromRequest, HttpRequest, HttpResponse, Responder};
 use base64::{engine::general_purpose, Engine};
 use core::net;
+use futures::task::Spawn;
 use rand::RngCore;
 use reqwest::Response;
 use serde_urlencoded;
@@ -164,11 +165,17 @@ pub async fn auth_code_callback(
             // First, if it is NOT an error, let's go ahead and request OAuth2Token from Google
             let auth_code = auth_code_response.possible_code.unwrap(); // should panic if code is not present!
 
+            let state_token = match possible_state {
+                Some(s) => s.state_token,
+                None => make_state_token(), // we should panic, but if we've come this far, we should take it
+            };
+
             // since ther are no way to record the auth_code as persisted data (because we don't have the DB connection)
             // we will have to do as much work as possible on this callback-thread (which is not ideal)
             // 5. POST a request to TOKEN_URL_POST to get back access_token, refresh_token, expires_in, etc.
             let http_client = web::Data::new(reqwest::Client::new());
             let token_request = OAuth2TokenRequest {
+                state_token: state_token,
                 client_id: config.google_client_id.clone(),
                 client_secret: config.google_client_secret.clone(),
                 code: auth_code,
@@ -194,10 +201,17 @@ pub async fn auth_code_callback(
                     match user_info_result {
                         Ok(user_info_response) => {
                             // Now that we've got the user's email address, we can now build TokenData!
+                            let user_info = serde_json::from_str(
+                                std::str::from_utf8(user_info_response.body().into().as_bytes)
+                                    .unwrap(),
+                            )
+                            .unwrap();
 
                             // save/persist it
+                            db_connection.post();
 
                             // 7. Signal/notify/message/publish that we have a new session_id (new login) for any services who cares for that event...
+                            mq_connection.post();
 
                             // the end...
                             HTtpResponse::Ok().finish()
@@ -205,7 +219,7 @@ pub async fn auth_code_callback(
                         Err(_) => HttpResponse::InternalServerError().finish(),
                     }
                 }
-                Some(e) => HttpResponse::InternalServerError(e).finish(),
+                Some(e) => HttpResponse::InternalServerError().finish(),
             }
 
             //HttpResponse::Ok().finish()
@@ -288,15 +302,18 @@ async fn request_userinfo(token: String, http_client: web::Data<reqwest::Client>
     // once we got OK/200 from Google OAuth2, get e-mail address (make sure Google API was setup with email priv enabled)
     // Note that www.googleapis.com
     // $curl -X GET "https://www.googleapis.com/oauth2/v1/userinfo?alt=json" -H"Authorization: Bearer accessTokenHere"
+    let req  = OAuth2UerInfoRequest{
+        access_token: token
+    };
     let user_info_response = http_client
         .get(USER_INFO_URL_GET)
-        .header("Authorization", format!("Bearer {}", token));
+        .header("Authorization", format!("Bearer {}", req.access_token));
 
     // wrap LoginResponse in a Result (Body)
-    let response_body = serde_json::to_string(&LoginResponse {
-        session_id: "1234567890".to_string(),
-        status: "OK".to_string(),
-        message: "Login successful".to_string(),
+    let response_body = serde_json::to_string(&OAuth2UserInfoResponse {
+        possible_login_error: ,
+        possible_session_id: ,
+        possible_state_token:
     })
     .unwrap();
     HttpResponse::Ok().body(response_body)
