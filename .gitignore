@@ -298,7 +298,7 @@ compile_commands.json
 .clangd
 *.har
 *client*secret*.json
-.env
+.env.local
 c:
 *:*
 *:/
