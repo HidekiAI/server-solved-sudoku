@@ -299,4 +299,8 @@ compile_commands.json
 *.har
 *client*secret*.json
 .env
+c:
+*:*
+*:/
+*:*/
 
