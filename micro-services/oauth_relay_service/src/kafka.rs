@@ -13,7 +13,7 @@ use main_kafka::*;
 
 pub type TMQConnection = Arc<Mutex<Client>>;
 
-fn open_mq_connection_from_config(config: Config) -> TMQConnection {
+pub fn open_mq_connection_from_config(config: Config) -> TMQConnection {
     match config.mq_connection {
         MQType::Kafka {
             host_address,

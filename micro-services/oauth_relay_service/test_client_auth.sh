@@ -21,11 +21,12 @@ function check_env_var() {
     fi
 }
 
+# See: https://developers.google.com/identity/openid-connect/openid-connect#obtaininguserprofileinformation on scope
 # Sample request (HTTP POST):
 #       https://accounts.google.com/o/oauth2/v2/auth?
 #        response_type=code&
 #        client_id=424911365001.apps.googleusercontent.com&
-#        scope=openid%20email&
+#        scope=openid%20profile%20email&
 #        redirect_uri=https%3A//oauth2.example.com/code&
 #        state=security_token%3D138r5719ru3e1%26url%3Dhttps%3A%2F%2Foauth2-login-demo.example.com%2FmyHome&
 #        prompt=consent%20select_account&
@@ -179,7 +180,7 @@ check_env_var "CLIENT_ID"
 check_env_var "CLIENT_SECRET"
 check_env_var "REDIRECT_URI"
 
-SCOPE="openid profile email"
+SCOPE="openid%20profile%20email"
 
 # curl to get the auth code
 echo "################################################## request_auth_code"

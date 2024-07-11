@@ -23,3 +23,4 @@ futures = "0.3.30"
 base64 = "0.22.1"
 dns-lookup = "2.0.4"
 rdkafka = { version = "0.36.2", features = ["cmake-build", "dynamic-linking"] }
+actix-files = "0.6.6"

@@ -112,11 +112,17 @@ pub struct OAuth2AuthCodeRequest {
     pub redirect_uri: String, // URL to accept code= or error= response
 
     // response_type: Determines whether the Google OAuth 2.0 endpoint returns an authorization code.
+    // See "response_types_supported" in https://accounts.google.com/.well-known/openid-configuration
     pub response_type: String, // Set the parameter value to `code` for web server applications.
 
     // scope: A space-delimited list of scopes that identify the resources that your application could
     // access on the user's behalf. These values inform the consent screen that Google displays
     // to the user.
+    // See: https://developers.google.com/identity/openid-connect/openid-connect#obtaininguserprofileinformation 
+    //      for access to UserInfo endpoint (HTTPS GET).
+    //      Example: "openid%20profile%20email" ("openid profile email")
+    // For supported types, see the "scopes_supported" array in https://accounts.google.com/.well-known/openid-configuration
+    // See also: https://developers.google.com/identity/protocols/oauth2/scopes#openid_connect (search for "Google Sign-in")
     pub scope: String,
 
     // access_type: Indicates whether your application can refresh access tokens when the user is not

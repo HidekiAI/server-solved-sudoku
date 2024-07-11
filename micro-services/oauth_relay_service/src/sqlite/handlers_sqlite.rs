@@ -1,8 +1,9 @@
-use super::{storage_sqlite, store_token, TDBConnection, TMQConnection};
+use super::{storage_sqlite, store_token, TDBConnection};
 use crate::{
     config::{Config, DBType, MQType},
     data::*,
-    sqlite::open_db_connection,
+    sqlite::{open_db_connection, open_db_connection_from_config},
+    kafka::{open_mq_connection, open_mq_connection_from_config},
 };
 use actix_web::{http, web, FromRequest, HttpRequest, HttpResponse, Responder};
 use base64::{engine::general_purpose, Engine};
@@ -24,16 +25,13 @@ use tokio_rusqlite::params;
 const TOKEN_REFRESH_INTERVAL: Duration = Duration::from_secs(3600);
 const TOKEN_REFRESH_INTERVAL_MARGIN: Duration = Duration::from_secs(30);
 
-// From https://accounts.google.com/.well-known/openid-configuration:
-//    "issuer": "https://accounts.google.com",
-//    "authorization_endpoint": "https://accounts.google.com/o/oauth2/v2/auth",
-//    "device_authorization_endpoint": "https://oauth2.googleapis.com/device/code",
-//    "token_endpoint": "https://oauth2.googleapis.com/token",
-//    "userinfo_endpoint": "https://openidconnect.googleapis.com/v1/userinfo",
-//    "revocation_endpoint": "https://oauth2.googleapis.com/revoke",
-const AUTH_URL_GET: &str = "https://accounts.google.com/o/oauth2/v2/auth"; // GET
-const TOKEN_URL_POST: &str = "https://oauth2.googleapis.com/token"; // POST
-const USER_INFO_URL_GET: &str = "https://openidconnect.googleapis.com/v1/userinfo"; // GET
+// NOTE: To make it less error-prone, the real way to do this is to grab the (latest) 
+//      JSON document from https://accounts.google.com/.well-known/openid-configuration
+//      and extract currently defined endpoints from there...
+// See: https://developers.google.com/identity/openid-connect/openid-connect#discovery
+const AUTHORIZATION_ENDPOINT_GET: &str = "https://accounts.google.com/o/oauth2/v2/auth"; // GET
+const TOKEN_ENDPOINT_POST: &str = "https://oauth2.googleapis.com/token"; // POST
+const USERINFO_ENDPOINT_GET: &str = "https://openidconnect.googleapis.com/v1/userinfo"; // GET
 
 ////////////////////////////////////////////////////////////////////////////////////
 // Though I've documented via UML, the flow is as follows:
@@ -74,7 +72,7 @@ async fn request_auth_code_trigger_callback(
     http_client: web::Data<reqwest::Client>,
 ) -> Result<Response, reqwest::Error> {
     let response = http_client
-        .get(AUTH_URL_GET)
+        .get(AUTHORIZATION_ENDPOINT_GET)
         .query(&[
             &format!("client_id={}", query_get_auth_request.client_id),
             &format!("redirect_uri={}", query_get_auth_request.redirect_uri),
@@ -259,7 +257,7 @@ async fn request_access_token(
         ("grant_type", query_post_token_request.grant_type),
     ];
 
-    let response = http_client.post(TOKEN_URL_POST).form(&params).send().await;
+    let response = http_client.post(TOKEN_ENDPOINT_POST).form(&params).send().await;
     match response {
         Ok(resp) => {
             // deserialize the response from Google OAuth2
@@ -302,18 +300,31 @@ async fn request_userinfo(token: String, http_client: web::Data<reqwest::Client>
     // once we got OK/200 from Google OAuth2, get e-mail address (make sure Google API was setup with email priv enabled)
     // Note that www.googleapis.com
     // $curl -X GET "https://www.googleapis.com/oauth2/v1/userinfo?alt=json" -H"Authorization: Bearer accessTokenHere"
+    // JavaScript example:
+    //    var xhr = new XMLHttpRequest();
+    //    xhr.open('POST', 'https://vision.googleapis.com/v1/images:annotate');
+    //    xhr.setRequestHeader('Authorization', 'Bearer ' + token);
+    //    xhr.setRequestHeader('Content-Type', 'application/json; charset=utf-8');
+    //    xhr.setRequestHeader('x-content-type-options', 'nosniff'); // Add x-content-type-options header
+    //    xhr.onload = function () {...
     let req  = OAuth2UerInfoRequest{
         access_token: token
     };
     let user_info_response = http_client
-        .get(USER_INFO_URL_GET)
+        .get(USERINFO_ENDPOINT_GET)
         .header("Authorization", format!("Bearer {}", req.access_token));
 
     // wrap LoginResponse in a Result (Body)
     let response_body = serde_json::to_string(&OAuth2UserInfoResponse {
-        possible_login_error: ,
-        possible_session_id: ,
-        possible_state_token:
+        id: "".to_string(),
+        email: "".to_string(),
+        name: "".to_string(),
+        picture: "".to_string(),
+        locale: "".to_string(),
+        family_name: "".to_string(),
+        given_name: "".to_string(),
+        link: "".to_string(),
+        gender: "".to_string(),
     })
     .unwrap();
     HttpResponse::Ok().body(response_body)
@@ -380,7 +391,7 @@ pub async fn login(
     let auth_request = OAuth2AuthCodeRequest {
         client_id: config.google_client_id.clone(),
         redirect_uri: config.google_redirect_uri.clone(),
-        response_type: "code".to_string(),
+        response_type: "code".to_string(),  // "code" for Authorization Code flow, valid: "code", "token", "id_token", "code token", "code id_token", "token id_token", "code token id_token"
         scope: "email%20profile%20https://www.googleapis.com/auth/drive".to_string(),
         possible_access_type: Some("offline".to_string()),
         possible_state: encode_state_token(Some(state)),
@@ -408,7 +419,7 @@ pub async fn login(
             // deserialize the response from Google OAuth2
             let oauth2_token_response: OAuth2TokenResponse = resp.json().await.unwrap();
             let http_client = reqwest::Client::new();
-            let user_info_response = http_client.get(USER_INFO_URL_GET).header(
+            let user_info_response = http_client.get(USERINFO_ENDPOINT_GET).header(
                 "Authorization",
                 format!("Bearer {}", oauth2_token_response.access_token),
             );

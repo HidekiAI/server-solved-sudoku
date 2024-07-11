@@ -1,3 +1,9 @@
+mod config;
+mod data;
+mod kafka;
+mod sqlite;
+
+use crate::sqlite;
 use actix_web::{web, App, HttpResponse, HttpServer, Responder};
 use config::Config;
 use reqwest::Client;
@@ -8,12 +14,7 @@ use std::time::{Duration, SystemTime};
 use tokio::sync::Mutex; // Note: We're using this Mutex rather than std::sync::Mutex
 use tokio_rusqlite::Connection;
 
-mod config;
-mod data;
-mod sqlite;
-mod kafka;
-
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-   crate::sqlite::main_sqlite::sqlite_actix_main().await
+    sqlite_actix_main().await
 }
