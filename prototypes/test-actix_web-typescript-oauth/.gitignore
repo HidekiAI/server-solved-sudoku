@@ -1,0 +1,6 @@
+# auto-generated files which sensitive information contained
+script.js
+
+# CLIENT_ID and secrets files which should NEVER get checked in
+.env.local
+.env

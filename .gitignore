@@ -281,6 +281,10 @@ paket-files/
 __pycache__/
 *.pyc
 
+# passwords and sensitive files used by Docker-Compose and Docker which should NEVER
+# get checked in to source control
+.env.local
+
 # other crufts
 **/generated
 **/bazel-*
@@ -298,12 +302,8 @@ compile_commands.json
 .clangd
 *.har
 *client*secret*.json
-.env.local
 c:
 *:*
 *:/
 *:*/
-
-
 bin-libs/
-

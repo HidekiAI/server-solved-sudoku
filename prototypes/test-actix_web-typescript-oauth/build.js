@@ -9,8 +9,9 @@ const scriptTs = fs.readFileSync('script.ts', 'utf8');
 
 // Replace placeholders with environment variables
 const scriptJs = scriptTs
-  .replace('YOUR_CLIENT_ID', process.env.GOOGLE_CLIENT_ID)
-  .replace('YOUR_CLIENT_SECRET', process.env.GOOGLE_CLIENT_SECRET);
+  .replace('GOOGLE_CLIENT_ID_FROM_SWAPPED_IN_BUILD', process.env.GOOGLE_CLIENT_ID)
+  .replace('GOOGLE_CLIENT_SECRET_SWAPPED_IN_BUILD', process.env.GOOGLE_CLIENT_SECRET)
+  .replace('GOOGLE_REDIRECT_URI_SWAPPED_IN_BUILD', process.env.GOOGLE_REDIRECT_URI);
 
 // Write the resulting JavaScript file
 fs.writeFileSync('script.js', scriptJs, 'utf8');

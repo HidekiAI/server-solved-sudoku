@@ -229,32 +229,72 @@ pub struct OAuth2TokenRequest {
 //      "scope": "https://www.googleapis.com/auth/drive.metadata.readonly",
 //      "refresh_token": "1//xEoDL4iW3cxlI7yDbSRFYNG01kVKM2C-259HOF2aQbI"
 //  }
+//  Actual response (edited/shortened) from Google:
+//  {
+//      "access_token" : "ya29.a0AXooCgs2qcHYleg5gD_Qrm...BFQ3NfyrB61-171",
+//      "expires_in" : 3599,
+//      "id_token" : "eyJhbGciOiJSUzI1NiIsIm...tpZCI6Ijg3YmJlMDmQYA",
+//      "scope" : "https://www.googleapis.com/auth/userinfo.profile openid https://www.googleapis.com/auth/userinfo.email",
+//      "token_type" : "Bearer"
+//   }
 // see: https://developers.google.com/identity/protocols/oauth2/web-server#httprest
 #[derive(Serialize, Deserialize)]
 pub struct OAuth2TokenResponse {
     pub access_token: String,
     pub expires_in: i64,
+    pub id_token: String,
+    pub scope: String,  // space separated, i.e. "https://www.googleapis.com/auth/userinfo.profile openid https://www.googleapis.com/auth/userinfo.email"
     pub token_type: String,
-    pub scope: String,
     pub possible_refresh_token: Option<String>,
 }
 
 #[derive(Deserialize)]
 pub struct OAuth2UerInfoRequest {
     pub access_token: String,
+    pub header_authorization: String,   // "Bearer <access_token>"
 }
 
-#[derive(Serialize)]
+//  Response from Google: 
+//  {
+//    "id": "113980003478662",
+//    "email": "hidekiai@some_domain.tld",
+//    "verified_email": true,
+//    "name": "Hideki A. Ikeda",
+//    "given_name": "Hideki A.",
+//    "family_name": "Ikeda",
+//    "picture": "https://lh3.googleusercontent.com/some_link_to_image.jpg",
+//    "hd": "some_domain.tld"
+//  }
+//  BODY:
+//<html><body><h1>OAuth Callback</h1>
+//<p>Code: Some("4/0ATx3LY7MX-iBJmPPujTw...amdJEO1mxg")</p>
+//<p>Error: None</p>
+//<p>OAuth2TokenResponse { 
+//      access_token: "ya29.a0AXooCgvskAow...Rfl_6_AybHG2Gmy9Mf0171", 
+//      expires_in: 3599, 
+//      id_token: "eyJhbGciOiJ...SUzI1NiIVsFwQ", 
+//      scope: "openid https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile", 
+//      token_type: "Bearer", 
+//      possible_refresh_token: None }</p>
+// </body></html>
+#[derive(Serialize, Deserialize)]
 pub struct OAuth2UserInfoResponse {
+    // "id": "113983517891773478662",
+    pub id: String,
+    // "email": "hidekiai@some_domain.tld",
     pub email: String,
-    pub id: String,          // User ID
-    pub name: String,        // Full name
-    pub given_name: String,  // First name
-    pub family_name: String, // Last name
-    pub link: String,        // Public profile URL
-    pub picture: String,     // Profile photo URL
-    pub gender: String,      // Gender
-    pub locale: String,      // Locale
+    // "verified_email": true,
+    pub verified_email: bool,
+    // "name": "Hideki A. Ikeda",
+    pub name: String,
+    // "given_name": "Hideki A.",
+    pub given_name: String,
+    // "family_name": "Ikeda",
+    pub family_name: String,
+    // "picture": "https://lh3.googleusercontent.com/some-link-to-image.jpg",
+    pub picture: Option<String>,
+    // "hd": "some_domain.tld"
+    pub hd: Option<String>,
 }
 
 #[derive(Deserialize)]
