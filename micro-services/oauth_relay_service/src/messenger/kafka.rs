@@ -1,9 +1,7 @@
 pub mod data_kafka;
 pub mod main_kafka;
 
-use crate::{config::*, data::*};
-use data_kafka::*;
-use main_kafka::*;
+use crate::{data::*};
 use rdkafka::client::Client;
 use std::sync::Arc;
 use tokio::sync::Mutex;

@@ -1,4 +1,3 @@
-use dns_lookup::{lookup_addr, lookup_host};
 use dotenv::dotenv;
 use std::{env, net::IpAddr};
 

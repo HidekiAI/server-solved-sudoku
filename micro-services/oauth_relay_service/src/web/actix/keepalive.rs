@@ -4,15 +4,12 @@ use crate::{
     web::web_consts::*,
 };
 use actix_web::{web, HttpRequest, HttpResponse};
-use anyhow::Result as AnyResult;
-use serde::{Deserialize, Serialize};
 use serde_json;
 use serde_urlencoded;
 use std::{
     collections::HashMap,
     time::{Duration, SystemTime, UNIX_EPOCH},
 };
-use tokio::sync::Mutex;
 
 /// Keep-alive route - Check if the client is authenticated and handle keep-alive
 /// HTTP verb: GET

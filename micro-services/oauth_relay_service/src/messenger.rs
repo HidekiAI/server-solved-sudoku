@@ -2,9 +2,7 @@
 pub mod kafka;
 
 use anyhow::Result as AnyResult;
-use rdkafka::client::Client;
-use std::{net::IpAddr, sync::Arc};
-use tokio::sync::Mutex;
+use std::{net::IpAddr};
 
 use crate::{config::*, data::TokenData};
 

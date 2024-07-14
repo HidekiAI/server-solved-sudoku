@@ -6,7 +6,6 @@ pub mod storage_sqlite;
 
 use anyhow::Result as AnyResult;
 use std::sync::Arc;
-use storage_sqlite::*;
 use tokio::sync::Mutex;
 
 pub type TDBConnection_sqlite = tokio_rusqlite::Connection; // currently using tokio-rusqlite

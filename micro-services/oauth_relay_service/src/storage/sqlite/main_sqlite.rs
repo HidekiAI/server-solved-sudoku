@@ -1,14 +1,11 @@
 use super::{storage_sqlite, TDBConnectionLock_sqlite};
 use crate::{
     config::Config,
-    data::{OAuth2AuthCodeRequest, OAuth2TokenResponse, SessionIDType, TokenData},
     messenger::TMQConnectionLock,
     web::actix::{keepalive, login},
 };
-use actix_web::{get, http::ConnectionType, web, App, HttpResponse, HttpServer, Responder};
+use actix_web::{web, App, HttpServer};
 use anyhow::Result as AnyResult;
-use std::time::{Duration, SystemTime};
-use tokio_rusqlite::Connection;
 
 const DB_PATHS: &str = "db/sqlite/tokens.sqlite";
 const HTTP_LISTEN_ADDR: &str = "0.0.0.0:8080";

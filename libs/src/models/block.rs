@@ -1,10 +1,10 @@
-use std::collections::HashSet; // use Set to assure unique cells per block
+ // use Set to assure unique cells per block
 
 pub mod libsudoku {
     pub mod models {
         use std::collections::HashSet;
 
-        use crate::models::cell::{self, libsudoku::models::Cell};
+        use crate::models::cell::{libsudoku::models::Cell};
 
         pub struct Block {
             cells: HashSet<HashSet<Cell>>, // each row (or column) must be unique

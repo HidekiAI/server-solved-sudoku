@@ -6,22 +6,17 @@ use crate::{
     web::web_consts::*,
 };
 use actix_web::{
-    http::{self},
-    web, FromRequest, HttpRequest, HttpResponse, Responder,
+    web, HttpRequest, HttpResponse,
 };
 use anyhow::Result as AnyResult;
 use base64::{engine::general_purpose, Engine};
-use core::net;
 use rand::RngCore;
 use serde_urlencoded;
 use std::{
     collections::HashMap,
-    net::IpAddr,
-    str::FromStr,
-    sync::Arc,
-    time::{Duration, SystemTime, UNIX_EPOCH},
+    time::{Duration, SystemTime},
 };
-use tokio::{sync::Mutex, time::sleep};
+use tokio::{time::sleep};
 
 // HTTP GET to request Google OAuth2 authorization code (AUTH_URL_GET) via OAuth2AuthCodeRequest
 // sample request:
@@ -377,7 +372,7 @@ pub async fn login(
     // wait for player/client to consent
     //loop{}
 
-    let mut login_response = LoginResponse {
+    let login_response = LoginResponse {
         possible_login_error: Some("Unexpected (unhandled) Error".to_string()),
         possible_session_id: None,
         possible_state_token: None,

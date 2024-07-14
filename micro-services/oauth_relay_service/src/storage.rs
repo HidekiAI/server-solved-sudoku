@@ -3,12 +3,12 @@ pub(crate) mod sqlite;
 
 use anyhow::Result as AnyResult;
 use core::panic;
-use std::{any::Any, net::IpAddr, sync::Arc};
+use std::{net::IpAddr, sync::Arc};
 use tokio::sync::Mutex;
 
 use crate::{
     config::*,
-    data::{SessionIDType, TokenData},
+    data::{TokenData},
 };
 
 pub type TDBConnection = sqlite::TDBConnection_sqlite; // currently using tokio-rusqlite
