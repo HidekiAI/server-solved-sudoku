@@ -144,8 +144,16 @@ impl Config {
         }
     }
 
-    pub fn from_env() -> Self {
-        dotenv().ok();
+    pub fn from_env(absolute_path_with_filename: Path) -> Self {
+        // problem with source'ing the .env file is that if it is nested souce'ing, that file
+        // has to be on the same directory or the path has to be absolute.
+        // hence we'll push (remember) current path, change directory to the path where the .env file is
+        // and then source it, then popd back to the original path
+        let current_path = env::current_dir().expect("Cannot get the current directory");
+        let env_file_path = Path::new(absolute_path_with_filename).parent().unwrap();
+        env::set_current_dir(env_file_path).expect("Cannot change directory to the .env file path");
+        dotenv::from_path(absolute_path_with_filename).ok();
+        env::set_current_dir(current_path).expect("Cannot change directory back to the original path");
         Config {
             google_client_id: env::var("GOOGLE_CLIENT_ID").expect("GOOGLE_CLIENT_ID must be set"),
             google_client_secret: env::var("GOOGLE_CLIENT_SECRET")

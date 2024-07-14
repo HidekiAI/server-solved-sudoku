@@ -5,11 +5,11 @@ authors = ["Hideki A. Ikeda <hidekiai@CodeMonkeyNinja.com>"]
 edition = "2018"
 
 [build-dependencies]
-tonic-build = "0.11.0"
+tonic-build = "0.12.0"
 
 [dependencies]
-tonic = "0.11.0"
-prost = "0.12.6"
+tonic = "0.12.0"
+prost = "0.13.1"
 tokio = { version = "1.38.0", features = ["full", "macros", "rt-multi-thread"] }
 anyhow = "1.0.86"
 

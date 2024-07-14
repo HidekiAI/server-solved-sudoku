@@ -4,19 +4,17 @@ version: '3.8'
 # host -> container:port
 # 8080 -> oauth_relay_service:8080 : endpoints such as /login and /redirect_uri 
 # 9092 -> kafka:9092 
-
+# NOTE: See comment in '.env' file, IF you're running `docker-compose build` from MSys
+#       P/S: DO _NOT_ enable Kubernetes on Windows version, it will make your life miserable!
 networks:
   app-tier:
     driver: bridge
 
 services:
   oauth_relay_service:
-    build: .
+    build: oauth_relay_service
     networks:
-    - app-tier
-    ports:
-      #- "8080:8080" # HTTP/REST
-      - "${REST_PORT}:${REST_PORT}" # HTTP/REST
+      - app-tier
     environment:
       - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
       - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
@@ -24,9 +22,12 @@ services:
       - REST_PORT=${REST_PORT}
       - DB_HOST=${DB_HOST}
       - DB_PORT=${DB_PORT}
-      - DB_STORAGE_PATH=${DB_STORAGE}
+      - DB_STORAGE_PATH=${DB_STORAGE_PATH}
       - BROKER_HOST=${BROKER_HOST}
       - BROKER_PORT=${BROKER_PORT}
+    ports:
+      #- "8080:8080" # HTTP/REST
+      - "${REST_PORT}:${REST_PORT}" # HTTP/REST
     volumes:
       - ./data:/usr/src/oauth_relay_service/${DB_STORAGE_PATH}
 
@@ -37,13 +38,6 @@ services:
       'bitnami/kafka:latest'
     networks:
       - app-tier
-    ports:
-      # Make sure this matches BROKER_PORT in .env!
-      #- "9092:9092"
-      - "${BROKER_PORT}:${BROKER_PORT}"
-    volumes:
-      # see: https://hub.docker.com/r/bitnami/kafka
-      - "kafka_data:/bitnami"
     environment:
       - BROKER_HOST=${BROKER_HOST}
       - BROKER_PORT=${BROKER_PORT}
@@ -57,6 +51,13 @@ services:
       - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
       - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
       - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=PLAINTEXT
+    ports:
+      # Make sure this matches BROKER_PORT in .env!
+      #- "9092:9092"
+      - "${BROKER_PORT}:${BROKER_PORT}"
+    volumes:
+      # see: https://hub.docker.com/r/bitnami/kafka
+      - "kafka_data:/bitnami"
 
 volumes:
   kafka_data:

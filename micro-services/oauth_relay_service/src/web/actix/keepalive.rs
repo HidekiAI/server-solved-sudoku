@@ -19,7 +19,7 @@ pub async fn keepalive(
     client_http_request: HttpRequest,
     db_connection: web::Data<TDBConnectionLock>,
 ) -> HttpResponse {
-    let config = crate::config::Config::from_env();
+    let config = crate::config::Config::from_env("./build/.env");
     let query_string = client_http_request.query_string();
     let query_params: HashMap<String, String> =
         serde_urlencoded::from_str(query_string).unwrap_or_else(|_| HashMap::new());

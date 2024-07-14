@@ -116,7 +116,7 @@ pub async fn auth_code_callback(
             HttpResponse::InternalServerError().finish()
         }
         None => {
-            let config = Config::from_env();
+            let config = Config::from_env("./build/.env");
             let db_connection = storage::open_db_connection_from_config(config.clone()).await;
             let mq_connection = messenger::open_mq_connection_from_config(config.clone()).await;
 

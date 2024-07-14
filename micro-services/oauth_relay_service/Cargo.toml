@@ -5,7 +5,11 @@ edition = "2021"
 authors = ["Hideki A. Ikeda <hidekiai@CodeMonkeyNinja.com>"]
 
 [dependencies]
+# NOTE: the relative file "../../libs" ONLY WORKS outisde Docker!
 libscsudoku = { path = "../../libs" }
+# The following path relies on make-service.sh to copy the libs to the right place (so Dockerfile can see it!)
+#libscsudoku = { path = "./build/libs" }
+
 actix-web = { version = "4.8.0", features = ["openssl"] }
 reqwest = { version = "^0.12.5", features = ["json", "gzip", "stream", "socks"] }
 serde = { version = "1.0.203", features = ["derive"] }
