@@ -24,7 +24,7 @@ services:
       - REST_PORT=${REST_PORT}
       - DB_HOST=${DB_HOST}
       - DB_PORT=${DB_PORT}
-      - DB_STORAGE_PATH=${DB_STORAGE}
+      - DB_STORAGE_PATH=${DB_STORAGE_PATH}
       - BROKER_HOST=${BROKER_HOST}
       - BROKER_PORT=${BROKER_PORT}
     volumes:
