@@ -1,4 +1,3 @@
-use actix_files::Files;
 use actix_web::{web, App, HttpRequest, HttpResponse, HttpServer, Responder};
 use dotenv::dotenv;
 use serde::{Deserialize, Serialize};
@@ -10,7 +9,7 @@ pub struct OAuth2TokenResponse {
     pub access_token: String,
     pub expires_in: i64,
     pub id_token: String,
-    pub scope: String,  // space separated, i.e. "https://www.googleapis.com/auth/userinfo.profile openid https://www.googleapis.com/auth/userinfo.email"
+    pub scope: String, // space separated, i.e. "https://www.googleapis.com/auth/userinfo.profile openid https://www.googleapis.com/auth/userinfo.email"
     pub token_type: String,
     pub possible_refresh_token: Option<String>,
 }
@@ -56,7 +55,7 @@ async fn auth_callback(client_http_request: HttpRequest) -> HttpResponse {
     let possible_code = query_params.get("code").map(|s| s.to_string());
 
     // Now that we've got the auth-code, let's exchange it for an access token
-    let mut ret_body: String = "".to_string();
+    let ret_body: String = "".to_string();
     match possible_code.clone() {
         Some(code) => {
             println!("Received code: '{}'", code);
@@ -65,10 +64,13 @@ async fn auth_callback(client_http_request: HttpRequest) -> HttpResponse {
                 std::env::var("GOOGLE_CLIENT_SECRET").expect("CLIENT_SECRET must be set");
             let redirect_uri =
                 std::env::var("GOOGLE_REDIRECT_URI").expect("REDIRECT_URI must be set");
-            // panic if 
+            // panic if
 
             let TOKEN_ENDPOINT_POST: &str = "https://oauth2.googleapis.com/token"; // POST
-            println!("Requesting for access token at {} (POST)", TOKEN_ENDPOINT_POST);
+            println!(
+                "Requesting for access token at {} (POST)",
+                TOKEN_ENDPOINT_POST
+            );
             let client = reqwest::Client::new();
             // build JSON body
             let json_body = json!({
@@ -77,7 +79,8 @@ async fn auth_callback(client_http_request: HttpRequest) -> HttpResponse {
                 "client_secret": client_secret,
                 "redirect_uri": redirect_uri,
                 "grant_type": "authorization_code"
-            }).to_string();
+            })
+            .to_string();
             // NOTE: Even if your client-id is garbage (not the value from Google Console), you'll get auth-code from redirect_uri :shrug:
             //println!("Params: {}", json_body);    // only uncomment this if you're getting "invalid_client" error, it's most likely that your .env file is not set with ClientID
             let resp = client
@@ -88,29 +91,38 @@ async fn auth_callback(client_http_request: HttpRequest) -> HttpResponse {
                 .await
                 .unwrap();
             // deserialize to OAuth2TokenResponse
-            let body_utf8_to_str= String::from_utf8(resp.bytes().await.unwrap().to_vec()).unwrap();
-            let token_response: OAuth2TokenResponse = serde_json::from_str(body_utf8_to_str.as_str()).unwrap() ;
+            let body_utf8_to_str = String::from_utf8(resp.bytes().await.unwrap().to_vec()).unwrap();
+            let token_response: OAuth2TokenResponse =
+                serde_json::from_str(body_utf8_to_str.as_str()).unwrap();
             println!("Response from Google: {:?}", token_response);
 
             // let's use this access_token to get user info
             let USERINFO_ENDPOINT_GET: &str = "https://www.googleapis.com/oauth2/v1/userinfo"; // GET
-            println!("Requesting for user info at {} (GET)", USERINFO_ENDPOINT_GET);
+            println!(
+                "Requesting for user info at {} (GET)",
+                USERINFO_ENDPOINT_GET
+            );
             let resp = client
                 .get(USERINFO_ENDPOINT_GET)
-                .header("Authorization", format!("{} {}", token_response.token_type, token_response.access_token))   
+                .header(
+                    "Authorization",
+                    format!(
+                        "{} {}",
+                        token_response.token_type, token_response.access_token
+                    ),
+                )
                 .send()
-                .await  
+                .await
                 .unwrap();
-            let body_utf8_to_str= String::from_utf8(resp.bytes().await.unwrap().to_vec()).unwrap();
-            let user_info_response: OAuth2UserInfoResponse = serde_json::from_str(body_utf8_to_str.as_str()).unwrap() ;
+            let body_utf8_to_str = String::from_utf8(resp.bytes().await.unwrap().to_vec()).unwrap();
+            let user_info_response: OAuth2UserInfoResponse =
+                serde_json::from_str(body_utf8_to_str.as_str()).unwrap();
             println!("Response from Google: {:?}", user_info_response);
 
-            let ret_body = 
-                            format!(
+            let ret_body = format!(
                             "<html><body><h1>OAuth Callback</h1><p>Code: {:?}</p><p>Error: {:?}</p><p>Token Response: {:?}<p>UserInfo: {:?}</p><></body></html>",
                             possible_code, possible_error, token_response , user_info_response
                             );
-                        );
             println!("\n{}\n", ret_body);
         }
         None => {

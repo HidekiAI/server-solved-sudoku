@@ -1,20 +1,58 @@
+use anyhow::Result as AnyResult;
 use base64::{engine::general_purpose, Engine};
+use crc64::crc64;
 use serde::{Deserialize, Serialize};
-use std::time::SystemTime;
+use serde_json::json;
+use std::{
+    borrow::Borrow,
+    hash::Hash,
+    time::{SystemTime, UNIX_EPOCH},
+};
 
-#[derive(Serialize, Deserialize, Clone)]
+//pub async fn httpresponse_body_to_json(http_response: reqwest::Response) -> AnyResult<TokenData> {
+//    let vec_u8 = http_response.bytes().await.unwrap().to_vec();
+//    let token_data = serde_json::from_str(
+//        std::str::from_utf8(&vec_u8)
+//            .map_err(|e| anyhow::Error::new(e))
+//            .unwrap(),
+//    )
+//    .map_err(|e| anyhow::Error::new(e));
+//    match token_data {
+//        Ok(token_data) => Ok(token_data),
+//        Err(e) => Err(e),
+//    }
+//}
+
+//// NOTE: I cannot do `http_response: &reqwest::Response` because it does not implement Copy trait
+//pub async fn httpresponse_body_to_json<'a, T: serde::Deserialize<'a> >(http_response: reqwest::Response) -> AnyResult<T> {
+//    let vec_u8 = http_response.bytes().await.unwrap().to_vec();
+//    let token_data: Result<T, anyhow::Error> = serde_json::from_slice(&vec_u8)
+//        .map_err(|e| anyhow::Error::new(e));
+//    match token_data {
+//        Ok(token_data) => Ok(token_data),
+//        Err(e) => Err(e),
+//    }
+//}
+
+#[derive(Serialize, Deserialize, Clone, Debug)]
 pub enum SessionIDType {
     Undefined(Option<bool>), // it's always None<_>()
     ID(u64),
-    Hash(String),
+    Hash(u64),
+}
+impl SessionIDType {
+    pub fn make_hash(session_token: &str) -> SessionIDType {
+        let hash = crc64::crc64(0, session_token.as_bytes());
+        SessionIDType::Hash(hash)
+    }
 }
 
 // oftentimes, for asyn methods, it's safest to clone before moving that closure to the thread, so
 // we need Clone to make sure it copies the data (not the ref)
 #[derive(Serialize, Deserialize, Clone)]
 pub struct TokenData {
-    pub session_id: SessionIDType, // for example, for SQL-based (including SQLite, it's the unique-key index), for no-sql, HASH of access_token?
-    pub state_token: String,       // used to prevent CSRF attacks
+    session_id: SessionIDType, // for example, for SQL-based (including SQLite, it's the unique-key index), for no-sql, HASH of access_token?
+    pub state_token: String,   // used to prevent CSRF attacks
 
     pub client_address: std::net::IpAddr, // either IPv4 or IPv6
     pub client_port: u16,
@@ -23,8 +61,25 @@ pub struct TokenData {
     pub access_token: String,
     pub possible_refresh_token: Option<String>,
     pub expires_in: i64,
-    pub expiry_time: SystemTime,
+    expiry_time: SystemTime,
 }
+// override to_string() so that we won't print access_token and other sensitive data in logs
+impl std::fmt::Display for TokenData {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(
+            f,
+            "TokenData {{ session_id: {:?}, state_token: {}, client_address: {}, client_port: {}, possible_client_email: {:?}, access_token: <hidden>, possible_refresh_token: <hidden>, expires_in: {}, expiry_time: {:?} }}",
+            self.session_id,
+            self.state_token,
+            self.client_address,
+            self.client_port,
+            self.possible_client_email,
+            self.expires_in,
+            self.expiry_time
+        )
+    }
+}
+
 impl PartialEq for TokenData {
     // Equality is based only on the KEY (either IP+Port or Email)
     fn eq(&self, other: &Self) -> bool {
@@ -81,6 +136,66 @@ impl TokenData {
         }
     }
 
+    pub fn expiry_time(&self) -> SystemTime {
+        self.expiry_time
+    }
+    pub fn expiry_time_as_sec_from_epoch(&self) -> u64 {
+        // NOTE: If this panics, it's because the expiry_time is BEFORE UNIX_EPOCH, which is impossible!
+        self.expiry_time
+            .duration_since(UNIX_EPOCH)
+            .unwrap()
+            .as_secs()
+    }
+    // can be negative, to indicate the past, 0 to be Now(), and +t to be in the future
+    pub fn expiry_time_as_sec_from_now(&self) -> i64 {
+        let expiry_time_since_epoch = self
+            .expiry_time
+            .duration_since(UNIX_EPOCH)
+            .unwrap()
+            .as_secs() as i64;
+        let now_in_seconds_since_epoch = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap()
+            .as_secs() as i64;
+        expiry_time_since_epoch - now_in_seconds_since_epoch
+    }
+
+    // set absolute time, regardless of the time being in the past
+    pub fn set_expiry_time(&mut self, expiry_time: SystemTime) {
+        self.expiry_time = expiry_time;
+        match self.expiry_time_as_sec_from_now() {
+            d if d < 0 => {
+                // warn that the expiry time is in the past
+                println!(
+                    "TokenData::set_expiry_time(): Expiry time to be set is in the past: {:?}",
+                    expiry_time
+                );
+            }
+            _ => {}
+        }
+    }
+    // duration can be negative, to indicate the past, 0 to be Now(), and +t to be in the future
+    pub fn set_expiry_time_from_now(&mut self, duration_in_sec: i64) {
+        match duration_in_sec {
+            0 => {
+                // set the expiry time to now
+                self.expiry_time = SystemTime::now();
+            }
+            d if d < 0 => {
+                // set the expiry time to 'now - abs(duration)' (rewind, go back in time)
+                self.expiry_time = SystemTime::now()
+                    .checked_sub(std::time::Duration::from_secs(duration_in_sec.abs() as u64))
+                    .unwrap();
+            }
+            _ => {
+                // set the expiry time to now + duration
+                self.expiry_time =
+                    SystemTime::now() + std::time::Duration::from_secs(duration_in_sec as u64);
+            }
+        }
+        // set the expiry time to now + aboslute_value(duration)
+    }
+
     pub fn is_expired(&self) -> bool {
         let now = SystemTime::now();
         now > self.expiry_time
@@ -93,6 +208,14 @@ impl TokenData {
         };
         format!("{}:{}:{}", self.client_address, self.client_port, email)
     }
+
+    pub fn session_id(&self) -> Option<u64> {
+        match self.session_id {
+            SessionIDType::ID(id) => Some(id),
+            SessionIDType::Hash(hash) => Some(hash),
+            _ => None,
+        }
+    }
 }
 
 // see: https://developers.google.com/identity/protocols/oauth2/web-server#creatingclient
@@ -100,7 +223,7 @@ impl TokenData {
 //   https://accounts.google.com/o/oauth2/v2/auth?response_type=code&client_id=my_client_id&redirect_uri=my_redirect_uri&scope=scope&state=my_state
 //   &access_type=my_access_type&include_granted_scopes=my_include_granted_scopes
 //   &prompt=select_account%20consent
-#[derive(Serialize)]
+#[derive(Serialize, Deserialize, Clone)]
 pub struct OAuth2AuthCodeRequest {
     pub client_id: String, // from the API Console Credentials page
 
@@ -118,7 +241,7 @@ pub struct OAuth2AuthCodeRequest {
     // scope: A space-delimited list of scopes that identify the resources that your application could
     // access on the user's behalf. These values inform the consent screen that Google displays
     // to the user.
-    // See: https://developers.google.com/identity/openid-connect/openid-connect#obtaininguserprofileinformation 
+    // See: https://developers.google.com/identity/openid-connect/openid-connect#obtaininguserprofileinformation
     //      for access to UserInfo endpoint (HTTPS GET).
     //      Example: "openid%20profile%20email" ("openid profile email")
     // For supported types, see the "scopes_supported" array in https://accounts.google.com/.well-known/openid-configuration
@@ -146,7 +269,7 @@ pub struct OAuth2AuthCodeRequest {
 // exact value that you send as a name=value pair in URL query component ('?') of the
 // 'redirect_uri' after the user consents to or denies your application's access request.
 // See the OpenID Connect documentation for an example of how to create and confirm a state token.
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 pub struct OAuth2AuthCodeRequestState {
     pub login_client_ip: std::net::IpAddr,
     pub login_client_port: u16,
@@ -197,7 +320,7 @@ pub fn decode_state_token(state_token: Option<String>) -> Option<OAuth2AuthCodeR
 // Sample response (to the  redirect_uri via parameter):
 //   https://localhost:8080/authcode_callback?error=access_denied
 //   https://localhost:8080/authcode_callback?code=4/P7q7W91a-oMsCeLvIaQm6bTrgtp7
-#[derive(Deserialize)]
+#[derive(Deserialize, Clone)]
 pub struct OAuth2AuthCodeResponse {
     // can I serialize Union/enum types so I don't have to make both elements Option<>?
     pub possible_code: Option<String>, // None if access_denied and/or other errors
@@ -211,7 +334,7 @@ pub struct OAuth2AuthCodeResponse {
 //  - code	The authorization code returned from the initial request to https://accounts.google.com/o/oauth2/v2/auth
 //  - grant_type	As defined in the OAuth 2.0 specification, this field's value must be set to authorization_code.
 //  - redirect_uri	One of the redirect URIs listed for your project in the API Console Credentials page for the given client_id.
-#[derive(Serialize)]
+#[derive(Serialize, Clone)]
 pub struct OAuth2TokenRequest {
     pub state_token: String,
     pub client_id: String,
@@ -238,23 +361,23 @@ pub struct OAuth2TokenRequest {
 //      "token_type" : "Bearer"
 //   }
 // see: https://developers.google.com/identity/protocols/oauth2/web-server#httprest
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 pub struct OAuth2TokenResponse {
     pub access_token: String,
-    pub expires_in: i64,
+    pub expires_in: i64, // I believe Google uses seconds (i.e. 3599 (6 minutes))
     pub id_token: String,
-    pub scope: String,  // space separated, i.e. "https://www.googleapis.com/auth/userinfo.profile openid https://www.googleapis.com/auth/userinfo.email"
+    pub scope: String, // space separated, i.e. "https://www.googleapis.com/auth/userinfo.profile openid https://www.googleapis.com/auth/userinfo.email"
     pub token_type: String,
     pub possible_refresh_token: Option<String>,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Clone)]
 pub struct OAuth2UerInfoRequest {
     pub access_token: String,
-    pub header_authorization: String,   // "Bearer <access_token>"
+    pub header_authorization: String, // "Bearer <access_token>"
 }
 
-//  Response from Google: 
+//  Response from Google:
 //  {
 //    "id": "113980003478662",
 //    "email": "hidekiai@some_domain.tld",
@@ -269,15 +392,15 @@ pub struct OAuth2UerInfoRequest {
 //<html><body><h1>OAuth Callback</h1>
 //<p>Code: Some("4/0ATx3LY7MX-iBJmPPujTw...amdJEO1mxg")</p>
 //<p>Error: None</p>
-//<p>OAuth2TokenResponse { 
-//      access_token: "ya29.a0AXooCgvskAow...Rfl_6_AybHG2Gmy9Mf0171", 
-//      expires_in: 3599, 
-//      id_token: "eyJhbGciOiJ...SUzI1NiIVsFwQ", 
-//      scope: "openid https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile", 
-//      token_type: "Bearer", 
+//<p>OAuth2TokenResponse {
+//      access_token: "ya29.a0AXooCgvskAow...Rfl_6_AybHG2Gmy9Mf0171",
+//      expires_in: 3599,
+//      id_token: "eyJhbGciOiJ...SUzI1NiIVsFwQ",
+//      scope: "openid https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile",
+//      token_type: "Bearer",
 //      possible_refresh_token: None }</p>
 // </body></html>
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 pub struct OAuth2UserInfoResponse {
     // "id": "113983517891773478662",
     pub id: String,
@@ -297,13 +420,13 @@ pub struct OAuth2UserInfoResponse {
     pub hd: Option<String>,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Clone)]
 pub struct LoginRequest {
     pub possible_last_session_id: SessionIDType,
     pub possible_last_state_token: Option<String>,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Clone)]
 pub struct LoginResponse {
     // Either session info (for next login request/recovery/keeplive) or error message
     pub possible_session_id: Option<u64>,
@@ -312,17 +435,17 @@ pub struct LoginResponse {
     pub possible_login_error: Option<String>,
 }
 
-#[derive(Deserialize)]
-struct KeepaliveRequest {
-    last_session_id: String,
+#[derive(Deserialize, Clone)]
+pub struct KeepaliveRequest {
+    pub last_session_id: String,
 }
-#[derive(Serialize)]
-struct KeepaliveResponse {
-    next_expected_time: u64, // absolute time, EPOCH based
+#[derive(Serialize, Clone)]
+pub struct KeepaliveResponse {
+    pub next_expected_time: u64, // absolute time, EPOCH based
     // time-to-live in seconds (problem with relative deltaT is that if round-trip takes long time,
     // few seconds may have passed already...) probably better to just calcuate
     // TTL = next_expected_time - current_time on client side...
-    ttl: u64,
-    status: String,
-    message: String,
+    pub ttl: u64,
+    pub status: String,
+    pub message: String,
 }

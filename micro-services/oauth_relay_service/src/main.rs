@@ -1,20 +1,17 @@
-mod config;
-mod data;
-mod kafka;
-mod sqlite;
+//#include modules:
+pub mod config;
+pub mod data;
+pub mod messenger;
+pub mod storage;
+pub mod web;
 
-use crate::sqlite;
-use actix_web::{web, App, HttpResponse, HttpServer, Responder};
 use config::Config;
-use reqwest::Client;
-use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
-use std::sync::Arc; // we're using this ARC
-use std::time::{Duration, SystemTime};
-use tokio::sync::Mutex; // Note: We're using this Mutex rather than std::sync::Mutex
-use tokio_rusqlite::Connection;
+use storage::sqlite::main_sqlite::sqlite_actix_main;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    sqlite_actix_main().await
+    let config = Config::from_env();
+    let db_connection = storage::open_db_connection_from_config(config.clone()).await;
+    let mq_connection = messenger::open_mq_connection_from_config(config.clone()).await;
+    sqlite_actix_main(&config, &db_connection, &mq_connection)
 }

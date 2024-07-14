@@ -1,16 +1,18 @@
-use super::{storage_sqlite, store_token, TDBConnection};
 use crate::{
-    config::{Config, DBType, MQType},
+    config::Config,
     data::*,
-    sqlite::{open_db_connection, open_db_connection_from_config},
-    kafka::{open_mq_connection, open_mq_connection_from_config},
+    messenger::{self, TMQConnectionLock},
+    storage::{self, TDBConnectionLock},
+    web::web_consts::*,
 };
-use actix_web::{http, web, FromRequest, HttpRequest, HttpResponse, Responder};
+use actix_web::{
+    http::{self},
+    web, FromRequest, HttpRequest, HttpResponse, Responder,
+};
+use anyhow::Result as AnyResult;
 use base64::{engine::general_purpose, Engine};
 use core::net;
-use futures::task::Spawn;
 use rand::RngCore;
-use reqwest::Response;
 use serde_urlencoded;
 use std::{
     collections::HashMap,
@@ -19,44 +21,7 @@ use std::{
     sync::Arc,
     time::{Duration, SystemTime, UNIX_EPOCH},
 };
-use tokio::sync::Mutex;
-use tokio_rusqlite::params;
-
-const TOKEN_REFRESH_INTERVAL: Duration = Duration::from_secs(3600);
-const TOKEN_REFRESH_INTERVAL_MARGIN: Duration = Duration::from_secs(30);
-
-// NOTE: To make it less error-prone, the real way to do this is to grab the (latest) 
-//      JSON document from https://accounts.google.com/.well-known/openid-configuration
-//      and extract currently defined endpoints from there...
-// See: https://developers.google.com/identity/openid-connect/openid-connect#discovery
-const AUTHORIZATION_ENDPOINT_GET: &str = "https://accounts.google.com/o/oauth2/v2/auth"; // GET
-const TOKEN_ENDPOINT_POST: &str = "https://oauth2.googleapis.com/token"; // POST
-const USERINFO_ENDPOINT_GET: &str = "https://openidconnect.googleapis.com/v1/userinfo"; // GET
-
-////////////////////////////////////////////////////////////////////////////////////
-// Though I've documented via UML, the flow is as follows:
-// 1. User login via /login (GET) which will trigger call to Google OAuth2
-//    AuthorizationEndpoint via request_auth_code_trigger_callback()
-// 2. Service requests GET request to AUTH_URL_GET (Google OAuth2 AuthorizationEndpoint)
-//    with OAuth2AuthCodeRequest, and schedules for a callback (see auth_code_callback())
-// 3. Google OAuth2 AuthorizationEndpoint will negotiate with client and based on
-//    prompt (consent select_account), client will consent
-// 4. Upon consentment, we'll get a HTTP GET to callback auth_code_callback() with
-//    either error or auth-code on the URI parameter
-// 5. auth_code_callback() - If we received a valid auth-code (in HTTP GET URI params),
-//    we'll use that to request Google OAuth2 Token (TOKEN_URL_POST) using THIS
-//    endpoint as redirect_uri (claiming "I'm the caller that you called back to")
-//     via request_access_token()
-// 6. auth_code_callback() - Upon successful token GET request, we'll get back a token
-//    (access_token, refresh_token, expires_in, etc.) which we'll store in SQLite3
-// 7. auth_code_callback() - We'll then use the access_token to request user's email
-//    address via HTTP GET to USER_INFO_URL_GET (within login() method)
-// 8. auth_code_callback() - if all is well, we'll now signal/notify/message/publish
-//    that we have a new session_id (new login) for any services who cares for that
-//    event...
-// 9. We'll then return a session_id and state_token to the client (via /login,
-//    LoginResponse)
-////////////////////////////////////////////////////////////////////////////////////
+use tokio::{sync::Mutex, time::sleep};
 
 // HTTP GET to request Google OAuth2 authorization code (AUTH_URL_GET) via OAuth2AuthCodeRequest
 // sample request:
@@ -69,8 +34,8 @@ const USERINFO_ENDPOINT_GET: &str = "https://openidconnect.googleapis.com/v1/use
 //      &prompt=select_account%20consent
 async fn request_auth_code_trigger_callback(
     query_get_auth_request: web::Query<OAuth2AuthCodeRequest>,
-    http_client: web::Data<reqwest::Client>,
-) -> Result<Response, reqwest::Error> {
+    http_client: &web::Data<reqwest::Client>,
+) -> Result<reqwest::Response, reqwest::Error> {
     let response = http_client
         .get(AUTHORIZATION_ENDPOINT_GET)
         .query(&[
@@ -157,8 +122,8 @@ pub async fn auth_code_callback(
         }
         None => {
             let config = Config::from_env();
-            let db_connection = open_db_connection_from_config(config.clone());
-            let mq_connection = open_mq_connection_from_config(config.clone());
+            let db_connection = storage::open_db_connection_from_config(config.clone()).await;
+            let mq_connection = messenger::open_mq_connection_from_config(config.clone()).await;
 
             // First, if it is NOT an error, let's go ahead and request OAuth2Token from Google
             let auth_code = auth_code_response.possible_code.unwrap(); // should panic if code is not present!
@@ -173,7 +138,7 @@ pub async fn auth_code_callback(
             // 5. POST a request to TOKEN_URL_POST to get back access_token, refresh_token, expires_in, etc.
             let http_client = web::Data::new(reqwest::Client::new());
             let token_request = OAuth2TokenRequest {
-                state_token: state_token,
+                state_token: state_token.clone(),
                 client_id: config.google_client_id.clone(),
                 client_secret: config.google_client_secret.clone(),
                 code: auth_code,
@@ -182,42 +147,48 @@ pub async fn auth_code_callback(
             };
             let query_post_token_request: web::Query<OAuth2TokenRequest> =
                 web::Query(token_request);
-            let token_response_with_json_body =
-                request_access_token(query_post_token_request, http_client).await;
+            let possible_token_response =
+                request_access_token(&query_post_token_request, &http_client).await;
 
-            match token_response_with_json_body.error() {
-                None => {
-                    let token_data: TokenData = serde_json::from_str(
-                        std::str::from_utf8(token_response_with_json_body.body().into().as_bytes)
-                            .unwrap(),
-                    )
-                    .unwrap();
-
+            match possible_token_response {
+                Ok(oauth_token_response) => {
+                    //let token_data: TokenData = serde_json::from_str( std::str::from_utf8(token_response_json_body.body().into().as_bytes) .unwrap(),) .unwrap();
                     // 6. GET user's email address from Google
                     let user_info_result =
-                        request_userinfo(token_data.access_token, http_client).await;
+                        request_userinfo(&http_client, oauth_token_response.clone()).await;
                     match user_info_result {
                         Ok(user_info_response) => {
+                            let next_expected_time = SystemTime::now()
+                                .checked_add(Duration::from_secs(
+                                    oauth_token_response.expires_in.clone() as u64,
+                                )) // Google OAuth2 token expires_in is in seconds
+                                .unwrap();
                             // Now that we've got the user's email address, we can now build TokenData!
-                            let user_info = serde_json::from_str(
-                                std::str::from_utf8(user_info_response.body().into().as_bytes)
-                                    .unwrap(),
-                            )
-                            .unwrap();
+                            let token_data = TokenData::new(
+                                SessionIDType::make_hash(state_token.clone().as_str()),
+                                state_token.clone(),
+                                client_ip,
+                                client_port,
+                                Some(user_info_response.email),
+                                oauth_token_response.access_token,
+                                oauth_token_response.possible_refresh_token,
+                                oauth_token_response.expires_in,
+                                next_expected_time,
+                            );
 
                             // save/persist it
-                            db_connection.post();
+                            storage::upsert_token_data(&config, &db_connection, &token_data);
 
                             // 7. Signal/notify/message/publish that we have a new session_id (new login) for any services who cares for that event...
-                            mq_connection.post();
+                            messenger::post_new_login(&config, &mq_connection, &token_data);
 
                             // the end...
-                            HTtpResponse::Ok().finish()
+                            HttpResponse::Ok().finish()
                         }
                         Err(_) => HttpResponse::InternalServerError().finish(),
                     }
                 }
-                Some(e) => HttpResponse::InternalServerError().finish(),
+                Err(e) => HttpResponse::InternalServerError().finish(),
             }
 
             //HttpResponse::Ok().finish()
@@ -242,63 +213,53 @@ pub async fn auth_code_callback(
 // Note that the request is blocked until we get a response from Google OAuth2 (unlike
 // auth_code_callback() which is a callback from Google OAuth2)
 // Sample response:
-//      {
-//        "access_token": "1/fFAGRN
-//        "expires_in": 3920,
+//  {
+//      "access_token" : "ya29.a0AXooCgs2qcHYleg5gD_Qrm...BFQ3NfyrB61-171",
+//      "expires_in" : 3599,
+//      "id_token" : "eyJhbGciOiJSUzI1NiIsIm...tpZCI6Ijg3YmJlMDmQYA",
+//      "scope" : "https://www.googleapis.com/auth/userinfo.profile openid https://www.googleapis.com/auth/userinfo.email",
+//      "token_type" : "Bearer"
+//   }
 async fn request_access_token(
-    query_post_token_request: web::Query<OAuth2TokenRequest>,
-    http_client: web::Data<reqwest::Client>,
-) -> HttpResponse {
+    query_post_token_request: &web::Query<OAuth2TokenRequest>,
+    http_client: &web::Data<reqwest::Client>,
+) -> AnyResult<OAuth2TokenResponse> {
     let params = [
-        ("code", query_post_token_request.code),
-        ("client_id", query_post_token_request.client_id),
-        ("client_secret", query_post_token_request.client_secret),
-        ("redirect_uri", query_post_token_request.redirect_uri),
-        ("grant_type", query_post_token_request.grant_type),
+        ("code", query_post_token_request.code.clone()),
+        ("client_id", query_post_token_request.client_id.clone()),
+        (
+            "client_secret",
+            query_post_token_request.client_secret.clone(),
+        ),
+        (
+            "redirect_uri",
+            query_post_token_request.redirect_uri.clone(),
+        ),
+        ("grant_type", query_post_token_request.grant_type.clone()),
     ];
 
-    let response = http_client.post(TOKEN_ENDPOINT_POST).form(&params).send().await;
+    let response = http_client
+        .post(TOKEN_ENDPOINT_POST)
+        .form(&params)
+        .send()
+        .await;
     match response {
         Ok(resp) => {
             // deserialize the response from Google OAuth2
             let oauth2_token_response: OAuth2TokenResponse = resp.json().await.unwrap();
-
-            let expiry_time =
-                SystemTime::now() + Duration::from_secs(oauth2_token_response.expires_in as u64);
-            let token_data_no_client_info = TokenData::new(
-                SessionIDType::Undefined(None), // when we get back response from Google, we have no SessionID...
-                query_post_token_request.state_token,
-                IpAddr::from_str("::1").unwrap(),
-                0,
-                None,
-                oauth2_token_response.access_token, // The token that your application sends to authorize a Google API request.
-                // A token that you can use to obtain a new access token.
-                // Refresh tokens are valid until the user revokes access.
-                // Again, this field is only present in this response if
-                // you set the access_type parameter to offline in the
-                // initial request to Google's authorization server
-                oauth2_token_response.possible_refresh_token,
-                oauth2_token_response.expires_in, // The remaining lifetime of the access token in seconds.
-                expiry_time,
-            );
-            // Store token data in SQLite3 just in case something goes wrong...
-            let conn: TDBConnection = conn_as_data.get_ref().clone();
-            let ret_session_id = store_token(conn, token_data_no_client_info.clone())
-                .await
-                .unwrap();
-            println!("Stored token with session_id={}", ret_session_id); // don't log access_token, instead log session_id
-            let token_response = serde_json::to_string(&token_data_no_client_info).unwrap();
-            HttpResponse::Ok().json(token_response)
+            Ok(oauth2_token_response)
         }
-        Err(_) => HttpResponse::InternalServerError().finish(),
+        Err(_) => anyhow::bail!("Failed to get token from Google OAuth2"),
     }
 }
 
 // this method is indirectly called from auth_code_callback() (chained call when qurest_and_store_google_oauth2 succeeds)
 // get the user's email address from Google
-async fn request_userinfo(token: String, http_client: web::Data<reqwest::Client>) -> HttpResponse {
+async fn request_userinfo(
+    http_client: &web::Data<reqwest::Client>,
+    token_response: OAuth2TokenResponse,
+) -> AnyResult<OAuth2UserInfoResponse> {
     // once we got OK/200 from Google OAuth2, get e-mail address (make sure Google API was setup with email priv enabled)
-    // Note that www.googleapis.com
     // $curl -X GET "https://www.googleapis.com/oauth2/v1/userinfo?alt=json" -H"Authorization: Bearer accessTokenHere"
     // JavaScript example:
     //    var xhr = new XMLHttpRequest();
@@ -306,28 +267,32 @@ async fn request_userinfo(token: String, http_client: web::Data<reqwest::Client>
     //    xhr.setRequestHeader('Authorization', 'Bearer ' + token);
     //    xhr.setRequestHeader('Content-Type', 'application/json; charset=utf-8');
     //    xhr.setRequestHeader('x-content-type-options', 'nosniff'); // Add x-content-type-options header
-    //    xhr.onload = function () {...
-    let req  = OAuth2UerInfoRequest{
-        access_token: token
+    //    xhr.onload = function () {...}
+    let req = OAuth2UerInfoRequest {
+        access_token: token_response.access_token.clone(),
+        // i.e. "Autorization": "Bearer <access_token_here>"
+        header_authorization: format!(
+            "{} {}", // note that because this is header, we don't need to use '%20' for space
+            token_response.token_type.clone(),
+            token_response.access_token.clone()
+        ),
     };
-    let user_info_response = http_client
+    let user_info_http_response = http_client
         .get(USERINFO_ENDPOINT_GET)
-        .header("Authorization", format!("Bearer {}", req.access_token));
+        .header("Authorization", req.header_authorization)
+        .send()
+        .await
+        .unwrap();
 
     // wrap LoginResponse in a Result (Body)
-    let response_body = serde_json::to_string(&OAuth2UserInfoResponse {
-        id: "".to_string(),
-        email: "".to_string(),
-        name: "".to_string(),
-        picture: "".to_string(),
-        locale: "".to_string(),
-        family_name: "".to_string(),
-        given_name: "".to_string(),
-        link: "".to_string(),
-        gender: "".to_string(),
-    })
-    .unwrap();
-    HttpResponse::Ok().body(response_body)
+    //let possible_user_info_response = httpresponse_body_to_json::<OAuth2UserInfoResponse>(user_info_response).await;
+    let possible_user_info_response = user_info_http_response
+        .json::<OAuth2UserInfoResponse>()
+        .await;
+    match possible_user_info_response {
+        Ok(user_info) => Ok(user_info),
+        Err(_) => anyhow::bail!("Failed to get user info from Google OAuth2"),
+    }
 }
 
 /// Login route - either authenticate or re-authenticate the client against Google OAuth2
@@ -337,9 +302,12 @@ async fn request_userinfo(token: String, http_client: web::Data<reqwest::Client>
 #[actix_web::get("/login")]
 pub async fn login(
     client_http_request: HttpRequest,
-    db_connection: web::Data<TDBConnection>,
+    db_connection: web::Data<TDBConnectionLock>,
+    mq_connection: web::Data<TMQConnectionLock>,
     config: web::Data<Config>,
 ) -> HttpResponse {
+    //let db_connection = storage::open_db_connection_from_config(config.clone()).await;
+    //let mq_connection = messenger::open_mq_connection_from_config(config.clone()).await;
     let query_string = client_http_request.query_string();
     let query_params: HashMap<String, String> =
         serde_urlencoded::from_str(query_string).unwrap_or_else(|_| HashMap::new());
@@ -375,32 +343,36 @@ pub async fn login(
         login_client_port: client_port,
 
         session_id: login_request.possible_last_session_id,
-        state_token: login_request.possible_last_state_token.clone(),
+        state_token: match login_request.possible_last_state_token {
+            Some(s) => s.clone(),
+            None => make_state_token(),
+        },
 
-        db_type: "sqlite".to_string(),
-        possible_db_address: None,
-        possible_db_port: None,
-        possible_db_path: config.db_connection.SQlite.path,
+        db_type: storage::get_db_type(config.as_ref()),
+        possible_db_address: storage::get_db_address(config.as_ref()),
+        possible_db_port: storage::get_db_port(config.as_ref()),
+        possible_db_path: storage::get_db_path(config.as_ref()),
 
-        mq_type: "kafka".to_string(),
-        possible_mq_address: Some(net::IpAddr::from("::1")),
-        possible_mq_port: Some(0),
+        mq_type: messenger::get_mq_type(config.as_ref()),
+        possible_mq_address: messenger::get_mq_address(config.as_ref()),
+        possible_mq_port: messenger::get_mq_port(config.as_ref()),
     };
 
     // reqwest Google to give us an AuthCode
     let auth_request = OAuth2AuthCodeRequest {
         client_id: config.google_client_id.clone(),
         redirect_uri: config.google_redirect_uri.clone(),
-        response_type: "code".to_string(),  // "code" for Authorization Code flow, valid: "code", "token", "id_token", "code token", "code id_token", "token id_token", "code token id_token"
+        response_type: "code".to_string(), // "code" for Authorization Code flow, valid: "code", "token", "id_token", "code token", "code id_token", "token id_token", "code token id_token"
         scope: "email%20profile%20https://www.googleapis.com/auth/drive".to_string(),
         possible_access_type: Some("offline".to_string()),
-        possible_state: encode_state_token(Some(state)),
+        possible_state: encode_state_token(Some(state.clone())),
         possible_include_granted_scopes: Some(true),
         possible_prompt: Some("consent%20select_account".to_string()), // space delimited
     };
+    let auth_request_as_json = serde_json::to_string(&auth_request).unwrap();
     let http_client = web::Data::new(reqwest::Client::new());
-    let query_get_auth_request = web::Query::from_query(auth_request).unwrap();
-    let schedule_auth = request_auth_code_trigger_callback(query_get_auth_request, http_client);
+    let query_get_auth_request = web::Query::from_query(auth_request_as_json.as_str()).unwrap();
+    let schedule_auth = request_auth_code_trigger_callback(query_get_auth_request, &http_client);
 
     // wait for player/client to consent
     //loop{}
@@ -410,31 +382,43 @@ pub async fn login(
         possible_session_id: None,
         possible_state_token: None,
     };
-    // I'd like to now block and wait for the signal that I've got a session_id...
-    //loop {}
+    // Block and wait for the signal that I've got a session_id...
+    let mut possible_token_response: Option<TokenData> = None;
+    let start_time = SystemTime::now();
+    let timeout = TIMEOUT_FOR_AUTH_CODE_CALLBACK;
+    loop {
+        // check if we have a session_id from messenger
+        possible_token_response = messenger::get_token(
+            &config,
+            &mq_connection,
+            &state.state_token.as_str(),
+            |lhs_state_token: &str, token_data: TokenData| {
+                lhs_state_token == token_data.state_token.as_str()
+            },
+        );
+
+        // yield
+        sleep(Duration::from_secs(1));
+        if start_time.elapsed().unwrap() > timeout {
+            break;
+        }
+    }
 
     // Now, query for user's email client_address
-    match token_response {
-        Ok(resp) => {
+    match possible_token_response {
+        Some(resp) => {
             // deserialize the response from Google OAuth2
-            let oauth2_token_response: OAuth2TokenResponse = resp.json().await.unwrap();
-            let http_client = reqwest::Client::new();
-            let user_info_response = http_client.get(USERINFO_ENDPOINT_GET).header(
-                "Authorization",
-                format!("Bearer {}", oauth2_token_response.access_token),
-            );
-
             // wrap LoginResponse in a Result (Body)
             let response_body = serde_json::to_string(&LoginResponse {
-                possible_login_error: None, // TODO: populate correct response
-                possible_session_id: None,
-                possible_state_token: None,
+                possible_login_error: None,
+                possible_session_id: resp.session_id(),
+                possible_state_token: Some(resp.state_token),
             })
             .unwrap();
             HttpResponse::Ok().body(response_body)
         }
-        Err(_) => HttpResponse::InternalServerError().finish(),
-    }
+        None => HttpResponse::InternalServerError().finish(),
+    };
 
     // TODO: signal (via kafka) of new session_id (new login) for any services who cares for that event...
 
@@ -463,83 +447,4 @@ fn make_state_token() -> String {
 
     println!("Random base64-encoded string: {}", sanitized_encoded);
     sanitized_encoded
-}
-
-/// Keep-alive route - Check if the client is authenticated and handle keep-alive
-/// HTTP verb: GET
-/// params: last_session_id
-#[actix_web::get("/keepalive")]
-pub async fn keepalive(
-    client_http_request: HttpRequest,
-    db_connection: web::Data<TDBConnection>,
-) -> HttpResponse {
-    let query_string = client_http_request.query_string();
-    let query_params: HashMap<String, String> =
-        serde_urlencoded::from_str(query_string).unwrap_or_else(|_| HashMap::new());
-    let last_session_id = query_params.get("last_session_id").map(|s| s.to_string());
-
-    // grab some data we want to setup TokenData
-    let client_ip = client_http_request
-        .peer_addr()
-        .map(|addr| addr.ip())
-        .unwrap();
-    let client_port = client_http_request
-        .peer_addr()
-        .map(|addr| addr.port())
-        .unwrap();
-
-    // first check if sessionID is valid (exists in DB)
-    let is_session_valid = db_connection
-        .lock()
-        .await
-        .call(move |conn| {
-            conn.query_row(
-                "SELECT COUNT(*) FROM tokens WHERE session_id = ?",
-                params![last_session_id],
-                |row| row.get(0),
-            )
-            .map_err(|e| tokio_rusqlite::Error::from(e))
-        })
-        .await;
-
-    match is_session_valid {
-        Ok(1) => {
-            // if result row-set exists, count SHOULD be 1 (cannot have more than 1 UNIQUE key)
-        }
-        _ => {
-            // REJECT/DROP this undesired client ASAP...
-            panic!("Keep-alive: Could not get client IP/port");
-        }
-    }
-    let ttl_in_seconds = Duration::from_secs(60);
-    let next_expected_time_in_epoch = SystemTime::now()
-        .checked_add(ttl_in_seconds)
-        .unwrap()
-        .duration_since(UNIX_EPOCH)
-        .unwrap()
-        .as_secs();
-    let response_body = serde_json::to_string(&KeepaliveResponse {
-        next_expected_time: next_expected_time_in_epoch,
-        ttl: ttl_in_seconds.as_secs(),
-        status: "OK".to_string(),
-        message: "Keep-alive successful".to_string(),
-    })
-    .unwrap();
-
-    HttpResponse::Ok().body(response_body)
-}
-
-#[actix_web::get("/test/keepalive")]
-async fn health_checker_handler() -> HttpResponse {
-    const MESSAGE1: &str = "OK";
-    let duration = std::time::Duration::new(30, 0);
-    let next_time = std::time::SystemTime::now()
-        .checked_add(duration)
-        .expect("Failed to calculate next time;")
-        .duration_since(std::time::UNIX_EPOCH)
-        .expect("Time went backwards");
-    let next_expected = format!("{}", next_time.as_secs());
-
-    HttpResponse::Ok()
-        .json(serde_json::json!({"status": "success", "ack": MESSAGE1, "next": next_expected}))
 }

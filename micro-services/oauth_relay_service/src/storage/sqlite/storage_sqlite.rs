@@ -1,8 +1,9 @@
-use super::TDBConnection;
 use crate::data::{SessionIDType, TokenData};
 //use anyhow::Result as AnyResult;
 use std::time::UNIX_EPOCH;
 use tokio_rusqlite::{self, params};
+
+use super::{TDBConnectionLock_sqlite};
 
 // Note that we use "IF NOT EXISTS" so that create_table_token() can be
 // safely called multiple times without failing...
@@ -20,7 +21,9 @@ CREATE TABLE IF NOT EXISTS tokens (
     expires_in      INTEGER NOT NULL,
     expiry_time     INTEGER NOT NULL)
 "#;
-pub(crate) async fn create_table_token(db_connection: TDBConnection) -> tokio_rusqlite::Result<()> {
+pub(crate) async fn create_table_token(
+    db_connection: &TDBConnectionLock_sqlite,
+) -> tokio_rusqlite::Result<()> {
     let conn = db_connection.lock().await;
     conn.call(|conn| match conn.execute(CREATE_TABLE, []) {
         Ok(_) => Ok(()),
@@ -47,7 +50,7 @@ INSERT INTO tokens (
     VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8)
 "#;
 pub(crate) async fn store_token(
-    db_connection: TDBConnection,
+    db_connection: &TDBConnectionLock_sqlite,
     token_data_no_session_id: TokenData,
 ) -> tokio_rusqlite::Result<i64> {
     let conn = db_connection.lock().await;
@@ -55,18 +58,14 @@ pub(crate) async fn store_token(
         conn.execute(
             INSERT_TOKEN,
             params![
-                token_data_no_session_id.state_token,                // 1
-                token_data_no_session_id.client_address.to_string(), // 2
-                token_data_no_session_id.client_port,                // 3
-                token_data_no_session_id.possible_client_email,      // 4
-                token_data_no_session_id.access_token,               // 5
-                token_data_no_session_id.possible_refresh_token,     // 6
-                token_data_no_session_id.expires_in,                 // 7
-                (token_data_no_session_id
-                    .expiry_time
-                    .duration_since(UNIX_EPOCH)
-                    .unwrap()
-                    .as_secs() as i64), // 8
+                token_data_no_session_id.state_token,                      // 1
+                token_data_no_session_id.client_address.to_string(),       // 2
+                token_data_no_session_id.client_port,                      // 3
+                token_data_no_session_id.possible_client_email,            // 4
+                token_data_no_session_id.access_token,                     // 5
+                token_data_no_session_id.possible_refresh_token,           // 6
+                token_data_no_session_id.expires_in,                       // 7
+                (token_data_no_session_id.expiry_time_as_sec_from_epoch() as i64), // 8
             ],
         )?;
         let session_id = conn.last_insert_rowid();
@@ -83,7 +82,7 @@ SELECT state_token,
     FROM tokens WHERE session_id = ?1
 "#;
 pub(crate) async fn get_token_by_session_id(
-    db_connection: TDBConnection,
+    db_connection: &TDBConnectionLock_sqlite,
     session_id: u64,
 ) -> tokio_rusqlite::Result<TokenData> {
     let conn = db_connection.lock().await;
