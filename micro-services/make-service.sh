@@ -171,7 +171,7 @@ git rm --cached .env.local 2>&1 > /dev/null
 
 cd ${_MICRO_SERVICE_DIR}
 echo "# Cleaning up duplicated .env* files"
-find . -name ".env*"
+find .. -name ".env*"
 _DIRS=$( find . -type f -name "Dockerfile" -exec dirname {} \; )
 for _D in ${_DIRS} ; do
     rm ${_D}/build/.env
