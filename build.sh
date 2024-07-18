@@ -1,4 +1,15 @@
 #!/bin/bash
+# Convention:
+# - When I mean "Linux", it's both actual Linux distro (I am biased on Debian) or WSL2 (again, Debian biased)
+# - VCPKG_ROOT for Linux will be on `/opt/vcpkg` (where binary is at `/opt/vcpkg/vcpkg`)
+# - VCPKG_ROOT for Windows will be on `C:\msys64\opt\vcpkg\` (where binary is at `C:\msys64\opt\vcpkg\vcpkg.exe` )
+# - With that said, it is assume that for Windows, you're working with MSYS2 (mingw64) and not Cygwin
+# - Assume rustup is installed whether on Windows or Linux
+# - Docker && Docker-compose is installed (for both Linux or Windows)
+# - Do NOT install/enable kubernetes on Windows unless you hate yourself or you get paid gobs of $$$ by the hour
+#   If you do have it installed, disabled it and delete all containers and images associated to it such as kube and pods
+#   (for REAL Linux, you can use/keep kubernetes, but for WSL2, just don't!)
+# - You've already edited .env.local with your own values from Google Cloud Platform
 set -o nounset   # exit when your script tries to use undeclared variables   
 
 function make_mingw() {
@@ -17,6 +28,7 @@ fi
 if [ "$(uname -o)" == "Msys" ] ; then
     pacman --sync --noconfirm           \
         zip unzip                       \
+        $(make_mingw "toolchain")       \
         $(make_mingw "gcc")             \
         $(make_mingw "gcc-libs")        \
         $(make_mingw "pkg-config")      \
@@ -25,11 +37,15 @@ if [ "$(uname -o)" == "Msys" ] ; then
         libsqlite-devel
 
     # Install vcpkg
-    if ! [ -e /opt/vcpkg ] ; then
-        mkdir -p /opt/vcpkg
-        git clone https://github.com/microsoft/vcpkg.git /opt/vcpkg && /opt/vcpkg/bootstrap-vcpkg.sh
+    export VCPKG_ROOT=/opt/vcpkg
+    if ! [ -e "${VCPKG_ROOT}/vcpkg" ] ; then
+        sudo mkdir -p "${VCPKG_ROOT}"
+        sudo chmod +rwx "${VCPKG_ROOT}"
+        sudo chown $(whoami) "${VCPKG_ROOT}"
+        git clone https://github.com/microsoft/vcpkg.git "${VCPKG_ROOT}" && "${VCPKG_ROOT}"/bootstrap-vcpkg.sh
     fi
-    PATH="/opt/vcpkg:${PATH}"
+    export PATH="${VCPKG_ROOT}:${PATH}"
+    export PKG_CONFIG_PATH=${VCPKG_ROOT}/packages
     cargo install cargo-vcpkg
     # NOTE: On MinGW64, you `vcpkg install librdkafka:x64-mingw-dynamic`
     #       On Linux, you `vcpkg install librdkafka:x64-linux`
@@ -44,7 +60,8 @@ elif [ "$(uname -o)" == "GNU/Linux" ] ; then
         zip unzip curl \
         gcc g++ cmake make \
         build-essential \
-        pkg-config
+        pkg-config  \
+        libssl-dev libsasl2-dev libzstd-dev
     sudo apt-get install -y --install-recommends \
         protobuf-compiler \
         libprotobuf-dev \
@@ -60,15 +77,24 @@ elif [ "$(uname -o)" == "GNU/Linux" ] ; then
         libsqlite3-dev  \
         libpq-dev       
     # Install vcpkg
-    if ! [ -e /opt/vcpkg ] ; then
-        mkdir -p /opt/vcpkg
-        git clone https://github.com/microsoft/vcpkg.git /opt/vcpkg && /opt/vcpkg/bootstrap-vcpkg.sh
+    export VCPKG_ROOT=/opt/vcpkg
+    if ! [ -e "${VCPKG_ROOT}/vcpkg" ] ; then
+        sudo mkdir -p "${VCPKG_ROOT}"
+        sudo chmod +rwx "${VCPKG_ROOT}"
+        sudo chown $(whoami) "${VCPKG_ROOT}"
+        git clone https://github.com/microsoft/vcpkg.git "${VCPKG_ROOT}" && "${VCPKG_ROOT}"/bootstrap-vcpkg.sh
     fi
-    PATH="/opt/vcpkg:${PATH}"
+    export PATH="${VCPKG_ROOT}:${PATH}"
+    export PKG_CONFIG_PATH=${VCPKG_ROOT}/packages
     cargo install cargo-vcpkg
     # NOTE: On MinGW64, you `vcpkg install librdkafka:x64-mingw-dynamic`
     #       On Linux, you `vcpkg install librdkafka:x64-linux`
     #       On Windows, you `vcpkg install librdkafka:x64-windows` BUT without VStudios installed, it WILL FAIL, so use mingw instead!
+    _BIN_FOUND=$(which vcpkg 2>&1 | grep -vi "error" )
+    if [ "${_BIN_FOUND}" == "" ] ; then
+        echo "Unable to locate vcpkg!"
+        exit -1
+    fi
     vcpkg install librdkafka:x64-linux
 
     # odd cases where reinstall is needed
@@ -80,7 +106,20 @@ else
     exit -1
 fi
 
-#cargo vcpkg build 
+# NOTE: Quite a few crates relies on vcpkg, hence MAKE SURE
+#       - VCPKG_ROOT is set to /opt/vcpkg
+#       - make sure PATH has ${VCPKG_ROOT} in the search (i.e. `export PATH=${VCPKG_ROOT}:$PATH`)
+# Prior to calling `cargo build`, let's make sure that vcpkg is accessible:
+_BIN_FOUND=$(which vcpkg 2>&1 | grep -vi "error" )
+if [ "${_BIN_FOUND}" == "" ] ; then
+    echo "Unable to locate vcpkg!"
+    exit -1
+fi
+if ! [ -e "${VCPKG_ROOT}/vcpkg" ] ;  then
+    echo "Directory ${VCPKG_ROOT} is inaccessible!"
+    exit -1
+fi
+
 if [ "$(uname -o)" == "GNU/Linux" ] ; then
     echo "######################################## Build Linux"
     

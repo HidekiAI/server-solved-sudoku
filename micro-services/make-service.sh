@@ -16,62 +16,33 @@ pushd . 2>&1 > /dev/null
 cd ..
 _ROOT_DIR=$(pwd)
 _MICRO_SERVICE_DIR=${_ROOT_DIR}/micro-services
+if [ x"${VCPKG_ROOT}" == x"" ] ; then
+    export VCPKG_ROOT=/opt/vcpkg
+fi
 
 if [ "$(uname -o)" == "GNU/Linux" ] ; then
     echo "######################################## Build Linux services (including WSL2)"
 elif [ "$(uname -o)" == "Msys" ] ; then
+    echo "######################################## MSYS/MinGW64"
     _WIN_DOCKER=$( which docker.exe 2>&1 2>/tmp/out.txt && grep "\/Docker" /tmp/out.txt )
     if [ "${_WIN_DOCKER}" == "" ]; then
         echo "# Make sure Dockers for Windows is in the search paths"
         exit -1
     fi
-    echo "Detected MSys/MinGW64 environment...  Hand-crafting .env files to make it work on Windows Docker-Compose..."
-    # first, remove all comments, in which I've purposely added comments on lines that Windows Docker-Compose dislikes
-    # Note that this is NOT an issue on MinGW-BASH (which can do nested source'ing as well as accept BASH commands 
-    # INSIDE source'ing file).  It's very deceptive because it allows BASH command `export` in .env, but won't allow
-    # any other BASH commands.
-    # TODO: Perhaps I should have 2 files, one is ".env.sh" and another is ".env" in which ".env" is in format of
-    # TODO: 'Key=Value' that Docker-Compose understands, and ".env.sh" is the version we would "source" with, hence
-    # TODO: ".env.sh" will `source .env` in from BASH, you'd do `source .env.sh`; The KVP ".env" file is basically ".env.msys" below:
-    cd ${_ROOT_DIR}
-    grep -v "#" .env > .env.msys
-    # append overriding vars to .env.sys
-    cat .env.local >> .env.msys
 else
     echo "OS not supported"
     exit -1
 fi
-pwd
 
 # Next, we'll need to source the '.env' so that all the auto-generated scripts
 # and logics (including Dockerfile) will have access to the environment variables.
 cd ${_MICRO_SERVICE_DIR}
-if ! [ -e .env.local ] ; then
-    echo "# Please create local file '.env.local' and at least set GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET"
-    echo "# the file '.env.local' must reside on the same directory as '.env' file"
-    exit -1
-else
-    # if .env.local exists, assume all overrides are set there, so make sure .env is in its prestine conditions
-    git fetch --all 2>&1 2> /dev/null
-    _DIFF=$(git diff .env)
-    if [ "${_DIFF}" != "" ] ; then
-        echo "############################################"
-        git diff .env
-        echo "############################################"
-        echo "# .env is modified, reset to original using:"
-        echo '$ git reset .env && git checkout .env'
-        exit -1
-    fi
-fi
+pwd
+# call NESTED source'ing so that in case `cargo build` needs env-vars, it's there
+source .env.sh  # whether it is MSys or Linux, THIS SHOULD WORK!
 
 # NOTE: Must have env set, i.e. `$ source .env && docker-compose --verbose --ansi=auto build` because
 # docker-compose.yml uses ${VAR} syntax, and it will not be expanded if not set in the environment
-if [ -e .env.msys ]; then
-    source .env.msys
-else
-    source .env
-fi
-
 if [ "${GOOGLE_CLIENT_ID}" == "your_google_client_id" ] ; then
     echo "# Please update GOOGLE_CLIENT_ID in your .env.local"
     exit -1
@@ -150,38 +121,63 @@ for _D in ${_DIRS} ; do
     pushd . 2>&1 > /dev/null
     cd ${_D}
     mkdir -p build
-    cd build
     # Because Docker will not allow access to dirs above it's build dir,
     # we will need to copy the .env.local to the build dir.
     # See oauth_relay_service/Dockerfile for more info.
-    ln -sv ${_MICRO_SERVICE_DIR}/.env
-    ln -sv ${_MICRO_SERVICE_DIR}/.env.local
+    #ln -sv ${_MICRO_SERVICE_DIR}/.env
+    #ln -sv ${_MICRO_SERVICE_DIR}/.env.local
+    bash ${_MICRO_SERVICE_DIR}/make_env.sh "${_MICRO_SERVICE_DIR}/.env.sh" "${_MICRO_SERVICE_DIR}/.env.local"
+
+    cd build
     # NOTE: No need to recursively copy, just copy the binaries at the root of the target/release
     cp --update ${_ROOT_DIR}/target/release/* .
+    ls -AR
     popd 2>&1 > /dev/null
 done
 
 # NOTE: The Dockerfile for oauth_relay_service will perform multi-stage build so that libscsudoku will be built when oauth_relay_service is built.
+echo "# Building micro-services using docker-compose"
+echo "# REST_PORT=${REST_PORT}"
+if [ "${REST_PORT}" == "" ] ; then
+    echo "# REST_PORT is not set, defaulting to 8080"
+    source .env.sh
+    if [ "${REST_PORT}" == "" ] ; then
+        echo "# REST_PORT is not set in .env"
+        exit -1
+    fi
+fi
+if [ "${GOOGLE_CLIENT_SECRET}" == "your_google_client_secret" ] ; then
+    echo "# Please update GOOGLE_CLIENT_SECRET in your .env.local" 
+    exit -1
+fi
 docker-compose --verbose --ansi=auto build --progress=plain
 
 # CLEAN UP
+cd ${_MICRO_SERVICE_DIR}
+echo "# Cleaning up duplicated .env* files"
+find .. -name ".env*"
+
+_DIRS=$( find . -type f -name "Dockerfile" -exec dirname {} \; )
+for _D in ${_DIRS} ; do
+    echo "# Cleaning up ${_D}"
+    pushd . 2>&1 > /dev/null
+    cd ${_D}
+    ls -AR build
+    rm -rf build
+    popd 2>&1 > /dev/null
+done
+
 # just in case somebody decided to add it to local commit, remove it!
 git rm .env.local 2>&1 > /dev/null
 git rm --cached .env.local 2>&1 > /dev/null
 
-cd ${_MICRO_SERVICE_DIR}
-echo "# Cleaning up duplicated .env* files"
-find .. -name ".env*"
-_DIRS=$( find . -type f -name "Dockerfile" -exec dirname {} \; )
-for _D in ${_DIRS} ; do
-    rm ${_D}/build/.env
-    rm ${_D}/build/.env.local
-done
 cd ${_ROOT_DIR}
-if [ -e .env.msys ]; then
-    rm .env.msys
-fi
 echo "# After cleaning up duplicated .env* files:"
 find . -name ".env*"
 
+cd ${_MICRO_SERVICE_DIR}
+docker-compose --verbose images
+
 popd 2>&1 > /dev/null
+
+docker image list

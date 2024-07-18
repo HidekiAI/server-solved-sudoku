@@ -1,0 +1,1854 @@
+2024-07-17 16:46:40 root@68e4ece6d43c:/# 
+
+root@68e4ece6d43c:/# 
+
+root@68e4ece6d43c:/# 
+
+root@68e4ece6d43c:/# apt-get update && apt-get update --help
+2024-07-17 16:46:40 
+
+2000-01-01 00:00:00 [Working]
+            
+2001-01-01 00:00:00 http://deb.debian.org/debian bookworm InRelease [151 kB]
+2024-07-17 16:46:40 
+2000-01-01 00:00:00 [1 InRelease 0 B/151 kB 0%]
+                              
+2000-01-01 00:00:00 [Working]
+            
+2001-02-01 00:00:00 http://deb.debian.org/debian bookworm-updates InRelease [55.4 kB]
+2024-07-17 16:46:40 
+            
+2001-03-01 00:00:00 http://deb.debian.org/debian-security bookworm-security InRelease [48.0 kB]
+2024-07-17 16:46:41 
+2000-01-01 00:00:00 [Working]
+2000-01-01 00:00:00 [Working]
+            
+2001-04-01 00:00:00 http://deb.debian.org/debian bookworm/main amd64 Packages [8788 kB]
+2024-07-17 16:46:42 
+2000-01-01 00:00:00 [4 Packages 0 B/8788 kB 0%]
+2000-01-01 00:00:00 [4 Packages 1788 kB/8788 kB 20%]
+2000-01-01 00:00:00 [4 Packages 5366 kB/8788 kB 61%]
+2000-01-01 00:00:00 [4 Packages 6362 kB/8788 kB 72%]
+                                   
+2000-01-01 00:00:00 [Working]
+2000-01-01 00:00:00 [4 Packages store 0 B] [Waiting for headers]
+                                               
+2001-05-01 00:00:00 http://deb.debian.org/debian bookworm-updates/main amd64 Packages [13.8 kB]
+2024-07-17 16:46:42 
+                                               
+2000-01-01 00:00:00 [4 Packages store 0 B]
+1992-01-01 00:00:00 [4 Packages store 0 B]
+                          
+2001-06-01 00:00:00 http://deb.debian.org/debian-security bookworm-security/main amd64 Packages [169 kB]
+2024-07-17 16:46:47 
+1993-01-01 00:00:00 [4 Packages store 0 B]
+1993-01-01 00:00:00 [4 Packages store 0 B]
+1993-01-01 00:00:00 [4 Packages store 0 B]
+1993-01-01 00:00:00 [4 Packages store 0 B]
+1993-01-01 00:00:00 [4 Packages store 0 B]
+1993-01-01 00:00:00 [4 Packages store 0 B]
+1993-01-01 00:00:00 [4 Packages store 0 B]
+1993-01-01 00:00:00 [4 Packages store 0 B]
+1993-01-01 00:00:00 [4 Packages store 0 B]                                                                                                                                                                                                                                                               1422 kB/s 0s
+1996-01-01 00:00:00 [Working]                                                                                                                                                                                                                                                                            1422 kB/s 0s
+1996-01-01 00:00:00 [5 Packages store 0 B]                                                                                                                                                                                                                                                               1422 kB/s 0s
+1998-01-01 00:00:00 [Working]                                                                                                                                                                                                                                                                            1422 kB/s 0s
+1998-01-01 00:00:00 [6 Packages store 0 B]                                                                                                                                                                                                                                                               1422 kB/s 0s
+0100-01-01 00:00:00 [Working]                                                                                                                                                                                                                                                                           1422 kB/s 0s
+                                                                                                                                                                                                                                                                                                     
+Fetched 9225 kB in 7s (1331 kB/s)
+2024-07-17 16:46:55 
+Reading package lists... 0%
+
+Reading package lists... 0%
+
+Reading package lists... 0%
+
+Reading package lists... 11%
+
+Reading package lists... 23%
+
+Reading package lists... 32%
+
+Reading package lists... 45%
+
+Reading package lists... 57%
+
+Reading package lists... 72%
+
+Reading package lists... 85%
+
+Reading package lists... 92%
+
+Reading package lists... 97%
+
+Reading package lists... 97%
+
+Reading package lists... 97%
+
+Reading package lists... 97%
+
+Reading package lists... 99%
+
+Reading package lists... 99%
+
+Reading package lists... 99%
+
+Reading package lists... Done
+
+2024-07-17 16:46:55 apt 2.6.1 (amd64)
+2024-07-17 16:46:55 Usage: apt-get [options] command
+2024-07-17 16:46:55        apt-get [options] install|remove pkg1 [pkg2 ...]
+2024-07-17 16:46:55        apt-get [options] source pkg1 [pkg2 ...]
+2024-07-17 16:46:55 
+2024-07-17 16:46:55 apt-get is a command line interface for retrieval of packages
+2024-07-17 16:46:55 and information about them from authenticated sources and
+2024-07-17 16:46:55 for installation, upgrade and removal of packages together
+2024-07-17 16:46:55 with their dependencies.
+2024-07-17 16:46:55 
+2024-07-17 16:46:55 Most used commands:
+2024-07-17 16:46:55   update - Retrieve new lists of packages
+2024-07-17 16:46:55   upgrade - Perform an upgrade
+2024-07-17 16:46:55   install - Install new packages (pkg is libc6 not libc6.deb)
+2024-07-17 16:46:55   reinstall - Reinstall packages (pkg is libc6 not libc6.deb)
+2024-07-17 16:46:55   remove - Remove packages
+2024-07-17 16:46:55   purge - Remove packages and config files
+2024-07-17 16:46:55   autoremove - Remove automatically all unused packages
+2024-07-17 16:46:55   dist-upgrade - Distribution upgrade, see apt-get(8)
+2024-07-17 16:46:55   dselect-upgrade - Follow dselect selections
+2024-07-17 16:46:55   build-dep - Configure build-dependencies for source packages
+2024-07-17 16:46:55   satisfy - Satisfy dependency strings
+2024-07-17 16:46:55   clean - Erase downloaded archive files
+2024-07-17 16:46:55   autoclean - Erase old downloaded archive files
+2024-07-17 16:46:55   check - Verify that there are no broken dependencies
+2024-07-17 16:46:55   source - Download source archives
+2024-07-17 16:46:55   download - Download the binary package into the current directory
+2024-07-17 16:46:55   changelog - Download and display the changelog for the given package
+2024-07-17 16:46:55 
+2024-07-17 16:46:55 See apt-get(8) for more information about the available commands.
+2024-07-17 16:46:55 Configuration options and syntax is detailed in apt.conf(5).
+2024-07-17 16:46:55 Information about how to configure sources can be found in sources.list(5).
+2024-07-17 16:46:55 Package and version choices can be expressed via apt_preferences(5).
+2024-07-17 16:46:55 Security details are available in apt-secure(8).
+2024-07-17 16:46:55                                         This APT has Super Cow Powers.
+2024-07-17 16:47:03 root@68e4ece6d43c:/# apt-get update && apt-get update --fix-broken
+2024-07-17 16:47:03 
+
+2000-01-01 00:00:00 [Working]
+            
+2001-01-01 00:00:00 http://deb.debian.org/debian bookworm InRelease
+2024-07-17 16:47:03 
+2000-01-01 00:00:00 [Working]
+            
+2001-02-01 00:00:00 http://deb.debian.org/debian bookworm-updates InRelease
+2024-07-17 16:47:03 
+2000-01-01 00:00:00 [Waiting for headers]
+                        
+2001-03-01 00:00:00 http://deb.debian.org/debian-security bookworm-security InRelease
+2024-07-17 16:47:11 
+                        
+2000-01-01 00:00:00 [Working]
+2000-01-01 00:00:00 [Working]
+2000-01-01 00:00:00 [Working]
+2000-01-01 00:00:00 [Working]
+2000-01-01 00:00:00 [Working]
+20% [Working]
+             
+
+Reading package lists... 0%
+
+Reading package lists... 0%
+
+Reading package lists... 0%
+
+Reading package lists... 11%
+
+Reading package lists... 28%
+
+Reading package lists... 47%
+
+Reading package lists... 65%
+
+Reading package lists... 78%
+
+Reading package lists... 93%
+
+Reading package lists... 97%
+
+Reading package lists... 97%
+
+Reading package lists... 97%
+
+Reading package lists... 97%
+
+Reading package lists... 99%
+
+Reading package lists... 99%
+
+Reading package lists... Done
+
+2024-07-17 16:47:11 E: Command line option --fix-broken is not understood in combination with the other options
+2024-07-17 16:47:24 root@68e4ece6d43c:/# apt-get update --fix-missing
+2024-07-17 16:47:24 
+
+2000-01-01 00:00:00 [Working]
+            
+2001-01-01 00:00:00 http://deb.debian.org/debian bookworm InRelease
+2024-07-17 16:47:24 
+2000-01-01 00:00:00 [Working]
+            
+2001-02-01 00:00:00 http://deb.debian.org/debian bookworm-updates InRelease
+2024-07-17 16:47:24 
+2000-01-01 00:00:00 [Waiting for headers]
+                        
+2001-03-01 00:00:00 http://deb.debian.org/debian-security bookworm-security InRelease
+2024-07-17 16:47:31 
+                        
+2000-01-01 00:00:00 [Working]
+2000-01-01 00:00:00 [Working]
+2000-01-01 00:00:00 [Working]
+2000-01-01 00:00:00 [Working]
+2000-01-01 00:00:00 [Working]
+20% [Working]
+             
+
+Reading package lists... 0%
+
+Reading package lists... 0%
+
+Reading package lists... 0%
+
+Reading package lists... 16%
+
+Reading package lists... 32%
+
+Reading package lists... 42%
+
+Reading package lists... 60%
+
+Reading package lists... 79%
+
+Reading package lists... 92%
+
+Reading package lists... 97%
+
+Reading package lists... 97%
+
+Reading package lists... 97%
+
+Reading package lists... 97%
+
+Reading package lists... 99%
+
+Reading package lists... 99%
+
+Reading package lists... Done
+
+2024-07-17 16:47:53 root@68e4ece6d43c:/# apt-get install -y --install-recommends \
+2024-07-17 16:47:53 
+        zip unzip curl \
+2024-07-17 16:47:53 
+        gcc g++ cmake make \
+2024-07-17 16:47:53 apt-get install -y --install-recommends \
+2024-07-17 16:47:54 ial \
+        zip unzip curl \
+2024-07-17 16:47:54 \
+        gcc g++ cmake make \
+2024-07-17 16:47:54 ibsasl2-dev libzstd-dev
+        build-essential \
+2024-07-17 16:47:54 
+        pkg-config  \
+2024-07-17 16:47:54 
+        libssl-dev libsasl2-dev libzstd-dev
+2024-07-17 16:47:59 
+
+Reading package lists... 0%
+
+Reading package lists... 0%
+
+Reading package lists... 0%
+
+Reading package lists... 14%
+
+Reading package lists... 31%
+
+Reading package lists... 44%
+
+Reading package lists... 62%
+
+Reading package lists... 84%
+
+Reading package lists... 97%
+
+Reading package lists... 97%
+
+Reading package lists... 97%
+
+Reading package lists... 97%
+
+Reading package lists... 99%
+
+Reading package lists... 99%
+
+Reading package lists... Done
+
+2024-07-17 16:48:00 
+Building dependency tree... 0%
+
+Building dependency tree... 0%
+
+Building dependency tree... 0%
+
+Building dependency tree... 50%
+
+Building dependency tree... 50%
+
+Building dependency tree... 75%
+
+Building dependency tree... Done
+
+2024-07-17 16:48:00 
+Reading state information... 0% 
+
+Reading state information... 0%
+
+Reading state information... Done
+
+2024-07-17 16:48:01 unzip is already the newest version (6.0-28).
+2024-07-17 16:48:01 curl is already the newest version (7.88.1-10+deb12u6).
+2024-07-17 16:48:01 gcc is already the newest version (4:12.2.0-3).
+2024-07-17 16:48:01 g++ is already the newest version (4:12.2.0-3).
+2024-07-17 16:48:01 make is already the newest version (4.3-4.1).
+2024-07-17 16:48:01 pkg-config is already the newest version (1.8.1-1).
+2024-07-17 16:48:01 pkg-config set to manually installed.
+2024-07-17 16:48:01 libssl-dev is already the newest version (3.0.13-1~deb12u1).
+2024-07-17 16:48:01 libzstd-dev is already the newest version (1.5.4+dfsg2-5).
+2024-07-17 16:48:01 libzstd-dev set to manually installed.
+2024-07-17 16:48:03 The following additional packages will be installed:
+2024-07-17 16:48:03   cmake-data libarchive13 libjsoncpp25 librhash0 libuv1
+2024-07-17 16:48:03 Suggested packages:
+2024-07-17 16:48:03   cmake-doc cmake-format elpa-cmake-mode ninja-build lrzip
+2024-07-17 16:48:04 The following NEW packages will be installed:
+2024-07-17 16:48:04   build-essential cmake cmake-data libarchive13 libjsoncpp25 librhash0 libsasl2-dev libuv1 zip
+2024-07-17 16:48:04 0 upgraded, 9 newly installed, 0 to remove and 11 not upgraded.
+2024-07-17 16:48:04 Need to get 11.9 MB of archives.
+2024-07-17 16:48:04 After this operation, 43.5 MB of additional disk space will be used.
+2024-07-17 16:48:04 
+2000-01-01 00:00:00 [Working]
+            
+2001-01-01 00:00:00 http://deb.debian.org/debian bookworm/main amd64 build-essential amd64 12.9 [7704 B]
+2024-07-17 16:48:04 
+2000-01-01 00:00:00 [1 build-essential 2896 B/7704 B 38%]
+                                        
+2001-02-01 00:00:00 [Working]
+            
+2001-02-01 00:00:00 http://deb.debian.org/debian bookworm/main amd64 libarchive13 amd64 3.6.2-1+deb12u1 [343 kB]
+2024-07-17 16:48:04 
+2001-02-01 00:00:00 [2 libarchive13 0 B/343 kB 0%]
+                                 
+2001-07-01 00:00:00 [Working]
+            
+2001-03-01 00:00:00 http://deb.debian.org/debian bookworm/main amd64 libjsoncpp25 amd64 1.9.5-4 [78.6 kB]
+2024-07-17 16:48:04 
+2001-07-01 00:00:00 [3 libjsoncpp25 40.6 kB/78.6 kB 52%]
+                                       
+2001-10-01 00:00:00 [Working]
+             
+2001-04-01 00:00:00 http://deb.debian.org/debian bookworm/main amd64 librhash0 amd64 1.4.3-3 [134 kB]
+2024-07-17 16:48:04 
+2001-10-01 00:00:00 [4 librhash0 32.9 kB/134 kB 24%]
+                                    
+13% [Waiting for headers]
+                         
+2001-05-01 00:00:00 http://deb.debian.org/debian bookworm/main amd64 libuv1 amd64 1.44.2-1+deb12u1 [136 kB]
+2024-07-17 16:48:04 
+13% [5 libuv1 23.1 kB/136 kB 17%]
+                                 
+16% [Waiting for headers]
+                         
+2001-06-01 00:00:00 http://deb.debian.org/debian bookworm/main amd64 cmake-data all 3.25.1-1 [2026 kB]
+2024-07-17 16:48:05 
+16% [6 cmake-data 4156 B/2026 kB 0%]
+27% [6 cmake-data 1682 kB/2026 kB 83%]
+                                      
+2032-01-01 00:00:00 [Working]
+             
+2001-07-01 00:00:00 http://deb.debian.org/debian bookworm/main amd64 cmake amd64 3.25.1-1 [8692 kB]
+2024-07-17 16:48:09 
+2032-01-01 00:00:00 [7 cmake 22.3 kB/8692 kB 0%]
+2038-01-01 00:00:00 [7 cmake 899 kB/8692 kB 10%]
+2039-01-01 00:00:00 [7 cmake 1064 kB/8692 kB 12%]
+2048-01-01 00:00:00 [7 cmake 2429 kB/8692 kB 28%]
+1953-01-01 00:00:00 [7 cmake 3120 kB/8692 kB 36%]
+1962-01-01 00:00:00 [7 cmake 4485 kB/8692 kB 52%]
+1974-01-01 00:00:00 [7 cmake 6316 kB/8692 kB 73%]
+1988-01-01 00:00:00 [7 cmake 8380 kB/8692 kB 96%]
+                                 
+1992-01-01 00:00:00 [Working]
+             
+2001-08-01 00:00:00 http://deb.debian.org/debian bookworm/main amd64 libsasl2-dev amd64 2.1.28+dfsg-10 [235 kB]
+2024-07-17 16:48:09 
+1993-01-01 00:00:00 [8 libsasl2-dev 90.5 kB/235 kB 39%]
+                                       
+1996-01-01 00:00:00 [Working]
+             
+2001-09-01 00:00:00 http://deb.debian.org/debian bookworm/main amd64 zip amd64 3.0-13 [230 kB]
+2024-07-17 16:48:09 
+1996-01-01 00:00:00 [9 zip 28.7 kB/230 kB 12%]
+                              
+0100-01-01 00:00:00 [Working]
+              
+Fetched 11.9 MB in 5s (2332 kB/s)
+2024-07-17 16:48:10 debconf: delaying package configuration, since apt-utils is not installed
+2024-07-17 16:48:11 Selecting previously unselected package build-essential.
+2024-07-17 16:48:12 (Reading database ... 
+(Reading database ... 5%
+(Reading database ... 10%
+(Reading database ... 15%
+(Reading database ... 20%
+(Reading database ... 25%
+(Reading database ... 30%
+(Reading database ... 35%
+(Reading database ... 40%
+(Reading database ... 45%
+(Reading database ... 50%
+(Reading database ... 55%
+(Reading database ... 60%
+(Reading database ... 65%
+(Reading database ... 70%
+(Reading database ... 75%
+(Reading database ... 80%
+(Reading database ... 85%
+(Reading database ... 90%
+(Reading database ... 95%
+(Reading database ... 100%
+(Reading database ... 23243 files and directories currently installed.)
+2024-07-17 16:48:12 Preparing to unpack .../0-build-essential_12.9_amd64.deb ...
+2024-07-17 16:48:12 Unpacking build-essential (12.9) ...
+2024-07-17 16:48:12 Selecting previously unselected package libarchive13:amd64.
+2024-07-17 16:48:12 Preparing to unpack .../1-libarchive13_3.6.2-1+deb12u1_amd64.deb ...
+2024-07-17 16:48:12 Unpacking libarchive13:amd64 (3.6.2-1+deb12u1) ...
+2024-07-17 16:48:13 Selecting previously unselected package libjsoncpp25:amd64.
+2024-07-17 16:48:13 Preparing to unpack .../2-libjsoncpp25_1.9.5-4_amd64.deb ...
+2024-07-17 16:48:13 Unpacking libjsoncpp25:amd64 (1.9.5-4) ...
+2024-07-17 16:48:13 Selecting previously unselected package librhash0:amd64.
+2024-07-17 16:48:13 Preparing to unpack .../3-librhash0_1.4.3-3_amd64.deb ...
+2024-07-17 16:48:13 Unpacking librhash0:amd64 (1.4.3-3) ...
+2024-07-17 16:48:14 Selecting previously unselected package libuv1:amd64.
+2024-07-17 16:48:14 Preparing to unpack .../4-libuv1_1.44.2-1+deb12u1_amd64.deb ...
+2024-07-17 16:48:14 Unpacking libuv1:amd64 (1.44.2-1+deb12u1) ...
+2024-07-17 16:48:14 Selecting previously unselected package cmake-data.
+2024-07-17 16:48:14 Preparing to unpack .../5-cmake-data_3.25.1-1_all.deb ...
+2024-07-17 16:48:14 Unpacking cmake-data (3.25.1-1) ...
+2024-07-17 16:48:19 Selecting previously unselected package cmake.
+2024-07-17 16:48:19 Preparing to unpack .../6-cmake_3.25.1-1_amd64.deb ...
+2024-07-17 16:48:19 Unpacking cmake (3.25.1-1) ...
+2024-07-17 16:48:23 Selecting previously unselected package libsasl2-dev.
+2024-07-17 16:48:23 Preparing to unpack .../7-libsasl2-dev_2.1.28+dfsg-10_amd64.deb ...
+2024-07-17 16:48:23 Unpacking libsasl2-dev (2.1.28+dfsg-10) ...
+2024-07-17 16:48:24 Selecting previously unselected package zip.
+2024-07-17 16:48:24 Preparing to unpack .../8-zip_3.0-13_amd64.deb ...
+2024-07-17 16:48:24 Unpacking zip (3.0-13) ...
+2024-07-17 16:48:24 Setting up libarchive13:amd64 (3.6.2-1+deb12u1) ...
+2024-07-17 16:48:24 Setting up zip (3.0-13) ...
+2024-07-17 16:48:24 Setting up libsasl2-dev (2.1.28+dfsg-10) ...
+2024-07-17 16:48:24 Setting up libuv1:amd64 (1.44.2-1+deb12u1) ...
+2024-07-17 16:48:24 Setting up libjsoncpp25:amd64 (1.9.5-4) ...
+2024-07-17 16:48:24 Setting up librhash0:amd64 (1.4.3-3) ...
+2024-07-17 16:48:24 Setting up build-essential (12.9) ...
+2024-07-17 16:48:24 Setting up cmake-data (3.25.1-1) ...
+2024-07-17 16:48:24 Setting up cmake (3.25.1-1) ...
+2024-07-17 16:48:24 Processing triggers for libc-bin (2.36-9+deb12u7) ...
+2024-07-17 16:48:29 root@68e4ece6d43c:/# apt-get install -y --install-recommends \
+2024-07-17 16:48:29 
+        protobuf-compiler \
+2024-07-17 16:48:29# apt-get install -y --install-recommends \
+2024-07-17 16:48:30 dev \
+        protobuf-compiler \
+2024-07-17 16:48:30 
+        libprotobuf-dev \
+2024-07-17 16:48:30 
+        grpc-proto 
+2024-07-17 16:48:33 
+
+Reading package lists... 0%
+
+Reading package lists... 0%
+
+Reading package lists... 0%
+
+Reading package lists... 45%
+
+Reading package lists... 81%
+
+Reading package lists... 97%
+
+Reading package lists... 97%
+
+Reading package lists... 97%
+
+Reading package lists... 97%
+
+Reading package lists... 99%
+
+Reading package lists... 99%
+
+Reading package lists... Done
+
+2024-07-17 16:48:33 
+Building dependency tree... 0%
+
+Building dependency tree... 0%
+
+Building dependency tree... 26%
+
+Building dependency tree... 50%
+
+Building dependency tree... 50%
+
+Building dependency tree... Done
+
+2024-07-17 16:48:33 
+Reading state information... 0% 
+
+Reading state information... 0%
+
+Reading state information... Done
+
+2024-07-17 16:48:34 The following additional packages will be installed:
+2024-07-17 16:48:34   libprotobuf-lite32 libprotobuf32 libprotoc32
+2024-07-17 16:48:34 Suggested packages:
+2024-07-17 16:48:34   protobuf-mode-el
+2024-07-17 16:48:34 The following NEW packages will be installed:
+2024-07-17 16:48:34   grpc-proto libprotobuf-dev libprotobuf-lite32 libprotobuf32 libprotoc32 protobuf-compiler
+2024-07-17 16:48:34 0 upgraded, 6 newly installed, 0 to remove and 11 not upgraded.
+2024-07-17 16:48:34 Need to get 3425 kB of archives.
+2024-07-17 16:48:34 After this operation, 19.8 MB of additional disk space will be used.
+2024-07-17 16:48:35 
+2000-01-01 00:00:00 [Working]
+            
+2001-01-01 00:00:00 http://deb.debian.org/debian bookworm/main amd64 grpc-proto all 0.0~git20230110.6956c0e-1 [35.9 kB]
+2024-07-17 16:48:35 
+2001-01-01 00:00:00 [1 grpc-proto 35.9 kB/35.9 kB 100%]
+                                      
+2001-04-01 00:00:00 [Working]
+            
+2001-02-01 00:00:00 http://deb.debian.org/debian bookworm/main amd64 libprotobuf32 amd64 3.21.12-3 [932 kB]
+2024-07-17 16:48:35 
+2001-04-01 00:00:00 [2 libprotobuf32 0 B/932 kB 0%]
+                                  
+29% [Working]
+             
+2001-03-01 00:00:00 http://deb.debian.org/debian bookworm/main amd64 libprotobuf-lite32 amd64 3.21.12-3 [261 kB]
+2024-07-17 16:48:35 
+29% [3 libprotobuf-lite32 0 B/261 kB 0%]
+                                        
+2039-01-01 00:00:00 [Working]
+             
+2001-04-01 00:00:00 http://deb.debian.org/debian bookworm/main amd64 libprotobuf-dev amd64 3.21.12-3 [1283 kB]
+2024-07-17 16:48:35 
+2039-01-01 00:00:00 [4 libprotobuf-dev 0 B/1283 kB 0%]
+                                      
+1972-01-01 00:00:00 [Waiting for headers]
+                         
+2001-05-01 00:00:00 http://deb.debian.org/debian bookworm/main amd64 libprotoc32 amd64 3.21.12-3 [829 kB]
+2024-07-17 16:48:35 
+1973-01-01 00:00:00 [5 libprotoc32 22.5 kB/829 kB 3%]
+                                     
+1995-01-01 00:00:00 [Working]
+             
+2001-06-01 00:00:00 http://deb.debian.org/debian bookworm/main amd64 protobuf-compiler amd64 3.21.12-3 [83.9 kB]
+2024-07-17 16:48:35 
+1995-01-01 00:00:00 [6 protobuf-compiler 32.8 kB/83.9 kB 39%]
+                                             
+0100-01-01 00:00:00 [Working]
+              
+Fetched 3425 kB in 1s (3260 kB/s)
+2024-07-17 16:48:36 debconf: delaying package configuration, since apt-utils is not installed
+2024-07-17 16:48:36 Selecting previously unselected package grpc-proto.
+2024-07-17 16:48:37 (Reading database ... 
+(Reading database ... 5%
+(Reading database ... 10%
+(Reading database ... 15%
+(Reading database ... 20%
+(Reading database ... 25%
+(Reading database ... 30%
+(Reading database ... 35%
+(Reading database ... 40%
+(Reading database ... 45%
+(Reading database ... 50%
+(Reading database ... 55%
+(Reading database ... 60%
+(Reading database ... 65%
+(Reading database ... 70%
+(Reading database ... 75%
+(Reading database ... 80%
+(Reading database ... 85%
+(Reading database ... 90%
+(Reading database ... 95%
+(Reading database ... 100%
+(Reading database ... 26596 files and directories currently installed.)
+2024-07-17 16:48:37 Preparing to unpack .../0-grpc-proto_0.0~git20230110.6956c0e-1_all.deb ...
+2024-07-17 16:48:37 Unpacking grpc-proto (0.0~git20230110.6956c0e-1) ...
+2024-07-17 16:48:37 Selecting previously unselected package libprotobuf32:amd64.
+2024-07-17 16:48:37 Preparing to unpack .../1-libprotobuf32_3.21.12-3_amd64.deb ...
+2024-07-17 16:48:37 Unpacking libprotobuf32:amd64 (3.21.12-3) ...
+2024-07-17 16:48:37 Selecting previously unselected package libprotobuf-lite32:amd64.
+2024-07-17 16:48:37 Preparing to unpack .../2-libprotobuf-lite32_3.21.12-3_amd64.deb ...
+2024-07-17 16:48:37 Unpacking libprotobuf-lite32:amd64 (3.21.12-3) ...
+2024-07-17 16:48:38 Selecting previously unselected package libprotobuf-dev:amd64.
+2024-07-17 16:48:38 Preparing to unpack .../3-libprotobuf-dev_3.21.12-3_amd64.deb ...
+2024-07-17 16:48:38 Unpacking libprotobuf-dev:amd64 (3.21.12-3) ...
+2024-07-17 16:48:38 Selecting previously unselected package libprotoc32:amd64.
+2024-07-17 16:48:38 Preparing to unpack .../4-libprotoc32_3.21.12-3_amd64.deb ...
+2024-07-17 16:48:38 Unpacking libprotoc32:amd64 (3.21.12-3) ...
+2024-07-17 16:48:39 Selecting previously unselected package protobuf-compiler.
+2024-07-17 16:48:39 Preparing to unpack .../5-protobuf-compiler_3.21.12-3_amd64.deb ...
+2024-07-17 16:48:39 Unpacking protobuf-compiler (3.21.12-3) ...
+2024-07-17 16:48:39 Setting up libprotobuf32:amd64 (3.21.12-3) ...
+2024-07-17 16:48:39 Setting up libprotobuf-lite32:amd64 (3.21.12-3) ...
+2024-07-17 16:48:39 Setting up grpc-proto (0.0~git20230110.6956c0e-1) ...
+2024-07-17 16:48:39 Setting up libprotoc32:amd64 (3.21.12-3) ...
+2024-07-17 16:48:39 Setting up protobuf-compiler (3.21.12-3) ...
+2024-07-17 16:48:39 Setting up libprotobuf-dev:amd64 (3.21.12-3) ...
+2024-07-17 16:48:39 Processing triggers for libc-bin (2.36-9+deb12u7) ...
+2024-07-17 16:48:52 root@68e4ece6d43c:/# apt-get install -y --install-recommends \
+2024-07-17 16:48:52 
+        libssl-dev      \
+2024-07-17 16:48:52 
+        librdkafka*  apt-get install -y --install-recommends \
+2024-07-17 16:48:53 
+        libssl-dev      \
+2024-07-17 16:48:53 
+        librdkafka*     \
+2024-07-17 16:48:53 
+        libsqlite3-dev  \
+2024-07-17 16:48:53 
+        libpq-dev     
+2024-07-17 16:48:57 
+
+Reading package lists... 0%
+
+Reading package lists... 0%
+
+Reading package lists... 0%
+
+Reading package lists... 16%
+
+Reading package lists... 42%
+
+Reading package lists... 73%
+
+Reading package lists... 97%
+
+Reading package lists... 97%
+
+Reading package lists... 97%
+
+Reading package lists... 97%
+
+Reading package lists... 97%
+
+Reading package lists... 99%
+
+Reading package lists... 99%
+
+Reading package lists... Done
+
+2024-07-17 16:48:57 
+Building dependency tree... 0%
+
+Building dependency tree... 0%
+
+Building dependency tree... 50%
+
+Building dependency tree... 50%
+
+Building dependency tree... 83%
+
+Building dependency tree... Done
+
+2024-07-17 16:48:57 
+Reading state information... 0% 
+
+Reading state information... 0%
+
+Reading state information... Done
+
+2024-07-17 16:48:57 Note, selecting 'librdkafka1' for glob 'librdkafka*'
+2024-07-17 16:48:57 Note, selecting 'librdkafka-dev' for glob 'librdkafka*'
+2024-07-17 16:48:57 Note, selecting 'librdkafka++1' for glob 'librdkafka*'
+2024-07-17 16:48:57 libssl-dev is already the newest version (3.0.13-1~deb12u1).
+2024-07-17 16:48:57 libsqlite3-dev is already the newest version (3.40.1-2).
+2024-07-17 16:48:57 libpq-dev is already the newest version (15.7-0+deb12u1).
+2024-07-17 16:48:59 The following NEW packages will be installed:
+2024-07-17 16:48:59   librdkafka++1 librdkafka-dev librdkafka1
+2024-07-17 16:48:59 0 upgraded, 3 newly installed, 0 to remove and 11 not upgraded.
+2024-07-17 16:48:59 Need to get 1562 kB of archives.
+2024-07-17 16:48:59 After this operation, 6937 kB of additional disk space will be used.
+2024-07-17 16:48:59 
+2000-01-01 00:00:00 [Working]
+            
+2001-01-01 00:00:00 http://deb.debian.org/debian bookworm/main amd64 librdkafka1 amd64 2.0.2-1 [644 kB]
+2024-07-17 16:48:59 
+2000-01-01 00:00:00 [1 librdkafka1 3658 B/644 kB 1%]
+                                   
+2040-01-01 00:00:00 [Working]
+             
+2001-02-01 00:00:00 http://deb.debian.org/debian bookworm/main amd64 librdkafka++1 amd64 2.0.2-1 [65.3 kB]
+2024-07-17 16:48:59 
+2040-01-01 00:00:00 [2 librdkafka++1 0 B/65.3 kB 0%]
+                                    
+1950-01-01 00:00:00 [Working]
+             
+2001-03-01 00:00:00 http://deb.debian.org/debian bookworm/main amd64 librdkafka-dev amd64 2.0.2-1 [853 kB]
+2024-07-17 16:49:00 
+1950-01-01 00:00:00 [3 librdkafka-dev 0 B/853 kB 0%]
+                                    
+0100-01-01 00:00:00 [Working]
+              
+Fetched 1562 kB in 1s (1802 kB/s)
+2024-07-17 16:49:01 debconf: delaying package configuration, since apt-utils is not installed
+2024-07-17 16:49:01 Selecting previously unselected package librdkafka1:amd64.
+2024-07-17 16:49:02 (Reading database ... 
+(Reading database ... 5%
+(Reading database ... 10%
+(Reading database ... 15%
+(Reading database ... 20%
+(Reading database ... 25%
+(Reading database ... 30%
+(Reading database ... 35%
+(Reading database ... 40%
+(Reading database ... 45%
+(Reading database ... 50%
+(Reading database ... 55%
+(Reading database ... 60%
+(Reading database ... 65%
+(Reading database ... 70%
+(Reading database ... 75%
+(Reading database ... 80%
+(Reading database ... 85%
+(Reading database ... 90%
+(Reading database ... 95%
+(Reading database ... 100%
+(Reading database ... 26822 files and directories currently installed.)
+2024-07-17 16:49:02 Preparing to unpack .../librdkafka1_2.0.2-1_amd64.deb ...
+2024-07-17 16:49:02 Unpacking librdkafka1:amd64 (2.0.2-1) ...
+2024-07-17 16:49:03 Selecting previously unselected package librdkafka++1:amd64.
+2024-07-17 16:49:03 Preparing to unpack .../librdkafka++1_2.0.2-1_amd64.deb ...
+2024-07-17 16:49:03 Unpacking librdkafka++1:amd64 (2.0.2-1) ...
+2024-07-17 16:49:03 Selecting previously unselected package librdkafka-dev:amd64.
+2024-07-17 16:49:04 Preparing to unpack .../librdkafka-dev_2.0.2-1_amd64.deb ...
+2024-07-17 16:49:04 Unpacking librdkafka-dev:amd64 (2.0.2-1) ...
+2024-07-17 16:49:04 Setting up librdkafka1:amd64 (2.0.2-1) ...
+2024-07-17 16:49:04 Setting up librdkafka++1:amd64 (2.0.2-1) ...
+2024-07-17 16:49:05 Setting up librdkafka-dev:amd64 (2.0.2-1) ...
+2024-07-17 16:49:05 Processing triggers for libc-bin (2.36-9+deb12u7) ...
+2024-07-17 16:49:23 root@68e4ece6d43c:/#    mkdir -p /opt/vcpkg
+2024-07-17 16:49:24 
+root@68e4ece6d43c:/#    mkdir -p /opt/vcpkgoft/vcpkg.git /opt/vcpkg && /opt/vcpkg/bootstrap-vcpkg.sh
+2024-07-17 16:49:24 
+        git clone https://github.com/microsoft/vcpkg.git /opt/vcpkg && /opt/vcpkg/bootstrap-vcpkg.sh
+2024-07-17 16:49:24 
+Cloning into '/opt/vcpkg'...
+2024-07-17 16:49:25 remote: Enumerating objects: 241039, done.
+2024-07-17 16:49:25 remote: Counting objects:   0% (1/258)
+remote: Counting objects:   1% (3/258)
+remote: Counting objects:   2% (6/258)
+remote: Counting objects:   3% (8/258)
+remote: Counting objects:   4% (11/258)
+remote: Counting objects:   5% (13/258)
+remote: Counting objects:   6% (16/258)
+remote: Counting objects:   7% (19/258)
+remote: Counting objects:   8% (21/258)
+remote: Counting objects:   9% (24/258)
+remote: Counting objects:  10% (26/258)
+remote: Counting objects:  11% (29/258)
+remote: Counting objects:  12% (31/258)
+remote: Counting objects:  13% (34/258)
+remote: Counting objects:  14% (37/258)
+remote: Counting objects:  15% (39/258)
+remote: Counting objects:  16% (42/258)
+remote: Counting objects:  17% (44/258)
+remote: Counting objects:  18% (47/258)
+remote: Counting objects:  19% (50/258)
+remote: Counting objects:  20% (52/258)
+remote: Counting objects:  21% (55/258)
+remote: Counting objects:  22% (57/258)
+remote: Counting objects:  23% (60/258)
+remote: Counting objects:  24% (62/258)
+remote: Counting objects:  25% (65/258)
+remote: Counting objects:  26% (68/258)
+remote: Counting objects:  27% (70/258)
+remote: Counting objects:  28% (73/258)
+remote: Counting objects:  29% (75/258)
+remote: Counting objects:  30% (78/258)
+remote: Counting objects:  31% (80/258)
+remote: Counting objects:  32% (83/258)
+remote: Counting objects:  33% (86/258)
+remote: Counting objects:  34% (88/258)
+remote: Counting objects:  35% (91/258)
+remote: Counting objects:  36% (93/258)
+remote: Counting objects:  37% (96/258)
+remote: Counting objects:  38% (99/258)
+remote: Counting objects:  39% (101/258)
+remote: Counting objects:  40% (104/258)
+remote: Counting objects:  41% (106/258)
+remote: Counting objects:  42% (109/258)
+remote: Counting objects:  43% (111/258)
+remote: Counting objects:  44% (114/258)
+remote: Counting objects:  45% (117/258)
+remote: Counting objects:  46% (119/258)
+remote: Counting objects:  47% (122/258)
+remote: Counting objects:  48% (124/258)
+remote: Counting objects:  49% (127/258)
+remote: Counting objects:  50% (129/258)
+remote: Counting objects:  51% (132/258)
+remote: Counting objects:  52% (135/258)
+remote: Counting objects:  53% (137/258)
+remote: Counting objects:  54% (140/258)
+remote: Counting objects:  55% (142/258)
+remote: Counting objects:  56% (145/258)
+remote: Counting objects:  57% (148/258)
+remote: Counting objects:  58% (150/258)
+remote: Counting objects:  59% (153/258)
+remote: Counting objects:  60% (155/258)
+remote: Counting objects:  61% (158/258)
+remote: Counting objects:  62% (160/258)
+remote: Counting objects:  63% (163/258)
+remote: Counting objects:  64% (166/258)
+remote: Counting objects:  65% (168/258)
+remote: Counting objects:  66% (171/258)
+remote: Counting objects:  67% (173/258)
+remote: Counting objects:  68% (176/258)
+remote: Counting objects:  69% (179/258)
+remote: Counting objects:  70% (181/258)
+remote: Counting objects:  71% (184/258)
+remote: Counting objects:  72% (186/258)
+remote: Counting objects:  73% (189/258)
+remote: Counting objects:  74% (191/258)
+remote: Counting objects:  75% (194/258)
+remote: Counting objects:  76% (197/258)
+remote: Counting objects:  77% (199/258)
+remote: Counting objects:  78% (202/258)
+remote: Counting objects:  79% (204/258)
+remote: Counting objects:  80% (207/258)
+remote: Counting objects:  81% (209/258)
+remote: Counting objects:  82% (212/258)
+remote: Counting objects:  83% (215/258)
+remote: Counting objects:  84% (217/258)
+remote: Counting objects:  85% (220/258)
+remote: Counting objects:  86% (222/258)
+remote: Counting objects:  87% (225/258)
+remote: Counting objects:  88% (228/258)
+remote: Counting objects:  89% (230/258)
+remote: Counting objects:  90% (233/258)
+remote: Counting objects:  91% (235/258)
+remote: Counting objects:  92% (238/258)
+remote: Counting objects:  93% (240/258)
+remote: Counting objects:  94% (243/258)
+remote: Counting objects:  95% (246/258)
+remote: Counting objects:  96% (248/258)
+remote: Counting objects:  97% (251/258)
+remote: Counting objects:  98% (253/258)
+remote: Counting objects:  99% (256/258)
+remote: Counting objects: 100% (258/258)
+remote: Counting objects: 100% (258/258), done.
+2024-07-17 16:49:25 remote: Compressing objects:   0% (1/169)
+remote: Compressing objects:   1% (2/169)
+remote: Compressing objects:   2% (4/169)
+remote: Compressing objects:   3% (6/169)
+remote: Compressing objects:   4% (7/169)
+remote: Compressing objects:   5% (9/169)
+remote: Compressing objects:   6% (11/169)
+remote: Compressing objects:   7% (12/169)
+remote: Compressing objects:   8% (14/169)
+remote: Compressing objects:   9% (16/169)
+remote: Compressing objects:  10% (17/169)
+remote: Compressing objects:  11% (19/169)
+remote: Compressing objects:  12% (21/169)
+remote: Compressing objects:  13% (22/169)
+remote: Compressing objects:  14% (24/169)
+remote: Compressing objects:  15% (26/169)
+remote: Compressing objects:  16% (28/169)
+remote: Compressing objects:  17% (29/169)
+remote: Compressing objects:  18% (31/169)
+remote: Compressing objects:  19% (33/169)
+remote: Compressing objects:  20% (34/169)
+remote: Compressing objects:  21% (36/169)
+remote: Compressing objects:  22% (38/169)
+remote: Compressing objects:  23% (39/169)
+remote: Compressing objects:  24% (41/169)
+remote: Compressing objects:  25% (43/169)
+remote: Compressing objects:  26% (44/169)
+remote: Compressing objects:  27% (46/169)
+remote: Compressing objects:  28% (48/169)
+remote: Compressing objects:  29% (50/169)
+remote: Compressing objects:  30% (51/169)
+remote: Compressing objects:  31% (53/169)
+remote: Compressing objects:  32% (55/169)
+remote: Compressing objects:  33% (56/169)
+remote: Compressing objects:  34% (58/169)
+remote: Compressing objects:  35% (60/169)
+remote: Compressing objects:  36% (61/169)
+remote: Compressing objects:  37% (63/169)
+remote: Compressing objects:  38% (65/169)
+remote: Compressing objects:  39% (66/169)
+remote: Compressing objects:  40% (68/169)
+remote: Compressing objects:  41% (70/169)
+remote: Compressing objects:  42% (71/169)
+remote: Compressing objects:  43% (73/169)
+remote: Compressing objects:  44% (75/169)
+remote: Compressing objects:  45% (77/169)
+remote: Compressing objects:  46% (78/169)
+remote: Compressing objects:  47% (80/169)
+remote: Compressing objects:  48% (82/169)
+remote: Compressing objects:  49% (83/169)
+remote: Compressing objects:  50% (85/169)
+remote: Compressing objects:  51% (87/169)
+remote: Compressing objects:  52% (88/169)
+remote: Compressing objects:  53% (90/169)
+remote: Compressing objects:  54% (92/169)
+remote: Compressing objects:  55% (93/169)
+remote: Compressing objects:  56% (95/169)
+remote: Compressing objects:  57% (97/169)
+remote: Compressing objects:  58% (99/169)
+remote: Compressing objects:  59% (100/169)
+remote: Compressing objects:  60% (102/169)
+remote: Compressing objects:  61% (104/169)
+remote: Compressing objects:  62% (105/169)
+remote: Compressing objects:  63% (107/169)
+remote: Compressing objects:  64% (109/169)
+remote: Compressing objects:  65% (110/169)
+remote: Compressing objects:  66% (112/169)
+remote: Compressing objects:  67% (114/169)
+remote: Compressing objects:  68% (115/169)
+remote: Compressing objects:  69% (117/169)
+remote: Compressing objects:  70% (119/169)
+remote: Compressing objects:  71% (120/169)
+remote: Compressing objects:  72% (122/169)
+remote: Compressing objects:  73% (124/169)
+remote: Compressing objects:  74% (126/169)
+remote: Compressing objects:  75% (127/169)
+remote: Compressing objects:  76% (129/169)
+remote: Compressing objects:  77% (131/169)
+remote: Compressing objects:  78% (132/169)
+remote: Compressing objects:  79% (134/169)
+remote: Compressing objects:  80% (136/169)
+remote: Compressing objects:  81% (137/169)
+remote: Compressing objects:  82% (139/169)
+remote: Compressing objects:  83% (141/169)
+remote: Compressing objects:  84% (142/169)
+remote: Compressing objects:  85% (144/169)
+remote: Compressing objects:  86% (146/169)
+remote: Compressing objects:  87% (148/169)
+remote: Compressing objects:  88% (149/169)
+remote: Compressing objects:  89% (151/169)
+remote: Compressing objects:  90% (153/169)
+remote: Compressing objects:  91% (154/169)
+remote: Compressing objects:  92% (156/169)
+remote: Compressing objects:  93% (158/169)
+remote: Compressing objects:  94% (159/169)
+remote: Compressing objects:  95% (161/169)
+remote: Compressing objects:  96% (163/169)
+remote: Compressing objects:  97% (164/169)
+remote: Compressing objects:  98% (166/169)
+remote: Compressing objects:  99% (168/169)
+remote: Compressing objects: 100% (169/169)
+remote: Compressing objects: 100% (169/169), done.
+2024-07-17 16:49:48 Receiving objects:   0% (1/241039)
+Receiving objects:   0% (2210/241039), 788.01 KiB | 1.47 MiB/s
+Receiving objects:   1% (2411/241039), 2.02 MiB | 1.97 MiB/s  
+Receiving objects:   2% (4821/241039), 3.46 MiB | 2.27 MiB/s
+Receiving objects:   2% (6475/241039), 3.46 MiB | 2.27 MiB/s
+Receiving objects:   3% (7232/241039), 4.63 MiB | 2.28 MiB/s
+Receiving objects:   4% (9642/241039), 4.63 MiB | 2.28 MiB/s
+Receiving objects:   5% (12052/241039), 6.83 MiB | 2.70 MiB/s
+Receiving objects:   5% (13687/241039), 6.83 MiB | 2.70 MiB/s
+Receiving objects:   6% (14463/241039), 6.83 MiB | 2.70 MiB/s
+Receiving objects:   7% (16873/241039), 9.06 MiB | 2.99 MiB/s
+Receiving objects:   8% (19284/241039), 9.06 MiB | 2.99 MiB/s
+Receiving objects:   9% (21694/241039), 9.06 MiB | 2.99 MiB/s
+Receiving objects:  10% (24104/241039), 10.87 MiB | 3.08 MiB/s
+Receiving objects:  11% (26515/241039), 10.87 MiB | 3.08 MiB/s
+Receiving objects:  11% (27140/241039), 10.87 MiB | 3.08 MiB/s
+Receiving objects:  12% (28925/241039), 12.51 MiB | 3.10 MiB/s
+Receiving objects:  13% (31336/241039), 12.51 MiB | 3.10 MiB/s
+Receiving objects:  14% (33746/241039), 14.02 MiB | 3.09 MiB/s
+Receiving objects:  15% (36156/241039), 14.02 MiB | 3.09 MiB/s
+Receiving objects:  15% (37877/241039), 14.02 MiB | 3.09 MiB/s
+Receiving objects:  16% (38567/241039), 16.41 MiB | 3.47 MiB/s
+Receiving objects:  17% (40977/241039), 16.41 MiB | 3.47 MiB/s
+Receiving objects:  18% (43388/241039), 18.21 MiB | 3.58 MiB/s
+Receiving objects:  18% (45213/241039), 18.21 MiB | 3.58 MiB/s
+Receiving objects:  19% (45798/241039), 19.30 MiB | 3.50 MiB/s
+Receiving objects:  20% (48208/241039), 19.30 MiB | 3.50 MiB/s
+Receiving objects:  21% (50619/241039), 20.42 MiB | 3.50 MiB/s
+Receiving objects:  21% (51723/241039), 20.42 MiB | 3.50 MiB/s
+Receiving objects:  22% (53029/241039), 21.43 MiB | 3.23 MiB/s
+Receiving objects:  23% (55439/241039), 21.43 MiB | 3.23 MiB/s
+Receiving objects:  24% (57850/241039), 22.83 MiB | 3.04 MiB/s
+Receiving objects:  25% (60260/241039), 22.83 MiB | 3.04 MiB/s
+Receiving objects:  25% (60479/241039), 22.83 MiB | 3.04 MiB/s
+Receiving objects:  26% (62671/241039), 24.18 MiB | 2.94 MiB/s
+Receiving objects:  27% (65081/241039), 24.18 MiB | 2.94 MiB/s
+Receiving objects:  28% (67491/241039), 25.57 MiB | 2.88 MiB/s
+Receiving objects:  28% (69254/241039), 25.57 MiB | 2.88 MiB/s
+Receiving objects:  29% (69902/241039), 26.91 MiB | 2.84 MiB/s
+Receiving objects:  30% (72312/241039), 26.91 MiB | 2.84 MiB/s
+Receiving objects:  31% (74723/241039), 26.91 MiB | 2.84 MiB/s
+Receiving objects:  32% (77133/241039), 28.56 MiB | 2.67 MiB/s
+Receiving objects:  33% (79543/241039), 28.56 MiB | 2.67 MiB/s
+Receiving objects:  33% (80368/241039), 28.56 MiB | 2.67 MiB/s
+Receiving objects:  34% (81954/241039), 29.75 MiB | 2.55 MiB/s
+Receiving objects:  35% (84364/241039), 29.75 MiB | 2.55 MiB/s
+Receiving objects:  36% (86775/241039), 29.75 MiB | 2.55 MiB/s
+Receiving objects:  37% (89185/241039), 31.28 MiB | 2.64 MiB/s
+Receiving objects:  37% (90850/241039), 31.28 MiB | 2.64 MiB/s
+Receiving objects:  38% (91595/241039), 31.28 MiB | 2.64 MiB/s
+Receiving objects:  39% (94006/241039), 32.60 MiB | 2.69 MiB/s
+Receiving objects:  40% (96416/241039), 32.60 MiB | 2.69 MiB/s
+Receiving objects:  41% (98826/241039), 34.00 MiB | 2.77 MiB/s
+Receiving objects:  41% (100764/241039), 34.00 MiB | 2.77 MiB/s
+Receiving objects:  42% (101237/241039), 34.00 MiB | 2.77 MiB/s
+Receiving objects:  43% (103647/241039), 35.38 MiB | 2.77 MiB/s
+Receiving objects:  44% (106058/241039), 37.00 MiB | 2.83 MiB/s
+Receiving objects:  44% (108301/241039), 37.00 MiB | 2.83 MiB/s
+Receiving objects:  45% (108468/241039), 37.00 MiB | 2.83 MiB/s
+Receiving objects:  46% (110878/241039), 38.60 MiB | 2.86 MiB/s
+Receiving objects:  47% (113289/241039), 38.60 MiB | 2.86 MiB/s
+Receiving objects:  48% (115699/241039), 40.08 MiB | 2.90 MiB/s
+Receiving objects:  48% (117698/241039), 40.08 MiB | 2.90 MiB/s
+Receiving objects:  49% (118110/241039), 40.08 MiB | 2.90 MiB/s
+Receiving objects:  50% (120520/241039), 40.08 MiB | 2.90 MiB/s
+Receiving objects:  51% (122930/241039), 41.75 MiB | 2.90 MiB/s
+Receiving objects:  52% (125341/241039), 41.75 MiB | 2.90 MiB/s
+Receiving objects:  53% (127751/241039), 43.42 MiB | 3.00 MiB/s
+Receiving objects:  54% (130162/241039), 43.42 MiB | 3.00 MiB/s
+Receiving objects:  54% (131224/241039), 43.42 MiB | 3.00 MiB/s
+Receiving objects:  55% (132572/241039), 45.11 MiB | 3.04 MiB/s
+Receiving objects:  56% (134982/241039), 45.11 MiB | 3.04 MiB/s
+Receiving objects:  57% (137393/241039), 46.56 MiB | 3.06 MiB/s
+Receiving objects:  57% (139498/241039), 46.56 MiB | 3.06 MiB/s
+Receiving objects:  58% (139803/241039), 46.56 MiB | 3.06 MiB/s
+Receiving objects:  59% (142214/241039), 48.02 MiB | 3.08 MiB/s
+Receiving objects:  60% (144624/241039), 49.14 MiB | 3.01 MiB/s
+Receiving objects:  60% (146294/241039), 49.14 MiB | 3.01 MiB/s
+Receiving objects:  61% (147034/241039), 49.14 MiB | 3.01 MiB/s
+Receiving objects:  62% (149445/241039), 51.22 MiB | 3.12 MiB/s
+Receiving objects:  63% (151855/241039), 51.22 MiB | 3.12 MiB/s
+Receiving objects:  64% (154265/241039), 51.22 MiB | 3.12 MiB/s
+Receiving objects:  65% (156676/241039), 51.22 MiB | 3.12 MiB/s
+Receiving objects:  66% (159086/241039), 51.22 MiB | 3.12 MiB/s
+Receiving objects:  67% (161497/241039), 51.22 MiB | 3.12 MiB/s
+Receiving objects:  68% (163907/241039), 51.22 MiB | 3.12 MiB/s
+Receiving objects:  69% (166317/241039), 52.66 MiB | 3.10 MiB/s
+Receiving objects:  70% (168728/241039), 52.66 MiB | 3.10 MiB/s
+Receiving objects:  71% (171138/241039), 52.66 MiB | 3.10 MiB/s
+Receiving objects:  71% (172443/241039), 52.66 MiB | 3.10 MiB/s
+Receiving objects:  72% (173549/241039), 52.66 MiB | 3.10 MiB/s
+Receiving objects:  73% (175959/241039), 54.42 MiB | 3.16 MiB/s
+Receiving objects:  74% (178369/241039), 54.42 MiB | 3.16 MiB/s
+Receiving objects:  75% (180780/241039), 54.42 MiB | 3.16 MiB/s
+Receiving objects:  76% (183190/241039), 54.42 MiB | 3.16 MiB/s
+Receiving objects:  77% (185601/241039), 56.13 MiB | 3.17 MiB/s
+Receiving objects:  77% (186565/241039), 56.13 MiB | 3.17 MiB/s
+Receiving objects:  78% (188011/241039), 57.70 MiB | 3.15 MiB/s
+Receiving objects:  79% (190421/241039), 57.70 MiB | 3.15 MiB/s
+Receiving objects:  80% (192832/241039), 57.70 MiB | 3.15 MiB/s
+Receiving objects:  81% (195242/241039), 57.70 MiB | 3.15 MiB/s
+Receiving objects:  82% (197652/241039), 59.55 MiB | 3.17 MiB/s
+Receiving objects:  82% (198251/241039), 59.55 MiB | 3.17 MiB/s
+Receiving objects:  83% (200063/241039), 61.50 MiB | 3.29 MiB/s
+Receiving objects:  84% (202473/241039), 61.50 MiB | 3.29 MiB/s
+Receiving objects:  85% (204884/241039), 61.50 MiB | 3.29 MiB/s
+Receiving objects:  86% (207294/241039), 63.14 MiB | 3.33 MiB/s
+Receiving objects:  86% (207692/241039), 63.14 MiB | 3.33 MiB/s
+Receiving objects:  87% (209704/241039), 64.60 MiB | 3.40 MiB/s
+Receiving objects:  88% (212115/241039), 64.60 MiB | 3.40 MiB/s
+Receiving objects:  89% (214525/241039), 64.60 MiB | 3.40 MiB/s
+Receiving objects:  90% (216936/241039), 66.32 MiB | 3.31 MiB/s
+Receiving objects:  90% (219270/241039), 66.32 MiB | 3.31 MiB/s
+Receiving objects:  91% (219346/241039), 66.32 MiB | 3.31 MiB/s
+Receiving objects:  92% (221756/241039), 66.32 MiB | 3.31 MiB/s
+Receiving objects:  93% (224167/241039), 68.09 MiB | 3.39 MiB/s
+Receiving objects:  94% (226577/241039), 68.09 MiB | 3.39 MiB/s
+Receiving objects:  95% (228988/241039), 68.09 MiB | 3.39 MiB/s
+Receiving objects:  96% (231398/241039), 69.86 MiB | 3.37 MiB/s
+Receiving objects:  97% (233808/241039), 69.86 MiB | 3.37 MiB/s
+Receiving objects:  98% (236219/241039), 69.86 MiB | 3.37 MiB/s
+Receiving objects:  98% (236227/241039), 69.86 MiB | 3.37 MiB/s
+Receiving objects:  99% (238629/241039), 69.86 MiB | 3.37 MiB/s
+remote: Total 241039 (delta 123), reused 176 (delta 89), pack-reused 240781
+2024-07-17 16:49:48 Receiving objects: 100% (241039/241039), 69.86 MiB | 3.37 MiB/s
+Receiving objects: 100% (241039/241039), 71.58 MiB | 3.08 MiB/s, done.
+2024-07-17 16:50:08 Resolving deltas:   0% (0/160675)
+Resolving deltas:   1% (1607/160675)
+Resolving deltas:   2% (3214/160675)
+Resolving deltas:   3% (4821/160675)
+Resolving deltas:   4% (6427/160675)
+Resolving deltas:   5% (8034/160675)
+Resolving deltas:   6% (9641/160675)
+Resolving deltas:   7% (11248/160675)
+Resolving deltas:   8% (12854/160675)
+Resolving deltas:   9% (14461/160675)
+Resolving deltas:  10% (16068/160675)
+Resolving deltas:  11% (17675/160675)
+Resolving deltas:  12% (19281/160675)
+Resolving deltas:  13% (20888/160675)
+Resolving deltas:  14% (22495/160675)
+Resolving deltas:  14% (22728/160675)
+Resolving deltas:  15% (24102/160675)
+Resolving deltas:  16% (25708/160675)
+Resolving deltas:  17% (27315/160675)
+Resolving deltas:  18% (28922/160675)
+Resolving deltas:  19% (30529/160675)
+Resolving deltas:  20% (32135/160675)
+Resolving deltas:  20% (33597/160675)
+Resolving deltas:  21% (33742/160675)
+Resolving deltas:  21% (34634/160675)
+Resolving deltas:  22% (35349/160675)
+Resolving deltas:  22% (36187/160675)
+Resolving deltas:  23% (36956/160675)
+Resolving deltas:  24% (38562/160675)
+Resolving deltas:  24% (38680/160675)
+Resolving deltas:  25% (40169/160675)
+Resolving deltas:  26% (41777/160675)
+Resolving deltas:  27% (43383/160675)
+Resolving deltas:  28% (44989/160675)
+Resolving deltas:  29% (46596/160675)
+Resolving deltas:  30% (48203/160675)
+Resolving deltas:  31% (49810/160675)
+Resolving deltas:  31% (50830/160675)
+Resolving deltas:  32% (51416/160675)
+Resolving deltas:  32% (52009/160675)
+Resolving deltas:  33% (53023/160675)
+Resolving deltas:  33% (53433/160675)
+Resolving deltas:  34% (54630/160675)
+Resolving deltas:  34% (54719/160675)
+Resolving deltas:  35% (56237/160675)
+Resolving deltas:  36% (57843/160675)
+Resolving deltas:  37% (59450/160675)
+Resolving deltas:  37% (60775/160675)
+Resolving deltas:  38% (61057/160675)
+Resolving deltas:  38% (62058/160675)
+Resolving deltas:  39% (62664/160675)
+Resolving deltas:  40% (64270/160675)
+Resolving deltas:  40% (65703/160675)
+Resolving deltas:  41% (65877/160675)
+Resolving deltas:  42% (67484/160675)
+Resolving deltas:  43% (69091/160675)
+Resolving deltas:  43% (69575/160675)
+Resolving deltas:  44% (70697/160675)
+Resolving deltas:  45% (72304/160675)
+Resolving deltas:  46% (73911/160675)
+Resolving deltas:  47% (75518/160675)
+Resolving deltas:  48% (77124/160675)
+Resolving deltas:  49% (78731/160675)
+Resolving deltas:  50% (80338/160675)
+Resolving deltas:  51% (81945/160675)
+Resolving deltas:  51% (82265/160675)
+Resolving deltas:  52% (83551/160675)
+Resolving deltas:  53% (85158/160675)
+Resolving deltas:  54% (86765/160675)
+Resolving deltas:  55% (88372/160675)
+Resolving deltas:  56% (89978/160675)
+Resolving deltas:  56% (90058/160675)
+Resolving deltas:  57% (91585/160675)
+Resolving deltas:  58% (93192/160675)
+Resolving deltas:  59% (94799/160675)
+Resolving deltas:  60% (96405/160675)
+Resolving deltas:  61% (98012/160675)
+Resolving deltas:  62% (99619/160675)
+Resolving deltas:  63% (101226/160675)
+Resolving deltas:  64% (102832/160675)
+Resolving deltas:  64% (102990/160675)
+Resolving deltas:  65% (104439/160675)
+Resolving deltas:  66% (106046/160675)
+Resolving deltas:  67% (107653/160675)
+Resolving deltas:  68% (109259/160675)
+Resolving deltas:  69% (110866/160675)
+Resolving deltas:  70% (112473/160675)
+Resolving deltas:  71% (114080/160675)
+Resolving deltas:  72% (115686/160675)
+Resolving deltas:  73% (117293/160675)
+Resolving deltas:  73% (118563/160675)
+Resolving deltas:  74% (118900/160675)
+Resolving deltas:  75% (120507/160675)
+Resolving deltas:  76% (122113/160675)
+Resolving deltas:  77% (123720/160675)
+Resolving deltas:  78% (125327/160675)
+Resolving deltas:  79% (126934/160675)
+Resolving deltas:  80% (128540/160675)
+Resolving deltas:  80% (129603/160675)
+Resolving deltas:  81% (130147/160675)
+Resolving deltas:  82% (131754/160675)
+Resolving deltas:  83% (133361/160675)
+Resolving deltas:  84% (134967/160675)
+Resolving deltas:  85% (136574/160675)
+Resolving deltas:  86% (138181/160675)
+Resolving deltas:  87% (139788/160675)
+Resolving deltas:  88% (141394/160675)
+Resolving deltas:  89% (143001/160675)
+Resolving deltas:  89% (143207/160675)
+Resolving deltas:  90% (144608/160675)
+Resolving deltas:  91% (146215/160675)
+Resolving deltas:  92% (147821/160675)
+Resolving deltas:  93% (149428/160675)
+Resolving deltas:  94% (151035/160675)
+Resolving deltas:  95% (152642/160675)
+Resolving deltas:  96% (154248/160675)
+Resolving deltas:  97% (155855/160675)
+Resolving deltas:  98% (157462/160675)
+Resolving deltas:  99% (159069/160675)
+Resolving deltas: 100% (160675/160675)
+Resolving deltas: 100% (160675/160675), done.
+2024-07-17 16:50:10 Updating files:  60% (6951/11513)
+Updating files:  61% (7023/11513)
+Updating files:  62% (7139/11513)
+Updating files:  63% (7254/11513)
+Updating files:  64% (7369/11513)
+Updating files:  65% (7484/11513)
+Updating files:  66% (7599/11513)
+Updating files:  67% (7714/11513)
+Updating files:  68% (7829/11513)
+Updating files:  69% (7944/11513)
+Updating files:  70% (8060/11513)
+Updating files:  71% (8175/11513)
+Updating files:  72% (8290/11513)
+Updating files:  73% (8405/11513)
+Updating files:  74% (8520/11513)
+Updating files:  75% (8635/11513)
+Updating files:  76% (8750/11513)
+Updating files:  77% (8866/11513)
+Updating files:  78% (8981/11513)
+Updating files:  79% (9096/11513)
+Updating files:  80% (9211/11513)
+Updating files:  81% (9326/11513)
+Updating files:  82% (9441/11513)
+Updating files:  83% (9556/11513)
+Updating files:  84% (9671/11513)
+Updating files:  85% (9787/11513)
+Updating files:  86% (9902/11513)
+Updating files:  87% (10017/11513)
+Updating files:  88% (10132/11513)
+Updating files:  89% (10247/11513)
+Updating files:  90% (10362/11513)
+Updating files:  91% (10477/11513)
+Updating files:  92% (10592/11513)
+Updating files:  93% (10708/11513)
+Updating files:  94% (10823/11513)
+Updating files:  95% (10938/11513)
+Updating files:  96% (11053/11513)
+Updating files:  97% (11168/11513)
+Updating files:  98% (11283/11513)
+Updating files:  99% (11398/11513)
+Updating files: 100% (11513/11513)
+Updating files: 100% (11513/11513), done.
+2024-07-17 16:50:10 Downloading vcpkg-glibc...
+2024-07-17 16:50:12 vcpkg package management program version 2024-07-10-d2dfc73769081bdd9b782d08d27794780b7a99b9
+2024-07-17 16:50:12 
+2024-07-17 16:50:12 See LICENSE.txt for license information.
+2024-07-17 16:50:12 Telemetry
+2024-07-17 16:50:12 ---------
+2024-07-17 16:50:12 vcpkg collects usage data in order to help us improve your experience.
+2024-07-17 16:50:12 The data collected by Microsoft is anonymous.
+2024-07-17 16:50:12 You can opt-out of telemetry by re-running the bootstrap-vcpkg script with -disableMetrics,
+2024-07-17 16:50:12 passing --disable-metrics to vcpkg on the command line,
+2024-07-17 16:50:12 or by setting the VCPKG_DISABLE_METRICS environment variable.
+2024-07-17 16:50:12 
+2024-07-17 16:50:12 Read more about vcpkg telemetry at docs/about/privacy.md
+2024-07-17 16:50:19 root@68e4ece6d43c:/#  PATH="/opt/vcpkg:${PATH}"
+2024-07-17 16:50:20  PATH="/opt/vcpkg:${PATH}"
+2024-07-17 16:50:20 rgo-vcpkg
+    cargo install cargo-vcpkg
+2024-07-17 16:50:21 
+    Updating crates.io index
+2024-07-17 16:50:22        Fetch [========>                        ] 1 complete; 1 pending                                                                                                                                                                                                                              
+ Downloading 1 crate                                                                                                                                                                                                                                                                                
+  Downloaded cargo-vcpkg v0.1.7
+2024-07-17 16:50:22  Downloading 0 crates                                                                                                                                                                                                                                                                               
+  Downloaded 1 crate (20.8 KB) in 0.28s
+2024-07-17 16:50:22   Installing cargo-vcpkg v0.1.7
+2024-07-17 16:50:22     Updating crates.io index
+2024-07-17 16:50:23        Fetch [=============================>   ] 55 complete; 0 pending                                                                                                                                                                                                                             
+     Locking 56 packages to latest compatible versions
+2024-07-17 16:50:23       Adding bitflags v1.3.2 (latest: v2.6.0)
+2024-07-17 16:50:23       Adding cargo_metadata v0.13.1 (latest: v0.18.1)
+2024-07-17 16:50:23       Adding clap v2.34.0 (latest: v4.5.9)
+2024-07-17 16:50:23       Adding heck v0.3.3 (latest: v0.5.0)
+2024-07-17 16:50:23       Adding hermit-abi v0.1.19 (latest: v0.4.0)
+2024-07-17 16:50:23       Adding semver v0.11.0 (latest: v1.0.23)
+2024-07-17 16:50:23       Adding strsim v0.8.0 (latest: v0.11.1)
+2024-07-17 16:50:23       Adding syn v1.0.109 (latest: v2.0.71)
+2024-07-17 16:50:23       Adding textwrap v0.11.0 (latest: v0.16.1)
+2024-07-17 16:50:23  Downloading 1 crate                                                                                                                                                                                                                                                                                
+ Downloading 2 crates                                                                                                                                                                                                                                                                               
+ Downloading 3 crates                                                                                                                                                                                                                                                                               
+ Downloading 4 crates                                                                                                                                                                                                                                                                               
+ Downloading 5 crates                                                                                                                                                                                                                                                                               
+ Downloading 6 crates                                                                                                                                                                                                                                                                               
+ Downloading 7 crates                                                                                                                                                                                                                                                                               
+ Downloading 8 crates                                                                                                                                                                                                                                                                               
+ Downloading 9 crates                                                                                                                                                                                                                                                                               
+ Downloading 10 crates                                                                                                                                                                                                                                                                              
+ Downloading 11 crates                                                                                                                                                                                                                                                                              
+ Downloading 12 crates                                                                                                                                                                                                                                                                              
+ Downloading 13 crates                                                                                                                                                                                                                                                                              
+ Downloading 14 crates                                                                                                                                                                                                                                                                              
+ Downloading 15 crates                                                                                                                                                                                                                                                                              
+ Downloading 16 crates                                                                                                                                                                                                                                                                              
+ Downloading 17 crates                                                                                                                                                                                                                                                                              
+ Downloading 18 crates                                                                                                                                                                                                                                                                              
+ Downloading 19 crates                                                                                                                                                                                                                                                                              
+ Downloading 20 crates                                                                                                                                                                                                                                                                              
+ Downloading 21 crates                                                                                                                                                                                                                                                                              
+ Downloading 22 crates                                                                                                                                                                                                                                                                              
+ Downloading 23 crates                                                                                                                                                                                                                                                                              
+ Downloading 24 crates                                                                                                                                                                                                                                                                              
+ Downloading 25 crates                                                                                                                                                                                                                                                                              
+ Downloading 26 crates                                                                                                                                                                                                                                                                              
+ Downloading 27 crates                                                                                                                                                                                                                                                                              
+ Downloading 28 crates                                                                                                                                                                                                                                                                              
+ Downloading 29 crates                                                                                                                                                                                                                                                                              
+ Downloading 30 crates                                                                                                                                                                                                                                                                              
+ Downloading 31 crates                                                                                                                                                                                                                                                                              
+ Downloading 32 crates                                                                                                                                                                                                                                                                              
+ Downloading 33 crates                                                                                                                                                                                                                                                                              
+ Downloading 34 crates                                                                                                                                                                                                                                                                              
+ Downloading 35 crates                                                                                                                                                                                                                                                                              
+ Downloading 36 crates                                                                                                                                                                                                                                                                              
+ Downloading 37 crates                                                                                                                                                                                                                                                                              
+ Downloading 38 crates                                                                                                                                                                                                                                                                              
+ Downloading 39 crates                                                                                                                                                                                                                                                                              
+ Downloading 40 crates                                                                                                                                                                                                                                                                              
+  Downloaded serde_derive v1.0.204
+2024-07-17 16:50:23  Downloading 39 crates, remaining bytes: 6.5 KB                                                                                                                                                                                                                                                     
+  Downloaded lazy_static v1.5.0
+2024-07-17 16:50:23  Downloading 38 crates, remaining bytes: 2.3 MB                                                                                                                                                                                                                                                     
+  Downloaded atty v0.2.14
+2024-07-17 16:50:23  Downloading 37 crates, remaining bytes: 2.3 MB                                                                                                                                                                                                                                                     
+  Downloaded bitflags v1.3.2
+2024-07-17 16:50:23  Downloading 36 crates, remaining bytes: 3.0 MB                                                                                                                                                                                                                                                     
+  Downloaded heck v0.3.3
+2024-07-17 16:50:23  Downloading 35 crates, remaining bytes: 2.9 MB                                                                                                                                                                                                                                                     
+  Downloaded version_check v0.9.4
+2024-07-17 16:50:23  Downloading 34 crates, remaining bytes: 2.9 MB                                                                                                                                                                                                                                                     
+  Downloaded termcolor v1.4.1
+2024-07-17 16:50:23  Downloading 33 crates, remaining bytes: 2.8 MB                                                                                                                                                                                                                                                     
+  Downloaded proc-macro-error v1.0.4
+2024-07-17 16:50:23  Downloading 32 crates, remaining bytes: 2.6 MB                                                                                                                                                                                                                                                     
+  Downloaded thiserror-impl v1.0.63
+2024-07-17 16:50:23  Downloading 31 crates, remaining bytes: 2.5 MB                                                                                                                                                                                                                                                     
+  Downloaded vec_map v0.8.2
+2024-07-17 16:50:23  Downloading 30 crates, remaining bytes: 2.3 MB                                                                                                                                                                                                                                                     
+  Downloaded semver v0.11.0
+2024-07-17 16:50:23  Downloading 29 crates, remaining bytes: 2.1 MB                                                                                                                                                                                                                                                     
+  Downloaded unicode-ident v1.0.12
+2024-07-17 16:50:23  Downloading 28 crates, remaining bytes: 2.0 MB                                                                                                                                                                                                                                                     
+  Downloaded unicode-segmentation v1.11.0
+2024-07-17 16:50:23  Downloading 27 crates, remaining bytes: 1.5 MB                                                                                                                                                                                                                                                     
+  Downloaded serde v1.0.204
+2024-07-17 16:50:23  Downloading 26 crates, remaining bytes: 1.3 MB                                                                                                                                                                                                                                                     
+  Downloaded serde_json v1.0.120
+2024-07-17 16:50:23  Downloading 25 crates, remaining bytes: 1.1 MB                                                                                                                                                                                                                                                     
+  Downloaded vcpkg v0.2.15
+2024-07-17 16:50:23  Downloading 24 crates, remaining bytes: 508.6 KB                                                                                                                                                                                                                                                   
+  Downloaded unicode-width v0.1.13
+2024-07-17 16:50:23  Downloading 23 crates, extracting unicode-width ...                                                                                                                                                                                                                                                
+  Downloaded syn v2.0.71
+2024-07-17 16:50:23  Downloading 22 crates, remaining bytes: 47.2 KB                                                                                                                                                                                                                                                    
+  Downloaded syn v1.0.109
+2024-07-17 16:50:24  Downloading 21 crates                                                                                                                                                                                                                                                                              
+  Downloaded libc v0.2.155
+2024-07-17 16:50:24  Downloading 20 crates, extracting libc ...                                                                                                                                                                                                                                                         
+  Downloaded clap v2.34.0
+2024-07-17 16:50:24  Downloading 19 crates                                                                                                                                                                                                                                                                              
+  Downloaded pest v2.7.11
+2024-07-17 16:50:24  Downloading 18 crates                                                                                                                                                                                                                                                                              
+  Downloaded ryu v1.0.18
+2024-07-17 16:50:24  Downloading 17 crates                                                                                                                                                                                                                                                                              
+  Downloaded memchr v2.7.4
+2024-07-17 16:50:24  Downloading 16 crates                                                                                                                                                                                                                                                                              
+  Downloaded ucd-trie v0.1.6
+2024-07-17 16:50:24  Downloading 15 crates                                                                                                                                                                                                                                                                              
+  Downloaded structopt v0.3.26
+2024-07-17 16:50:24  Downloading 14 crates                                                                                                                                                                                                                                                                              
+  Downloaded quote v1.0.36
+2024-07-17 16:50:24  Downloading 13 crates                                                                                                                                                                                                                                                                              
+  Downloaded proc-macro2 v1.0.86
+2024-07-17 16:50:24  Downloading 12 crates                                                                                                                                                                                                                                                                              
+  Downloaded anyhow v1.0.86
+2024-07-17 16:50:24  Downloading 11 crates                                                                                                                                                                                                                                                                              
+  Downloaded thiserror v1.0.63
+2024-07-17 16:50:24  Downloading 10 crates                                                                                                                                                                                                                                                                              
+  Downloaded textwrap v0.11.0
+2024-07-17 16:50:24  Downloading 9 crates                                                                                                                                                                                                                                                                               
+  Downloaded semver-parser v0.10.2
+2024-07-17 16:50:24  Downloading 8 crates                                                                                                                                                                                                                                                                               
+  Downloaded camino v1.1.7
+2024-07-17 16:50:24  Downloading 7 crates                                                                                                                                                                                                                                                                               
+  Downloaded structopt-derive v0.4.18
+2024-07-17 16:50:24  Downloading 6 crates                                                                                                                                                                                                                                                                               
+  Downloaded strsim v0.8.0
+2024-07-17 16:50:24  Downloading 5 crates                                                                                                                                                                                                                                                                               
+  Downloaded proc-macro-error-attr v1.0.4
+2024-07-17 16:50:24  Downloading 4 crates                                                                                                                                                                                                                                                                               
+  Downloaded ansi_term v0.12.1
+2024-07-17 16:50:24  Downloading 3 crates                                                                                                                                                                                                                                                                               
+  Downloaded itoa v1.0.11
+2024-07-17 16:50:24  Downloading 2 crates                                                                                                                                                                                                                                                                               
+  Downloaded cargo_metadata v0.13.1
+2024-07-17 16:50:24  Downloading 1 crate                                                                                                                                                                                                                                                                                
+  Downloaded cargo-platform v0.1.8
+2024-07-17 16:50:24  Downloading 0 crates                                                                                                                                                                                                                                                                               
+  Downloaded 40 crates (3.4 MB) in 1.29s
+2024-07-17 16:50:24    Compiling proc-macro2 v1.0.86
+2024-07-17 16:50:24     Building [                            ] 0/63: proc-macro2(build.rs)                                                                                                                                                                                                                             
+   Compiling unicode-ident v1.0.12
+2024-07-17 16:50:25     Building [                            ] 0/63: unicode-ident, proc-macro2(build.rs)                                                                                                                                                                                                              
+   Compiling version_check v0.9.4
+2024-07-17 16:50:26     Building [                            ] 1/63: version_check, proc-macro2(build.rs)                                                                                                                                                                                                              
+    Building [                            ] 2/63: version_check, proc-macro2(build)                                                                                                                                                                                                                 
+   Compiling serde v1.0.204
+2024-07-17 16:50:26     Building [>                           ] 3/63: proc-macro2(build), serde(build.rs)                                                                                                                                                                                                               
+    Building [>                           ] 4/63: proc-macro2, serde(build.rs)                                                                                                                                                                                                                      
+    Building [=>                          ] 5/63: proc-macro2, serde(build)                                                                                                                                                                                                                         
+   Compiling thiserror v1.0.63
+2024-07-17 16:50:27     Building [=>                          ] 6/63: proc-macro2, thiserror(build.rs)                                                                                                                                                                                                                  
+    Building [==>                         ] 7/63: proc-macro2, thiserror(build)                                                                                                                                                                                                                     
+   Compiling quote v1.0.36
+2024-07-17 16:50:28     Building [==>                         ] 8/63: proc-macro2, quote                                                                                                                                                                                                                                
+   Compiling syn v2.0.71
+2024-07-17 16:50:28     Building [===>                        ] 9/63: proc-macro2, syn                                                                                                                                                                                                                                  
+   Compiling proc-macro-error-attr v1.0.4
+2024-07-17 16:50:28     Building [===>                       ] 10/63: proc-macro-error-attr(build.rs), syn                                                                                                                                                                                                              
+   Compiling syn v1.0.109
+2024-07-17 16:50:29     Building [===>                       ] 11/63: syn, syn(build.rs)                                                                                                                                                                                                                                
+   Compiling libc v0.2.155
+2024-07-17 16:50:30     Building [====>                      ] 12/63: libc(build.rs), syn                                                                                                                                                                                                                               
+    Building [====>                      ] 13/63: libc(build), syn                                                                                                                                                                                                                                  
+    Building [=====>                     ] 14/63: syn(build), syn                                                                                                                                                                                                                                   
+    Building [=====>                     ] 15/63: proc-macro-error-attr(build), syn                                                                                                                                                                                                                 
+   Compiling proc-macro-error v1.0.4
+2024-07-17 16:50:30     Building [=====>                     ] 16/63: proc-macro-error(build.rs), syn                                                                                                                                                                                                                   
+   Compiling ucd-trie v0.1.6
+2024-07-17 16:50:32     Building [======>                    ] 17/63: syn, ucd-trie                                                                                                                                                                                                                                     
+   Compiling memchr v2.7.4
+2024-07-17 16:50:36     Building [======>                    ] 18/63: memchr, syn                                                                                                                                                                                                                                       
+    Building [=======>                   ] 19/63: syn, proc-macro-error(build)                                                                                                                                                                                                                      
+   Compiling serde_derive v1.0.204
+2024-07-17 16:50:36     Building [=======>                   ] 20/63: serde_derive, proc-macro-error(build)                                                                                                                                                                                                             
+   Compiling thiserror-impl v1.0.63
+2024-07-17 16:50:39     Building [========>                  ] 21/63: serde_derive, thiserror-impl                                                                                                                                                                                                                      
+    Building [========>                  ] 22/63: serde_derive, thiserror                                                                                                                                                                                                                           
+   Compiling pest v2.7.11
+2024-07-17 16:50:55     Building [========>                  ] 23/63: serde_derive, pest                                                                                                                                                                                                                                
+    Building [=========>                 ] 24/63: serde_derive, proc-macro-error-attr                                                                                                                                                                                                               
+    Building [=========>                 ] 25/63: serde_derive, syn                                                                                                                                                                                                                                 
+    Building [==========>                ] 26/63: serde, syn                                                                                                                                                                                                                                        
+    Building [==========>                ] 27/63: syn, libc                                                                                                                                                                                                                                         
+   Compiling serde_json v1.0.120
+2024-07-17 16:50:55     Building [===========>               ] 28/63: syn, serde_json(build.rs)                                                                                                                                                                                                                         
+   Compiling camino v1.1.7
+2024-07-17 16:50:56     Building [===========>               ] 29/63: syn, camino(build.rs)                                                                                                                                                                                                                             
+   Compiling unicode-segmentation v1.11.0
+2024-07-17 16:50:56    Compiling unicode-width v0.1.13
+2024-07-17 16:50:56     Building [============>              ] 31/63: unicode-width, unicode-segmentation                                                                                                                                                                                                               
+   Compiling textwrap v0.11.0
+2024-07-17 16:50:57     Building [============>              ] 32/63: textwrap, unicode-segmentation                                                                                                                                                                                                                    
+   Compiling heck v0.3.3
+2024-07-17 16:50:57     Building [=============>             ] 33/63: textwrap, heck                                                                                                                                                                                                                                    
+    Building [=============>             ] 34/63: textwrap, camino(build)                                                                                                                                                                                                                           
+    Building [==============>            ] 35/63: textwrap, serde_json(build)                                                                                                                                                                                                                       
+   Compiling atty v0.2.14
+2024-07-17 16:50:57     Building [==============>            ] 36/63: textwrap, atty                                                                                                                                                                                                                                    
+    Building [==============>            ] 37/63: textwrap, proc-macro-error                                                                                                                                                                                                                        
+   Compiling semver-parser v0.10.2
+2024-07-17 16:50:58     Building [===============>           ] 38/63: proc-macro-error, semver-parser                                                                                                                                                                                                                   
+   Compiling strsim v0.8.0
+2024-07-17 16:50:59     Building [===============>           ] 39/63: semver-parser, strsim                                                                                                                                                                                                                             
+   Compiling vec_map v0.8.2
+2024-07-17 16:51:00     Building [================>          ] 40/63: vec_map, semver-parser                                                                                                                                                                                                                            
+   Compiling itoa v1.0.11
+2024-07-17 16:51:00     Building [================>          ] 41/63: semver-parser, itoa                                                                                                                                                                                                                               
+   Compiling ryu v1.0.18
+2024-07-17 16:51:01     Building [=================>         ] 42/63: ryu, semver-parser                                                                                                                                                                                                                                
+   Compiling anyhow v1.0.86
+2024-07-17 16:51:01     Building [=================>         ] 43/63: semver-parser, anyhow(build.rs)                                                                                                                                                                                                                   
+   Compiling bitflags v1.3.2
+2024-07-17 16:51:01     Building [=================>         ] 44/63: semver-parser, bitflags                                                                                                                                                                                                                           
+   Compiling ansi_term v0.12.1
+2024-07-17 16:51:02     Building [==================>        ] 45/63: ansi_term, semver-parser                                                                                                                                                                                                                          
+   Compiling clap v2.34.0
+2024-07-17 16:51:13     Building [==================>        ] 46/63: semver-parser, clap                                                                                                                                                                                                                               
+    Building [===================>       ] 47/63: anyhow(build), clap                                                                                                                                                                                                                               
+    Building [===================>       ] 48/63: serde_json, clap                                                                                                                                                                                                                                  
+   Compiling semver v0.11.0
+2024-07-17 16:51:19     Building [====================>      ] 49/63: semver, clap                                                                                                                                                                                                                                      
+   Compiling structopt-derive v0.4.18
+2024-07-17 16:51:24     Building [====================>      ] 50/63: structopt-derive, clap                                                                                                                                                                                                                            
+    Building [====================>      ] 51/63: camino, clap                                                                                                                                                                                                                                      
+   Compiling cargo-platform v0.1.8
+2024-07-17 16:51:26     Building [=====================>     ] 52/63: cargo-platform, clap                                                                                                                                                                                                                              
+   Compiling lazy_static v1.5.0
+2024-07-17 16:51:26     Building [=====================>     ] 53/63: lazy_static, clap                                                                                                                                                                                                                                 
+   Compiling cargo-vcpkg v0.1.7
+2024-07-17 16:51:26     Building [======================>    ] 54/63: cargo-vcpkg(build.rs), clap                                                                                                                                                                                                                       
+    Building [======================>    ] 55/63: cargo-vcpkg(build), clap                                                                                                                                                                                                                          
+   Compiling structopt v0.3.26
+2024-07-17 16:51:26     Building [=======================>   ] 56/63: structopt, clap                                                                                                                                                                                                                                   
+   Compiling cargo_metadata v0.13.1
+2024-07-17 16:51:44     Building [=======================>   ] 57/63: cargo_metadata, clap                                                                                                                                                                                                                              
+    Building [=======================>   ] 58/63: anyhow, clap                                                                                                                                                                                                                                      
+   Compiling vcpkg v0.2.15
+2024-07-17 16:51:44     Building [========================>  ] 59/63: vcpkg, clap                                                                                                                                                                                                                                       
+   Compiling termcolor v1.4.1
+2024-07-17 16:51:57     Building [========================>  ] 60/63: vcpkg, termcolor                                                                                                                                                                                                                                  
+    Building [=========================> ] 61/63: vcpkg                                                                                                                                                                                                                                             
+    Building [=========================> ] 62/63: cargo-vcpkg(bin)                                                                                                                                                                                                                                  
+    Finished `release` profile [optimized] target(s) in 1m 36s
+2024-07-17 16:51:57   Installing /usr/local/cargo/bin/cargo-vcpkg
+2024-07-17 16:51:57    Installed package `cargo-vcpkg v0.1.7` (executable `cargo-vcpkg`)
+2024-07-17 16:52:01 root@68e4ece6d43c:/# vcpkg install librdkafka:x64-linux
+root@68e4ece6d43c:/# vcpkg install librdkafka:x64-linux
+2024-07-17 16:52:01 
+Computing installation plan...
+2024-07-17 16:52:01 A suitable version of cmake was not found (required v3.29.2).
+2024-07-17 16:52:11 Downloading https://github.com/Kitware/CMake/releases/download/v3.29.2/cmake-3.29.2-linux-x86_64.tar.gz
+2024-07-17 16:52:11 Extracting cmake...
+2024-07-17 16:52:18 The following packages will be built and installed:
+2024-07-17 16:52:18     librdkafka:x64-linux@2.3.0#3
+2024-07-17 16:52:18   * lz4:x64-linux@1.9.4#2
+2024-07-17 16:52:18   * vcpkg-cmake:x64-linux@2024-04-23
+2024-07-17 16:52:18   * vcpkg-cmake-config:x64-linux@2024-05-23
+2024-07-17 16:52:18 Additional packages (*) will be modified to complete this operation.
+2024-07-17 16:52:18 Detecting compiler hash for triplet x64-linux...
+2024-07-17 16:52:22 Compiler found: /usr/bin/c++
+2024-07-17 16:52:22 Restored 0 package(s) from /root/.cache/vcpkg/archives in 89.9 us. Use --debug to see more details.
+2024-07-17 16:52:22 Installing 1/4 vcpkg-cmake:x64-linux@2024-04-23...
+2024-07-17 16:52:22 Building vcpkg-cmake:x64-linux@2024-04-23...
+2024-07-17 16:52:22 -- Installing: /opt/vcpkg/packages/vcpkg-cmake_x64-linux/share/vcpkg-cmake/vcpkg_cmake_configure.cmake
+2024-07-17 16:52:22 -- Installing: /opt/vcpkg/packages/vcpkg-cmake_x64-linux/share/vcpkg-cmake/vcpkg_cmake_build.cmake
+2024-07-17 16:52:22 -- Installing: /opt/vcpkg/packages/vcpkg-cmake_x64-linux/share/vcpkg-cmake/vcpkg_cmake_install.cmake
+2024-07-17 16:52:22 -- Installing: /opt/vcpkg/packages/vcpkg-cmake_x64-linux/share/vcpkg-cmake/vcpkg-port-config.cmake
+2024-07-17 16:52:22 -- Installing: /opt/vcpkg/packages/vcpkg-cmake_x64-linux/share/vcpkg-cmake/copyright
+2024-07-17 16:52:22 -- Performing post-build validation
+2024-07-17 16:52:22 Stored binaries in 1 destinations in 24.4 ms.
+2024-07-17 16:52:22 Elapsed time to handle vcpkg-cmake:x64-linux: 196 ms
+2024-07-17 16:52:22 vcpkg-cmake:x64-linux package ABI: 6c88b259a922cd4712fe1cb1e91ec8c90dd742fc1a7b8edfb29602fdf888d7ff
+2024-07-17 16:52:22 Installing 2/4 vcpkg-cmake-config:x64-linux@2024-05-23...
+2024-07-17 16:52:22 Building vcpkg-cmake-config:x64-linux@2024-05-23...
+2024-07-17 16:52:22 -- Installing: /opt/vcpkg/packages/vcpkg-cmake-config_x64-linux/share/vcpkg-cmake-config/vcpkg_cmake_config_fixup.cmake
+2024-07-17 16:52:22 -- Installing: /opt/vcpkg/packages/vcpkg-cmake-config_x64-linux/share/vcpkg-cmake-config/vcpkg-port-config.cmake
+2024-07-17 16:52:22 -- Installing: /opt/vcpkg/packages/vcpkg-cmake-config_x64-linux/share/vcpkg-cmake-config/copyright
+2024-07-17 16:52:22 -- Skipping post-build validation due to VCPKG_POLICY_EMPTY_PACKAGE
+2024-07-17 16:52:22 Stored binaries in 1 destinations in 36.7 ms.
+2024-07-17 16:52:22 Elapsed time to handle vcpkg-cmake-config:x64-linux: 194 ms
+2024-07-17 16:52:22 vcpkg-cmake-config:x64-linux package ABI: e6e08792f9150d9c216e55051dd2c047ceb143ef15d2cd750b7e47788f93afca
+2024-07-17 16:52:22 Installing 3/4 lz4:x64-linux@1.9.4#2...
+2024-07-17 16:52:22 Building lz4:x64-linux@1.9.4#2...
+2024-07-17 16:52:23 -- Downloading https://github.com/lz4/lz4/archive/v1.9.4.tar.gz -> lz4-lz4-v1.9.4.tar.gz...
+2024-07-17 16:52:25 -- Extracting source /opt/vcpkg/downloads/lz4-lz4-v1.9.4.tar.gz
+2024-07-17 16:52:25 -- Using source at /opt/vcpkg/buildtrees/lz4/src/v1.9.4-9f4a1a30bd.clean
+2024-07-17 16:52:25 -- Configuring x64-linux
+2024-07-17 16:52:26 -- Building x64-linux-dbg
+2024-07-17 16:52:31 -- Building x64-linux-rel
+2024-07-17 16:52:53 -- Fixing pkgconfig file: /opt/vcpkg/packages/lz4_x64-linux/lib/pkgconfig/liblz4.pc
+2024-07-17 16:52:53 -- Fixing pkgconfig file: /opt/vcpkg/packages/lz4_x64-linux/debug/lib/pkgconfig/liblz4.pc
+2024-07-17 16:52:53 -- Installing: /opt/vcpkg/packages/lz4_x64-linux/share/lz4/copyright
+2024-07-17 16:52:53 -- Downloading https://github.com/NixOS/patchelf/releases/download/0.14.5/patchelf-0.14.5-x86_64.tar.gz -> patchelf-0.14.5-x86_64.tar.gz...
+2024-07-17 16:52:55 -- Performing post-build validation
+2024-07-17 16:52:55 Stored binaries in 1 destinations in 229 ms.
+2024-07-17 16:52:55 Elapsed time to handle lz4:x64-linux: 32 s
+2024-07-17 16:52:55 lz4:x64-linux package ABI: 12bcb39b5348baf5b8c27cb6f0a67b5a50e038fb9100954a041d21c3212b8a58
+2024-07-17 16:52:55 Installing 4/4 librdkafka:x64-linux@2.3.0#3...
+2024-07-17 16:52:55 Building librdkafka:x64-linux@2.3.0#3...
+2024-07-17 16:52:55 -- Downloading https://github.com/confluentinc/librdkafka/archive/v2.3.0.tar.gz -> confluentinc-librdkafka-v2.3.0.tar.gz...
+2024-07-17 16:52:57 -- Extracting source /opt/vcpkg/downloads/confluentinc-librdkafka-v2.3.0.tar.gz
+2024-07-17 16:52:58 -- Applying patch lz4.patch
+2024-07-17 16:52:58 -- Using source at /opt/vcpkg/buildtrees/librdkafka/src/v2.3.0-cd9f208ba7.clean
+2024-07-17 16:52:58 -- Configuring x64-linux
+2024-07-17 16:53:05 CMake Warning at installed/x64-linux/share/vcpkg-cmake/vcpkg_cmake_configure.cmake:344 (message):
+2024-07-17 16:53:05   The following variables are not used in CMakeLists.txt:
+2024-07-17 16:53:05 
+2024-07-17 16:53:05       WITH_SNAPPY
+2024-07-17 16:53:05 
+2024-07-17 16:53:05   Please recheck them and remove the unnecessary options from the
+2024-07-17 16:53:05   `vcpkg_cmake_configure` call.
+2024-07-17 16:53:05 
+2024-07-17 16:53:05   If these options should still be passed for whatever reason, please use the
+2024-07-17 16:53:05   `MAYBE_UNUSED_VARIABLES` argument.
+2024-07-17 16:53:05 Call Stack (most recent call first):
+2024-07-17 16:53:05   ports/librdkafka/portfile.cmake:24 (vcpkg_cmake_configure)
+2024-07-17 16:53:05   scripts/ports.cmake:192 (include)
+2024-07-17 16:53:05 
+2024-07-17 16:53:05 
+2024-07-17 16:53:05 -- Building x64-linux-dbg
+2024-07-17 16:54:01 -- Building x64-linux-rel
+2024-07-17 16:55:29 -- Installing: /opt/vcpkg/packages/librdkafka_x64-linux/share/librdkafka/copyright
+2024-07-17 16:55:29 -- Fixing pkgconfig file: /opt/vcpkg/packages/librdkafka_x64-linux/lib/pkgconfig/rdkafka++-static.pc
+2024-07-17 16:55:29 -- Fixing pkgconfig file: /opt/vcpkg/packages/librdkafka_x64-linux/lib/pkgconfig/rdkafka-static.pc
+2024-07-17 16:55:29 -- Fixing pkgconfig file: /opt/vcpkg/packages/librdkafka_x64-linux/debug/lib/pkgconfig/rdkafka++-static.pc
+2024-07-17 16:55:29 -- Fixing pkgconfig file: /opt/vcpkg/packages/librdkafka_x64-linux/debug/lib/pkgconfig/rdkafka-static.pc
+2024-07-17 16:55:29 -- Performing post-build validation
+2024-07-17 16:55:32 Stored binaries in 1 destinations in 2.2 s.
+2024-07-17 16:55:32 Elapsed time to handle librdkafka:x64-linux: 2.6 min
+2024-07-17 16:55:32 librdkafka:x64-linux package ABI: db2e5a6cd4873a2d6bac35cb9e776ee2f9b0b145ede4578d964ec7775d43febc
+2024-07-17 16:55:32 Total install time: 3.2 min
+2024-07-17 16:55:32 The package librdkafka:x64-linux provides CMake targets:
+2024-07-17 16:55:32 
+2024-07-17 16:55:32     find_package(RdKafka CONFIG REQUIRED)
+2024-07-17 16:55:32     target_link_libraries(main PRIVATE RdKafka::rdkafka RdKafka::rdkafka++)
+2024-07-17 16:55:32 
+2024-07-17 16:56:40 root@68e4ece6d43c:/# cargo new --help
+2024-07-17 16:56:41 
+Create a new cargo package at <path>
+2024-07-17 16:56:41 
+2024-07-17 16:56:41 Usage: cargo new [OPTIONS] <PATH>
+2024-07-17 16:56:41 
+2024-07-17 16:56:41 Arguments:
+2024-07-17 16:56:41   <PATH>  
+2024-07-17 16:56:41 
+2024-07-17 16:56:41 Options:
+2024-07-17 16:56:41       --vcs <VCS>            Initialize a new repository for the given version control system, overriding a global configuration. [possible values: git, hg, pijul, fossil, none]
+2024-07-17 16:56:41       --bin                  Use a binary (application) template [default]
+2024-07-17 16:56:41       --lib                  Use a library template
+2024-07-17 16:56:41       --edition <YEAR>       Edition to set for the crate generated [possible values: 2015, 2018, 2021, 2024]
+2024-07-17 16:56:41       --name <NAME>          Set the resulting package name, defaults to the directory name
+2024-07-17 16:56:41       --registry <REGISTRY>  Registry to use
+2024-07-17 16:56:41   -v, --verbose...           Use verbose output (-vv very verbose/build.rs output)
+2024-07-17 16:56:41   -q, --quiet                Do not print cargo log messages
+2024-07-17 16:56:41       --color <WHEN>         Coloring: auto, always, never
+2024-07-17 16:56:41       --config <KEY=VALUE>   Override a configuration value
+2024-07-17 16:56:41   -Z <FLAG>                  Unstable (nightly-only) flags to Cargo, see 'cargo -Z help' for details
+2024-07-17 16:56:41   -h, --help                 Print help
+2024-07-17 16:56:41 
+2024-07-17 16:56:41 Manifest Options:
+2024-07-17 16:56:41       --locked   Assert that `Cargo.lock` will remain unchanged
+2024-07-17 16:56:41       --offline  Run without accessing the network
+2024-07-17 16:56:41       --frozen   Equivalent to specifying both --locked and --offline
+2024-07-17 16:56:41 
+2024-07-17 16:56:41 Run `cargo help new` for more detailed information.
+2024-07-17 16:56:54 root@68e4ece6d43c:/# cargo new --bin test_kafka
+2024-07-17 16:56:54 
+    Creating binary (application) `test_kafka` package
+2024-07-17 16:56:56 note: see more `Cargo.toml` keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+2024-07-17 16:56:59 root@68e4ece6d43c:/# cd test_kafka/
+2024-07-17 16:58:06 
+root@68e4ece6d43c:/test_kafka# cargo add rdkafka --features=cmake-build
+2024-07-17 16:58:06 
+    Updating crates.io index
+2024-07-17 16:58:07       Adding rdkafka v0.36.2 to dependencies
+2024-07-17 16:58:07              Features:
+2024-07-17 16:58:07              + cmake-build
+2024-07-17 16:58:07              + libz
+2024-07-17 16:58:07              + tokio
+2024-07-17 16:58:07              - cmake_build
+2024-07-17 16:58:07              - curl
+2024-07-17 16:58:07              - curl-static
+2024-07-17 16:58:07              - dynamic-linking
+2024-07-17 16:58:07              - dynamic_linking
+2024-07-17 16:58:07              - external-lz4
+2024-07-17 16:58:07              - external_lz4
+2024-07-17 16:58:07              - futures-executor
+2024-07-17 16:58:07              - gssapi
+2024-07-17 16:58:07              - gssapi-vendored
+2024-07-17 16:58:07              - libz-static
+2024-07-17 16:58:07              - naive-runtime
+2024-07-17 16:58:07              - sasl
+2024-07-17 16:58:07              - ssl
+2024-07-17 16:58:07              - ssl-vendored
+2024-07-17 16:58:07              - tracing
+2024-07-17 16:58:07              - zstd
+2024-07-17 16:58:07              - zstd-pkg-config
+2024-07-17 16:58:07     Updating crates.io index
+2024-07-17 16:58:08        Fetch [=============================>   ] 36 complete; 1 pending                                                                                                                                                                                                                             
+       Fetch [=============================>   ] 45 complete; 2 pending                                                                                                                                                                                                                             
+     Locking 48 packages to latest compatible versions
+2024-07-17 16:58:08       Adding addr2line v0.22.0 (latest: v0.24.0)
+2024-07-17 16:58:08       Adding gimli v0.29.0 (latest: v0.31.0)
+2024-07-17 16:58:08       Adding num_enum v0.5.11 (latest: v0.7.2)
+2024-07-17 16:58:08       Adding num_enum_derive v0.5.11 (latest: v0.7.2)
+2024-07-17 16:58:08       Adding proc-macro-crate v1.3.1 (latest: v3.1.0)
+2024-07-17 16:58:08       Adding syn v1.0.109 (latest: v2.0.71)
+2024-07-17 16:58:08       Adding toml_edit v0.19.15 (latest: v0.22.16)
+2024-07-17 16:58:08       Adding winnow v0.5.40 (latest: v0.6.13)
+2024-07-17 16:58:13 root@68e4ece6d43c:/test_kafka# cargo build --release
+2024-07-17 16:58:13 
+ Downloading 1 crate                                                                                                                                                                                                                                                                                
+ Downloading 2 crates                                                                                                                                                                                                                                                                               
+ Downloading 3 crates                                                                                                                                                                                                                                                                               
+ Downloading 4 crates                                                                                                                                                                                                                                                                               
+ Downloading 5 crates                                                                                                                                                                                                                                                                               
+ Downloading 6 crates                                                                                                                                                                                                                                                                               
+ Downloading 7 crates                                                                                                                                                                                                                                                                               
+ Downloading 8 crates                                                                                                                                                                                                                                                                               
+ Downloading 9 crates                                                                                                                                                                                                                                                                               
+ Downloading 10 crates                                                                                                                                                                                                                                                                              
+ Downloading 11 crates                                                                                                                                                                                                                                                                              
+ Downloading 12 crates                                                                                                                                                                                                                                                                              
+ Downloading 13 crates                                                                                                                                                                                                                                                                              
+ Downloading 14 crates                                                                                                                                                                                                                                                                              
+ Downloading 15 crates                                                                                                                                                                                                                                                                              
+ Downloading 16 crates                                                                                                                                                                                                                                                                              
+ Downloading 17 crates                                                                                                                                                                                                                                                                              
+ Downloading 18 crates                                                                                                                                                                                                                                                                              
+ Downloading 19 crates                                                                                                                                                                                                                                                                              
+ Downloading 20 crates                                                                                                                                                                                                                                                                              
+ Downloading 21 crates                                                                                                                                                                                                                                                                              
+ Downloading 22 crates                                                                                                                                                                                                                                                                              
+ Downloading 23 crates                                                                                                                                                                                                                                                                              
+ Downloading 24 crates                                                                                                                                                                                                                                                                              
+ Downloading 25 crates                                                                                                                                                                                                                                                                              
+ Downloading 26 crates                                                                                                                                                                                                                                                                              
+  Downloaded autocfg v1.3.0
+2024-07-17 16:58:13  Downloading 25 crates                                                                                                                                                                                                                                                                              
+  Downloaded equivalent v1.0.1
+2024-07-17 16:58:13  Downloading 24 crates, remaining bytes: 60.5 KB                                                                                                                                                                                                                                                    
+  Downloaded indexmap v2.2.6
+2024-07-17 16:58:13  Downloading 23 crates                                                                                                                                                                                                                                                                              
+  Downloaded pin-utils v0.1.0
+2024-07-17 16:58:13  Downloading 22 crates, remaining bytes: 6.9 MB                                                                                                                                                                                                                                                     
+  Downloaded futures-core v0.3.30
+2024-07-17 16:58:13  Downloading 21 crates, remaining bytes: 6.8 MB                                                                                                                                                                                                                                                     
+  Downloaded num_enum_derive v0.5.11
+2024-07-17 16:58:13  Downloading 20 crates, remaining bytes: 6.8 MB                                                                                                                                                                                                                                                     
+  Downloaded pkg-config v0.3.30
+2024-07-17 16:58:13  Downloading 19 crates, remaining bytes: 6.7 MB                                                                                                                                                                                                                                                     
+  Downloaded futures-task v0.3.30
+2024-07-17 16:58:13  Downloading 18 crates, remaining bytes: 6.7 MB                                                                                                                                                                                                                                                     
+  Downloaded toml_datetime v0.6.6
+2024-07-17 16:58:13  Downloading 17 crates, remaining bytes: 6.5 MB                                                                                                                                                                                                                                                     
+  Downloaded slab v0.4.9
+2024-07-17 16:58:14  Downloading 16 crates, remaining bytes: 6.4 MB                                                                                                                                                                                                                                                     
+  Downloaded proc-macro-crate v1.3.1
+2024-07-17 16:58:14  Downloading 15 crates, remaining bytes: 6.3 MB                                                                                                                                                                                                                                                     
+  Downloaded once_cell v1.19.0
+2024-07-17 16:58:14  Downloading 14 crates, remaining bytes: 6.1 MB                                                                                                                                                                                                                                                     
+  Downloaded cc v1.1.5
+2024-07-17 16:58:14  Downloading 13 crates, remaining bytes: 5.6 MB                                                                                                                                                                                                                                                     
+  Downloaded toml_edit v0.19.15
+2024-07-17 16:58:14  Downloading 12 crates, remaining bytes: 5.2 MB                                                                                                                                                                                                                                                     
+  Downloaded winnow v0.5.40
+2024-07-17 16:58:14  Downloading 11 crates, remaining bytes: 4.7 MB                                                                                                                                                                                                                                                     
+  Downloaded futures-util v0.3.30
+2024-07-17 16:58:14  Downloading 10 crates, remaining bytes: 4.2 MB                                                                                                                                                                                                                                                     
+  Downloaded rdkafka v0.36.2
+2024-07-17 16:58:14  Downloading 9 crates, remaining bytes: 3.6 MB                                                                                                                                                                                                                                                      
+  Downloaded tokio v1.38.1
+2024-07-17 16:58:14  Downloading 8 crates, extracting tokio ...                                                                                                                                                                                                                                                         
+ Downloading 8 crates, remaining bytes: 3.2 MB                                                                                                                                                                                                                                                      
+  Downloaded libz-sys v1.1.18
+2024-07-17 16:58:14  Downloading 7 crates, extracting libz-sys ...                                                                                                                                                                                                                                                      
+  Downloaded hashbrown v0.14.5
+2024-07-17 16:58:14  Downloading 6 crates, remaining bytes: 3.1 MB                                                                                                                                                                                                                                                      
+  Downloaded log v0.4.22
+2024-07-17 16:58:14  Downloading 5 crates, remaining bytes: 2.9 MB                                                                                                                                                                                                                                                      
+  Downloaded pin-project-lite v0.2.14
+2024-07-17 16:58:14  Downloading 4 crates, remaining bytes: 2.7 MB                                                                                                                                                                                                                                                      
+  Downloaded num_enum v0.5.11
+2024-07-17 16:58:14  Downloading 3 crates, remaining bytes: 2.5 MB                                                                                                                                                                                                                                                      
+  Downloaded futures-channel v0.3.30
+2024-07-17 16:58:14  Downloading 2 crates, remaining bytes: 2.3 MB                                                                                                                                                                                                                                                      
+  Downloaded cmake v0.1.50
+2024-07-17 16:58:14  Downloading 1 crate, remaining bytes: 2.2 MB                                                                                                                                                                                                                                                       
+  Downloaded rdkafka-sys v4.7.0+2.3.0
+2024-07-17 16:58:15  Downloading 0 crates, extracting rdkafka-sys ...                                                                                                                                                                                                                                                   
+  Downloaded 26 crates (7.1 MB) in 1.59s (largest was `rdkafka-sys` at 4.4 MB)
+2024-07-17 16:58:15    Compiling proc-macro2 v1.0.86
+2024-07-17 16:58:15    Compiling unicode-ident v1.0.12
+2024-07-17 16:58:15     Building [                            ] 0/55: proc-macro2(build.rs), unicode-ident                                                                                                                                                                                                              
+   Compiling cc v1.1.5
+2024-07-17 16:58:17     Building [                            ] 1/55: proc-macro2(build.rs), cc                                                                                                                                                                                                                         
+    Building [>                           ] 2/55: cc, proc-macro2(build)                                                                                                                                                                                                                            
+    Building [>                           ] 3/55: cc, proc-macro2                                                                                                                                                                                                                                   
+   Compiling quote v1.0.36
+2024-07-17 16:58:17     Building [=>                          ] 4/55: cc, quote                                                                                                                                                                                                                                         
+   Compiling pkg-config v0.3.30
+2024-07-17 16:58:18     Building [=>                          ] 5/55: pkg-config, cc                                                                                                                                                                                                                                    
+   Compiling hashbrown v0.14.5
+2024-07-17 16:58:19     Building [==>                         ] 6/55: pkg-config, hashbrown                                                                                                                                                                                                                             
+   Compiling equivalent v1.0.1
+2024-07-17 16:58:19     Building [==>                         ] 7/55: hashbrown, equivalent                                                                                                                                                                                                                             
+   Compiling syn v1.0.109
+2024-07-17 16:58:19     Building [===>                        ] 8/55: syn(build.rs), hashbrown                                                                                                                                                                                                                          
+   Compiling indexmap v2.2.6
+2024-07-17 16:58:19     Building [===>                        ] 9/55: hashbrown, indexmap                                                                                                                                                                                                                               
+   Compiling winnow v0.5.40
+2024-07-17 16:58:21     Building [===>                       ] 10/55: winnow, indexmap                                                                                                                                                                                                                                  
+   Compiling vcpkg v0.2.15
+2024-07-17 16:58:22     Building [====>                      ] 11/55: winnow, vcpkg                                                                                                                                                                                                                                     
+   Compiling toml_datetime v0.6.6
+2024-07-17 16:58:23     Building [====>                      ] 12/55: winnow, toml_datetime                                                                                                                                                                                                                             
+   Compiling libz-sys v1.1.18
+2024-07-17 16:58:24     Building [=====>                     ] 13/55: winnow, libz-sys(build.rs)                                                                                                                                                                                                                        
+   Compiling toml_edit v0.19.15
+2024-07-17 16:58:24     Building [=====>                     ] 14/55: libz-sys(build.rs), toml_edit                                                                                                                                                                                                                     
+    Building [======>                    ] 15/55: syn(build), toml_edit                                                                                                                                                                                                                             
+   Compiling once_cell v1.19.0
+2024-07-17 16:58:24     Building [======>                    ] 16/55: once_cell, toml_edit                                                                                                                                                                                                                              
+   Compiling libc v0.2.155
+2024-07-17 16:58:30     Building [=======>                   ] 17/55: libc(build.rs), toml_edit                                                                                                                                                                                                                         
+    Building [=======>                   ] 18/55: libc(build), toml_edit                                                                                                                                                                                                                            
+    Building [========>                  ] 19/55: syn, toml_edit                                                                                                                                                                                                                                    
+   Compiling proc-macro-crate v1.3.1
+2024-07-17 16:58:30     Building [========>                  ] 20/55: proc-macro-crate, toml_edit                                                                                                                                                                                                                       
+    Building [=========>                 ] 21/55: libz-sys(build), proc-macro-crate                                                                                                                                                                                                                 
+   Compiling syn v2.0.71
+2024-07-17 16:58:31     Building [=========>                 ] 22/55: syn, proc-macro-crate                                                                                                                                                                                                                             
+   Compiling cmake v0.1.50
+2024-07-17 16:58:32     Building [==========>                ] 23/55: syn, cmake                                                                                                                                                                                                                                        
+   Compiling autocfg v1.3.0
+2024-07-17 16:58:33     Building [==========>                ] 24/55: syn, autocfg                                                                                                                                                                                                                                      
+   Compiling serde v1.0.204
+2024-07-17 16:58:33     Building [===========>               ] 25/55: syn, serde(build.rs)                                                                                                                                                                                                                              
+    Building [===========>               ] 26/55: syn, serde(build)                                                                                                                                                                                                                                 
+   Compiling slab v0.4.9
+2024-07-17 16:58:33     Building [============>              ] 27/55: syn, slab(build.rs)                                                                                                                                                                                                                               
+   Compiling rdkafka-sys v4.7.0+2.3.0
+2024-07-17 16:58:34     Building [============>              ] 28/55: syn, rdkafka-sys(build.rs)                                                                                                                                                                                                                        
+   Compiling num_enum_derive v0.5.11
+2024-07-17 16:58:36     Building [=============>             ] 29/55: syn, num_enum_derive                                                                                                                                                                                                                              
+   Compiling serde_derive v1.0.204
+2024-07-17 16:58:38     Building [=============>             ] 30/55: num_enum_derive, serde_derive                                                                                                                                                                                                                     
+    Building [==============>            ] 31/55: libc, serde_derive                                                                                                                                                                                                                                
+   Compiling serde_json v1.0.120
+2024-07-17 16:58:38     Building [==============>            ] 32/55: serde_json(build.rs), serde_derive                                                                                                                                                                                                                
+   Compiling futures-core v0.3.30
+2024-07-17 16:58:38     Building [===============>           ] 33/55: futures-core, serde_derive                                                                                                                                                                                                                        
+   Compiling pin-project-lite v0.2.14
+2024-07-17 16:58:39     Building [===============>           ] 34/55: pin-project-lite, serde_derive                                                                                                                                                                                                                    
+    Building [================>          ] 35/55: serde_json(build), serde_derive                                                                                                                                                                                                                   
+    Building [================>          ] 36/55: libz-sys, serde_derive                                                                                                                                                                                                                            
+   Compiling num_enum v0.5.11
+2024-07-17 16:58:52     Building [=================>         ] 37/55: num_enum, serde_derive                                                                                                                                                                                                                            
+    Building [=================>         ] 38/55: rdkafka-sys(build), serde_derive                                                                                                                                                                                                                  
+    Building [==================>        ] 39/55: rdkafka-sys(build), serde                                                                                                                                                                                                                         
+    Building [==================>        ] 40/55: rdkafka-sys(build), slab(build)                                                                                                                                                                                                                   
+   Compiling pin-utils v0.1.0
+2024-07-17 16:58:52     Building [===================>       ] 41/55: rdkafka-sys(build), pin-utils                                                                                                                                                                                                                     
+   Compiling itoa v1.0.11
+2024-07-17 16:58:52     Building [===================>       ] 42/55: rdkafka-sys(build), itoa                                                                                                                                                                                                                          
+   Compiling ryu v1.0.18
+2024-07-17 16:58:53     Building [====================>      ] 43/55: rdkafka-sys(build), ryu                                                                                                                                                                                                                           
+   Compiling futures-task v0.3.30
+2024-07-17 16:58:53     Building [====================>      ] 44/55: rdkafka-sys(build), futures-task                                                                                                                                                                                                                  
+   Compiling futures-util v0.3.30
+2024-07-17 16:59:03     Building [=====================>     ] 45/55: rdkafka-sys(build), futures-util                                                                                                                                                                                                                  
+    Building [=====================>     ] 46/55: rdkafka-sys(build), serde_json                                                                                                                                                                                                                    
+    Building [======================>    ] 47/55: rdkafka-sys(build), slab                                                                                                                                                                                                                          
+   Compiling tokio v1.38.1
+2024-07-17 16:59:13     Building [======================>    ] 48/55: rdkafka-sys(build), tokio                                                                                                                                                                                                                         
+   Compiling futures-channel v0.3.30
+2024-07-17 16:59:14     Building [=======================>   ] 49/55: rdkafka-sys(build), futures-channel                                                                                                                                                                                                               
+   Compiling log v0.4.22
+2024-07-17 17:00:25     Building [=======================>   ] 50/55: rdkafka-sys(build), log                                                                                                                                                                                                                           
+    Building [========================>  ] 51/55: rdkafka-sys(build)                                                                                                                                                                                                                                
+    Building [========================>  ] 52/55: rdkafka-sys                                                                                                                                                                                                                                       
+   Compiling rdkafka v0.36.2
+2024-07-17 17:00:35     Building [========================>  ] 52/55: rdkafka-sys, rdkafka                                                                                                                                                                                                                              
+    Building [=========================> ] 53/55: rdkafka                                                                                                                                                                                                                                           
+   Compiling test_kafka v0.1.0 (/test_kafka)
+2024-07-17 17:00:35     Building [=========================> ] 54/55: test_kafka(bin)                                                                                                                                                                                                                                   
+    Finished `release` profile [optimized] target(s) in 2m 22s

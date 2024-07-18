@@ -12,13 +12,12 @@ FROM rust:latest
 # Set the working directory inside the container
 WORKDIR /usr/src/scsudoku/oauth_relay_service
 
-# Copies build/.env, build.env.local, build/target/release, etc
+# Copies build/.env,  build/target/release, etc
 # NOTE: Files that are required for THIS service is explicitly copied, so that
 #       if `cargo build --release` had failed, the missing binaries will be
 #       detected and the build will fail.
 COPY build/oauth_relay_service* ./
 COPY build/.env ./
-COPY build/.env.local ./
 COPY build ./
 RUN ls -AR
 

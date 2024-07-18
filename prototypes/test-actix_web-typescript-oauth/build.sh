@@ -2,7 +2,7 @@
 
 npm install dotenv
 
-source .env
+source .env.sh
 
 npm run build
 
