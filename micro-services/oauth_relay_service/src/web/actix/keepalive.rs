@@ -8,7 +8,9 @@ use actix_web::{web, HttpRequest, HttpResponse};
 use serde_json;
 use serde_urlencoded;
 use std::{
-    collections::HashMap, path::Path, time::{Duration, SystemTime, UNIX_EPOCH}
+    collections::HashMap,
+    path::Path,
+    time::{Duration, SystemTime, UNIX_EPOCH},
 };
 
 /// Keep-alive route - Check if the client is authenticated and handle keep-alive
@@ -21,7 +23,7 @@ pub async fn keepalive(
 ) -> HttpResponse {
     let current_dir = std::env::current_dir().unwrap();
     let env_file_path = current_dir.join("build/.env");
-    let config = Config::from_env_paths(env_file_path.as_path());
+    let config = Config::from_local_env_file();
     let query_string = client_http_request.query_string();
     let query_params: HashMap<String, String> =
         serde_urlencoded::from_str(query_string).unwrap_or_else(|_| HashMap::new());

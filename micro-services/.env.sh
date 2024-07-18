@@ -35,6 +35,9 @@ GOOGLE_REDIRECT_URI=http://localhost:${REST_PORT}/auth_callback
 # As for username/passwd for SQL services, it should be at the host access level (i.e. in MySQL, it's via I.P. address)
 # I do agree that CIDN-IP-based access is not the most secure, but I do not wish to over-complicate this project (personally
 # I think stuffing password in a static file here is worse!)
+# NOTE: For SQLite, the directory MUST exist (but if file does not exist, it will be created), and at the same
+# time, if it is within the Docker container, it will be created as a volume (so it will persist)
+DB_CONNECTION=sqlite
 DB_HOST=localhost
 DB_PORT=5432
 DB_STORAGE_PATH=./data/db.sqlite3
@@ -43,7 +46,9 @@ DB_STORAGE_PATH=./data/db.sqlite3
 # Kafka: 9092
 # RabbitMQ (AMQP): 5672
 # Redis: 6379
-BROKER_HOST=localhost
+# Make sure the hostname (BROKER_HOST) matches whats on Docker-Compose hostname
+MQ_CONNECTION=kafka
+BROKER_HOST=kafka_auth_messenger
 BROKER_PORT=9092
 
 # Now load local environment variables, if it exists
@@ -55,13 +60,20 @@ BROKER_PORT=9092
 #   $ source .env && source .env.local
 source .env.local       # nested source'ing...
 
-export GOOGLE_CLIENT_ID
-export GOOGLE_CLIENT_SECRET
-export GOOGLE_REDIRECT_URI
+# In case REST_PORT was overridden in .env.local, we'll need to update this as well:
+GOOGLE_REDIRECT_URI=http://localhost:${REST_PORT}/auth_callback
 
-export DB_HOST
-export DB_PORT
-export DB_STORAGE_PATH
+export REST_PORT=$REST_PORT
 
-export BROKER_HOST
-export BROKER_PORT
+export GOOGLE_CLIENT_ID=$GOOGLE_CLIENT_ID
+export GOOGLE_CLIENT_SECRET=$GOOGLE_CLIENT_SECRET
+export GOOGLE_REDIRECT_URI=$GOOGLE_REDIRECT_URI
+
+export DB_CONNECTION=$DB_CONNECTION
+export DB_HOST=$DB_HOST
+export DB_PORT=$DB_PORT
+export DB_STORAGE_PATH=$DB_STORAGE_PATH
+
+export MQ_CONNECTION=$MQ_CONNECTION
+export BROKER_HOST=$BROKER_HOST
+export BROKER_PORT=$BROKER_PORT

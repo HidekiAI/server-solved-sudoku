@@ -1,5 +1,5 @@
 use actix_web::{web, App, HttpRequest, HttpResponse, HttpServer, Responder};
-use dotenv::dotenv;
+use dotenvy::dotenv;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 use std::{collections::HashMap, fs};
@@ -134,7 +134,7 @@ async fn auth_callback(client_http_request: HttpRequest) -> HttpResponse {
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    dotenv().ok();
+    dotenvy::dotenv().unwrap();
     let redirect_uri = std::env::var("GOOGLE_REDIRECT_URI").expect("REDIRECT_URI must be set");
     // parse redirect_uri (i.e. "http://localhost:8080/auth_callback") and extract port
     let port_from_redirect = redirect_uri.split(":").collect::<Vec<&str>>()[2]

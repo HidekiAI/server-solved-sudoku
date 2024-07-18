@@ -1,21 +1,21 @@
 use crate::{
-    config::Config,
+    config::{Config, HostType},
     data::*,
-    messenger::{self, TMQConnectionLock},
+    messenger::{self, TMQConsumerLock, TMQProducerLock},
     storage::{self, TDBConnectionLock},
     web::web_consts::*,
 };
-use actix_web::{
-    web, HttpRequest, HttpResponse,
-};
+use actix_web::{web, HttpRequest, HttpResponse};
 use anyhow::Result as AnyResult;
 use base64::{engine::general_purpose, Engine};
 use rand::RngCore;
 use serde_urlencoded;
 use std::{
-    collections::HashMap, path::Path, time::{Duration, SystemTime}
+    collections::HashMap,
+    path::Path,
+    time::{Duration, SystemTime},
 };
-use tokio::{time::sleep};
+use tokio::time::sleep;
 
 // HTTP GET to request Google OAuth2 authorization code (AUTH_URL_GET) via OAuth2AuthCodeRequest
 // sample request:
@@ -94,7 +94,7 @@ pub async fn auth_code_callback(
     // NOTE: Don't log query_params, for it contains auth code...
     let client_ip = client_http_request
         .peer_addr()
-        .map(|addr| addr.ip())
+        .map(|addr| HostType::HostAsIP(addr.ip()))
         .unwrap();
     let client_port = client_http_request
         .peer_addr()
@@ -117,9 +117,10 @@ pub async fn auth_code_callback(
         None => {
             let current_dir = std::env::current_dir().unwrap();
             let env_file_path = current_dir.join("build/.env");
-            let config = Config::from_env_paths(env_file_path.as_path());
-            let db_connection = storage::open_db_connection_from_config(config.clone()).await;
-            let mq_connection = messenger::open_mq_connection_from_config(config.clone()).await;
+            let config = Config::from_local_env_file();
+            let db_connection = storage::open_db_connection_from_config(&config).await;
+            let (mq_producer, mq_consumer) =
+                messenger::open_mq_connections_from_config(&config).await;
 
             // First, if it is NOT an error, let's go ahead and request OAuth2Token from Google
             let auth_code = auth_code_response.possible_code.unwrap(); // should panic if code is not present!
@@ -176,7 +177,7 @@ pub async fn auth_code_callback(
                             storage::upsert_token_data(&config, &db_connection, &token_data);
 
                             // 7. Signal/notify/message/publish that we have a new session_id (new login) for any services who cares for that event...
-                            messenger::post_new_login(&config, &mq_connection, &token_data);
+                            messenger::post_new_login(&config, &mq_producer, &token_data);
 
                             // the end...
                             HttpResponse::Ok().finish()
@@ -299,7 +300,8 @@ async fn request_userinfo(
 pub async fn login(
     client_http_request: HttpRequest,
     db_connection: web::Data<TDBConnectionLock>,
-    mq_connection: web::Data<TMQConnectionLock>,
+    mq_producer: web::Data<TMQProducerLock>,
+    mq_consumer: web::Data<TMQConsumerLock>,
     config: web::Data<Config>,
 ) -> HttpResponse {
     //let db_connection = storage::open_db_connection_from_config(config.clone()).await;
@@ -326,7 +328,7 @@ pub async fn login(
     // grab some data we want to setup TokenData (we SHOULD panic if we cannot get client IP/port)
     let client_ip = client_http_request
         .peer_addr()
-        .map(|addr| addr.ip())
+        .map(|addr| HostType::HostAsIP(addr.ip()))
         .unwrap();
     let client_port = client_http_request
         .peer_addr()
@@ -386,7 +388,7 @@ pub async fn login(
         // check if we have a session_id from messenger
         possible_token_response = messenger::get_token(
             &config,
-            &mq_connection,
+            &mq_producer,
             &state.state_token.as_str(),
             |lhs_state_token: &str, token_data: TokenData| {
                 lhs_state_token == token_data.state_token.as_str()

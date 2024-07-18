@@ -1,7 +1,7 @@
 use super::{storage_sqlite, TDBConnectionLock_sqlite};
 use crate::{
     config::Config,
-    messenger::TMQConnectionLock,
+    messenger::{TMQConsumerLock, TMQProducerLock},
     web::actix::{keepalive, login},
 };
 use actix_web::{web, App, HttpServer};
@@ -14,7 +14,8 @@ const HTTP_LISTEN_ADDR: &str = "0.0.0.0:8080";
 pub async fn sqlite_actix_main(
     config: &Config,
     db_connection: &TDBConnectionLock_sqlite,
-    mq_connection: &TMQConnectionLock,
+    mq_producer: &TMQProducerLock,
+    mq_consumer: &TMQConsumerLock,
 ) -> AnyResult<(), std::io::Error> {
     // create DB table in case it does not exist yet
     storage_sqlite::create_table_token(db_connection)
@@ -22,7 +23,7 @@ pub async fn sqlite_actix_main(
         .unwrap();
 
     let db_connection_as_data = web::Data::new(db_connection.clone()); // cloning an Arc<T> just means incrementing the reference count
-    let mq_connection_as_data = web::Data::new(mq_connection.clone());
+    let mq_connection_as_data = web::Data::new(mq_producer.clone());
     let config_as_data = web::Data::new(config.clone());
     let http_server = HttpServer::new(move || {
         App::new()

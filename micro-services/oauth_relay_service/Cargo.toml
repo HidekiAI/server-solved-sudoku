@@ -14,7 +14,6 @@ actix-web = { version = "4.8.0", features = ["openssl"] }
 reqwest = { version = "^0.12.5", features = ["json", "gzip", "stream", "socks"] }
 serde = { version = "1.0.203", features = ["derive"] }
 serde_json = "1.0.120"
-dotenv = "0.15.0"
 tokio-rusqlite = "0.5.1"
 anyhow = "1.0.86"
 rand = "0.8.5"
@@ -29,3 +28,5 @@ dns-lookup = "2.0.4"
 rdkafka = { version = "0.36.2", features = ["cmake-build"] }
 actix-files = "0.6.6"
 crc64 = "2.0.0"
+dotenvy = { version = "0.15.7", features = ["cli"] }
+dotenvy_macro = "0.15.7"

@@ -1,4 +1,4 @@
-version: '3.8'
+# See: https://github.com/compose-spec/compose-spec/blob/main/spec.md
 
 # Ports (from external hosts (including WAN)):
 # host -> container:port
@@ -6,45 +6,57 @@ version: '3.8'
 # 9092 -> kafka:9092 
 # NOTE: See comment in '.env' file, IF you're running `docker-compose build` from MSys
 #       P/S: DO _NOT_ enable Kubernetes on Windows version, it will make your life miserable!
-networks:
-  app-tier:
-    driver: bridge
-
+# NOTE: Docker Compose Internal DNS service will let you refer to other hosts by service name
+#       e.g. 'kafka_auth_messenger', 'oauth_relay_service', etc. without needing to use 
+#       the "hostname: my_host_name" magically AS LONG AS they're in the same network
+#       (in this case, 'ms_network_bridge') AND the container is running.  When it isn't
+#       running, the name lookup (i.e. 'nslookup kafka_auth_messenger') will fail instantly.
 services:
   oauth_relay_service:
     build: oauth_relay_service
     networks:
-      - app-tier
+      - ms_network_bridge
+    depends_on:
+      kafka_auth_messenger:
+        condition: service_started
     environment:
       - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
       - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
       - GOOGLE_REDIRECT_URI=${GOOGLE_REDIRECT_URI}
       - REST_PORT=${REST_PORT}
+      - DB_CONNECTION=${DB_CONNECTION}
       - DB_HOST=${DB_HOST}
       - DB_PORT=${DB_PORT}
       - DB_STORAGE_PATH=${DB_STORAGE_PATH}
+      - MQ_CONNECTION=${MQ_CONNECTION}
       - BROKER_HOST=${BROKER_HOST}
       - BROKER_PORT=${BROKER_PORT}
     ports:
       #- "8080:8080" # HTTP/REST
-      - "${REST_PORT}:${REST_PORT}" # HTTP/REST
+      #- "${REST_PORT}:${REST_PORT}" # HTTP/REST
+      - published: ${REST_PORT}
+        target: ${REST_PORT}
+        protocol: tcp
     volumes:
-      - ./data:/usr/src/oauth_relay_service/${DB_STORAGE_PATH}
+      - "sqlite_data:/${DB_STORAGE_PATH}:rw"
+    entrypoint: 
+      ["./verify-kafka.sh", "kafka_auth_messenger", "${BROKER_PORT}", "./oauth_relay_service"]
 
   # see: https://github.com/bitnami/containers/blob/main/bitnami/kafka/docker-compose.yml
-  kafka:
+  kafka_auth_messenger:
     image: 
       #docker.io/bitnami/kafka:3.7
       'bitnami/kafka:latest'
     networks:
-      - app-tier
+      - ms_network_bridge
     environment:
+      - MQ_CONNECTION=${MQ_CONNECTION}
       - BROKER_HOST=${BROKER_HOST}
       - BROKER_PORT=${BROKER_PORT}
       # KRaft settings
       - KAFKA_CFG_NODE_ID=0
       - KAFKA_CFG_PROCESS_ROLES=controller,broker
-      - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=0@kafka:9093
+      - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=0@localhost:9093
       # Listeners
       - KAFKA_CFG_LISTENERS=PLAINTEXT://:${BROKER_PORT},CONTROLLER://:9093
       - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://:${BROKER_PORT}
@@ -53,12 +65,26 @@ services:
       - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=PLAINTEXT
     ports:
       # Make sure this matches BROKER_PORT in .env!
+      - published: ${BROKER_PORT}
+        target: ${BROKER_PORT}
+        protocol: tcp
       #- "9092:9092"
-      - "${BROKER_PORT}:${BROKER_PORT}"
     volumes:
       # see: https://hub.docker.com/r/bitnami/kafka
-      - "kafka_data:/bitnami"
+      - "kafka_auth_data:/bitnami:rw"
+    healthcheck:
+      test: ["CMD", "/opt/bitnami/kafka/bin/kafka-broker-api-versions.sh", "--bootstrap-server", "localhost:${BROKER_PORT}"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
 
 volumes:
-  kafka_data:
+  kafka_auth_data:
     driver: local
+  sqlite_data:
+    driver: local
+
+# Don't define networks unless you have specific needs to isolate it from the default bridge
+networks:
+  ms_network_bridge:
+    driver: bridge

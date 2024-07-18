@@ -69,6 +69,7 @@ if grep -q "failed" ./.docker-status.txt ; then
     echo '$ sudo service docker start'
     exit -1
 fi
+docker-compose down --remove-orphans
 
 if [ "${VCPKG_ROOT}" == "" ] ; then
     echo "# Please set VCPKG_ROOT to the directory where vcpkg is installed"
@@ -150,6 +151,7 @@ if [ "${GOOGLE_CLIENT_SECRET}" == "your_google_client_secret" ] ; then
     echo "# Please update GOOGLE_CLIENT_SECRET in your .env.local" 
     exit -1
 fi
+docker-compose config
 docker-compose --verbose --ansi=auto build --progress=plain
 
 # CLEAN UP
@@ -176,8 +178,26 @@ echo "# After cleaning up duplicated .env* files:"
 find . -name ".env*"
 
 cd ${_MICRO_SERVICE_DIR}
-docker-compose --verbose images
+docker-compose images
 
 popd 2>&1 > /dev/null
 
 docker image list
+
+docker-compose --ansi=auto up --detach
+docker-compose ps --all
+docker network ls
+# Make sure the network name matches Docker-Compose network name
+for _ID in $(docker network ls | gawk '{print $2}' | tail -n +2) ; do 
+    echo "########################### $_ID"
+    docker network inspect $_ID | grep --color=auto "^\|Subnet\|Gateway\|Address"
+done
+echo "########################### "
+#docker network inspect micro-services_ms_network_bridge 
+
+docker-compose logs kafka_auth_messenger
+docker-compose logs oauth_relay_service 
+#docker-compose logs --follow 
+sleep 15
+docker-compose logs
+docker container ls

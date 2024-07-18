@@ -51,9 +51,10 @@ INSERT INTO tokens (
 "#;
 pub(crate) async fn store_token(
     db_connection: &TDBConnectionLock_sqlite,
-    token_data_no_session_id: TokenData,
+    token_data_no_session_id_ref: &TokenData,
 ) -> tokio_rusqlite::Result<i64> {
     let conn = db_connection.lock().await;
+    let token_data_no_session_id = token_data_no_session_id_ref.clone();
     conn.call(move |conn| {
         conn.execute(
             INSERT_TOKEN,

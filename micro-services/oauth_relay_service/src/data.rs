@@ -4,6 +4,8 @@ use std::{
     time::{SystemTime, UNIX_EPOCH},
 };
 
+use crate::config::HostType;
+
 //pub async fn httpresponse_body_to_json(http_response: reqwest::Response) -> AnyResult<TokenData> {
 //    let vec_u8 = http_response.bytes().await.unwrap().to_vec();
 //    let token_data = serde_json::from_str(
@@ -49,7 +51,7 @@ pub struct TokenData {
     session_id: SessionIDType, // for example, for SQL-based (including SQLite, it's the unique-key index), for no-sql, HASH of access_token?
     pub state_token: String,   // used to prevent CSRF attacks
 
-    pub client_address: std::net::IpAddr, // either IPv4 or IPv6
+    pub client_address: HostType, // either IPv4 or IPv6
     pub client_port: u16,
     pub possible_client_email: Option<String>, // optionally, client email address used to auth against
 
@@ -97,7 +99,7 @@ impl TokenData {
     pub fn new(
         session_id: SessionIDType,
         state_token: String,
-        client_address: std::net::IpAddr,
+        client_address: HostType,
         client_port: u16,
         possible_client_email: Option<String>,
         access_token: String,
@@ -266,19 +268,19 @@ pub struct OAuth2AuthCodeRequest {
 // See the OpenID Connect documentation for an example of how to create and confirm a state token.
 #[derive(Serialize, Deserialize, Clone)]
 pub struct OAuth2AuthCodeRequestState {
-    pub login_client_ip: std::net::IpAddr,
+    pub login_client_ip: HostType,
     pub login_client_port: u16,
 
     pub session_id: SessionIDType,
     pub state_token: String,
 
     pub db_type: String,                               // SQLite or PostgresSQL
-    pub possible_db_address: Option<std::net::IpAddr>, // for PostgresSQL
+    pub possible_db_address: Option<HostType>, // for PostgresSQL
     pub possible_db_port: Option<u16>,                 // for PostgresSQL
     pub possible_db_path: Option<String>,              // for SQLite
 
     pub mq_type: String,                               // None, Kafka, etc
-    pub possible_mq_address: Option<std::net::IpAddr>, // for PostgresSQL
+    pub possible_mq_address: Option<HostType>, // for PostgresSQL
     pub possible_mq_port: Option<u16>,                 // for PostgresSQL
 }
 pub fn encode_state_token(possible_state: Option<OAuth2AuthCodeRequestState>) -> Option<String> {

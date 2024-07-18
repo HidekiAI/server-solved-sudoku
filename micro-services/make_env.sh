@@ -59,9 +59,10 @@ fi
 #   'set -o nounset   # exit when your script tries to use undeclared variables'
 # will be removed; not that in '.env.sh' file, I've INTENTIONALLY added comments
 # to lines that python dotenv disagrees with.
-grep -v "#" ${_SOURCE} > ${_DEST}
+grep -v "#" ${_SOURCE} | grep -v "^set \|^source " > ${_DEST}
 # now post-end the '.env' file with the '.env.local' file so that all the local
 # assignes will be overridden:
-grep -v "#" ${_LOCAL} >> ${_DEST}
+grep -v "#" ${_LOCAL} | grep -v "^set \|^source " >> ${_DEST}
+chmod +x ${_DEST}
 
 echo "# Created '${_DEST}' file @ $(pwd) based on '${_SOURCE}' and '${_LOCAL}'"

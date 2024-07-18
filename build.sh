@@ -26,6 +26,7 @@ fi
 
 # first, install base dependencies either for MinGW or Linux
 if [ "$(uname -o)" == "Msys" ] ; then
+    echo "# Building on MSYS/MinGW: $(uname -a)"
     pacman --sync --noconfirm           \
         zip unzip                       \
         $(make_mingw "toolchain")       \
@@ -34,6 +35,7 @@ if [ "$(uname -o)" == "Msys" ] ; then
         $(make_mingw "pkg-config")      \
         $(make_mingw "pkgconf")         \
         $(make_mingw "make") $(make_mingw "cmake") \
+        $(make_mingw "zstd") libzstd libzstd-devel zstd \
         libsqlite-devel
 
     # Install vcpkg
@@ -53,9 +55,10 @@ if [ "$(uname -o)" == "Msys" ] ; then
     vcpkg install librdkafka:x64-mingw-dynamic
     pacman --sync --noconfirm           \
         $(make_mingw "librdkafka")
-
+    
 elif [ "$(uname -o)" == "GNU/Linux" ] ; then
     # Linux
+    echo "# Building on Linux: $(uname -a)"
     sudo apt-get install -y --install-recommends \
         zip unzip curl \
         gcc g++ cmake make \
@@ -96,11 +99,8 @@ elif [ "$(uname -o)" == "GNU/Linux" ] ; then
         exit -1
     fi
     vcpkg install librdkafka:x64-linux
-
-    # odd cases where reinstall is needed
-    sudo apt-get reinstall -y --install-recommends \
-        librdkafka*
 else
+    echo "# You're using an O/S that understands 'uname' $(uname -o) command, but I don't know what it is... $(uname -a)"
     # Windows or some other OS I care not about...
     echo "OS not supported"
     exit -1
